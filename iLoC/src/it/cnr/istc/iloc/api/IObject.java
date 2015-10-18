@@ -20,6 +20,7 @@ package it.cnr.istc.iloc.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -115,6 +116,8 @@ public interface IObject extends IEnvironment {
                 fields.addAll(c_type.getFields().values().stream().filter(field -> !field.isSynthetic()).collect(Collectors.toList()));
                 c_type = c_type.getSuperclass();
             }
+            assert fields.stream().map(field -> get(field.getName())).noneMatch(Objects::isNull);
+            assert fields.stream().map(field -> expression.get(field.getName())).noneMatch(Objects::isNull);
             List<IBool> c_terms = fields.stream().map(field -> get(field.getName()).eq(expression.get(field.getName()))).collect(Collectors.toList());
             if (c_terms.isEmpty()) {
                 // Objects are logically equivalent
