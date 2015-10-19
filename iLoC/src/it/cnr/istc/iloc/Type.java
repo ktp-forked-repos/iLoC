@@ -291,7 +291,7 @@ public class Type extends Scope implements IType {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("(").append(name).append("\n");
-        getFields().keySet().stream().forEach((field) -> {
+        getFields().keySet().stream().forEach(field -> {
             sb.append("  ").append(field).append("\n");
         });
         constructors.stream().forEach((c) -> {
