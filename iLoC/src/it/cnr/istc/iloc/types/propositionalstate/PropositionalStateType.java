@@ -91,29 +91,52 @@ public class PropositionalStateType extends Type {
         );
 
         if (!lazy_scheduling) {
-            IPredicate predicate = null;
             try {
                 if (formula.getType().getName().endsWith("True")) {
-                    predicate = formula.getType().getEnclosingScope().getPredicate(formula.getType().getName().substring(0, formula.getType().getName().length() - 4) + "False");
+                    IPredicate predicate = formula.getType().getEnclosingScope().getPredicate(formula.getType().getName().substring(0, formula.getType().getName().length() - 4) + "False");
+                    predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active).forEach(f -> {
+                        List<IBool> or = new ArrayList<>();
+                        // Either they have different parameters ..
+                        formula.getType().getFields().values().stream().filter(field -> !field.isSynthetic() && !(field.getName().equals(Constants.START) || field.getName().equals(Constants.END) || field.getName().equals(Constants.DURATION))).forEach(field -> {
+                            or.add(network.not(formula.get(field.getName()).eq(f.get(field.getName()))));
+                        });
+                        // .. or they are ordered
+                        or.add(network.leq(f.get(Constants.END), start));
+                        or.add(network.leq(end, f.get(Constants.START)));
+                        network.assertFacts(network.or(or.toArray(new IBool[or.size()])));
+                    });
                 } else if (formula.getType().getName().endsWith("False")) {
-                    predicate = formula.getType().getEnclosingScope().getPredicate(formula.getType().getName().substring(0, formula.getType().getName().length() - 5) + "True");
+                    IPredicate predicate = formula.getType().getEnclosingScope().getPredicate(formula.getType().getName().substring(0, formula.getType().getName().length() - 5) + "True");
+                    predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active).forEach(f -> {
+                        List<IBool> or = new ArrayList<>();
+                        // Either they have different parameters ..
+                        formula.getType().getFields().values().stream().filter(field -> !field.isSynthetic() && !(field.getName().equals(Constants.START) || field.getName().equals(Constants.END) || field.getName().equals(Constants.DURATION))).forEach(field -> {
+                            or.add(network.not(formula.get(field.getName()).eq(f.get(field.getName()))));
+                        });
+                        // .. or they are ordered
+                        or.add(network.leq(f.get(Constants.END), start));
+                        or.add(network.leq(end, f.get(Constants.START)));
+                        network.assertFacts(network.or(or.toArray(new IBool[or.size()])));
+                    });
                 } else {
-                    predicate = formula.getType();
+                    IPredicate predicate = formula.getType();
+                    predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active).forEach(f -> {
+                        List<IBool> or = new ArrayList<>();
+                        // Either they have different parameters ..
+                        formula.getType().getFields().values().stream().filter(field -> !field.isSynthetic() && !(field.getName().equals(Constants.START) || field.getName().equals(Constants.END) || field.getName().equals(Constants.DURATION) || field.getName().equals("value"))).forEach(field -> {
+                            or.add(network.not(formula.get(field.getName()).eq(f.get(field.getName()))));
+                        });
+                        // .. they are have the same value ..
+                        or.add(formula.get("value").eq(f.get("value")));
+                        // .. or they are ordered
+                        or.add(network.leq(f.get(Constants.END), start));
+                        or.add(network.leq(end, f.get(Constants.START)));
+                        network.assertFacts(network.or(or.toArray(new IBool[or.size()])));
+                    });
                 }
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(PropositionalStateType.class.getName()).log(Level.SEVERE, null, ex);
             }
-            predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active).forEach(f -> {
-                List<IBool> or = new ArrayList<>();
-                // .. or they have different parameters ..
-                formula.getType().getFields().values().stream().filter(field -> !field.isSynthetic() && !(field.getName().equals(Constants.START) || field.getName().equals(Constants.END) || field.getName().equals(Constants.DURATION))).forEach(field -> {
-                    or.add(network.not(formula.get(field.getName()).eq(f.get(field.getName()))));
-                });
-                // .. or are ordered
-                or.add(network.leq(f.get(Constants.END), start));
-                or.add(network.leq(end, f.get(Constants.START)));
-                network.assertFacts(network.or(or.toArray(new IBool[or.size()])));
-            });
         }
     }
 }
