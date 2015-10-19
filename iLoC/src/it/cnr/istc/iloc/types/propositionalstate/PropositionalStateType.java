@@ -93,6 +93,12 @@ public class PropositionalStateType extends Type {
         if (!lazy_scheduling) {
             try {
                 if (formula.getType().getName().endsWith("True")) {
+                    /**
+                     * Activated formula is a positive polarity formula
+                     * therefore it must be scheduled only with negative
+                     * polarity formulas having the same predicate and the same
+                     * parameters.
+                     */
                     IPredicate predicate = formula.getType().getEnclosingScope().getPredicate(formula.getType().getName().substring(0, formula.getType().getName().length() - 4) + "False");
                     predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active).forEach(f -> {
                         List<IBool> or = new ArrayList<>();
@@ -106,6 +112,12 @@ public class PropositionalStateType extends Type {
                         network.assertFacts(network.or(or.toArray(new IBool[or.size()])));
                     });
                 } else if (formula.getType().getName().endsWith("False")) {
+                    /**
+                     * Activated formula is a negative polarity formula
+                     * therefore it must be scheduled only with positive
+                     * polarity formulas having the same predicate and the same
+                     * parameters.
+                     */
                     IPredicate predicate = formula.getType().getEnclosingScope().getPredicate(formula.getType().getName().substring(0, formula.getType().getName().length() - 5) + "True");
                     predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active).forEach(f -> {
                         List<IBool> or = new ArrayList<>();
@@ -119,6 +131,12 @@ public class PropositionalStateType extends Type {
                         network.assertFacts(network.or(or.toArray(new IBool[or.size()])));
                     });
                 } else {
+                    /**
+                     * Activated formula is a multivalued function formula
+                     * therefore it must be scheduled only with multivalued
+                     * function formulas having the same predicate, the same
+                     * parameters and a different value.
+                     */
                     IPredicate predicate = formula.getType();
                     predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active).forEach(f -> {
                         List<IBool> or = new ArrayList<>();
@@ -126,7 +144,7 @@ public class PropositionalStateType extends Type {
                         formula.getType().getFields().values().stream().filter(field -> !field.isSynthetic() && !(field.getName().equals(Constants.START) || field.getName().equals(Constants.END) || field.getName().equals(Constants.DURATION) || field.getName().equals("value"))).forEach(field -> {
                             or.add(network.not(formula.get(field.getName()).eq(f.get(field.getName()))));
                         });
-                        // .. they are have the same value ..
+                        // .. or they are have the same value ..
                         or.add(formula.get("value").eq(f.get("value")));
                         // .. or they are ordered
                         or.add(network.leq(f.get(Constants.END), start));
