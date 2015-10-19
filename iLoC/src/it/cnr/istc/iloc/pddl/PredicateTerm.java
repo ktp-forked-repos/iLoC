@@ -138,7 +138,7 @@ class PredicateTerm implements Term {
         }
         assert translation != null;
 
-        translation.add("name", Utils.lowercase(predicate.getName()));
+        translation.add("name", Utils.lowercase(predicate.getName()) + (directed ? "_true" : "_false"));
         translation.add("predicate_name", Utils.capitalize(predicate.getName()) + (directed ? "True" : "False"));
         translation.add("assignments", assignments);
 

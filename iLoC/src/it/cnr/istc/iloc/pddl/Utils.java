@@ -83,7 +83,12 @@ class Utils {
         INF("inf"),
         TRUE("true"),
         FALSE("false"),
-        RETURN("return");
+        STATE("state"),
+        RETURN("return"),
+        AT("at"),
+        START("start"),
+        END("end"),
+        DURATION("duration");
         public final String name;
 
         private Keyword(String name) {
