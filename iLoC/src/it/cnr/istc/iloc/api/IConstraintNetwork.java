@@ -119,25 +119,25 @@ public interface IConstraintNetwork {
      * Creates and returns a new enumerative variable having the given objects
      * as allowed variables.
      *
-     * @param <T> the type of the allowed values of the enumerative variable.
+     * @param type the type of the allowed values of the enumerative variable.
      * @param values the allowed values of the enumerative variable.
      * @return an enumerative variable having the given objects as allowed
      * variables.
      */
-    public <T extends IObject> IEnum newEnum(List<T> values);
+    public IEnum newEnum(IType type, List<IObject> values);
 
     /**
      * Creates and returns a new enumerative variable having the given integer
      * variable as controller variable and the given objects as allowed
      * variables.
      *
-     * @param <T> the type of the allowed values of the enumerative variable.
+     * @param type the type of the allowed values of the enumerative variable.
      * @param var the controller variable.
      * @param values the allowed values of the enumerative variable.
      * @return an enumerative variable having the given objects as allowed
      * variables.
      */
-    public <T extends IObject> IEnum newEnum(IInt var, List<T> values);
+    public IEnum newEnum(IType type, IInt var, List<IObject> values);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents

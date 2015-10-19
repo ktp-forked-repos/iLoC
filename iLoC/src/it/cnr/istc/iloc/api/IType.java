@@ -137,7 +137,7 @@ public interface IType extends IScope {
      * @return an existential of this {@code IType} object.
      */
     public default IEnum newExistential() {
-        return getSolver().getConstraintNetwork().newEnum(getInstances());
+        return getSolver().getConstraintNetwork().newEnum(this, getInstances());
     }
 
     /**
