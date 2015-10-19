@@ -124,7 +124,7 @@ public interface IConstraintNetwork {
      * @return an enumerative variable having the given objects as allowed
      * variables.
      */
-    public IEnum newEnum(IType type, List<IObject> values);
+    public IEnum newEnum(IType type, List<? extends IObject> values);
 
     /**
      * Creates and returns a new enumerative variable having the given integer
@@ -137,7 +137,7 @@ public interface IConstraintNetwork {
      * @return an enumerative variable having the given objects as allowed
      * variables.
      */
-    public IEnum newEnum(IType type, IInt var, List<IObject> values);
+    public IEnum newEnum(IType type, IInt var, List<? extends IObject> values);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
