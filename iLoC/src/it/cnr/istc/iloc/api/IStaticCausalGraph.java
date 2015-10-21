@@ -153,6 +153,14 @@ public interface IStaticCausalGraph {
     public void removeEdge(IEdge edge);
 
     /**
+     * Returns all the nodes that are reachable from the given node.
+     *
+     * @param node the node from which all the reachable nodes are computed.
+     * @return all the nodes that are reachable from the given node.
+     */
+    public Set<INode> getAllReachableNodes(INode node);
+
+    /**
      * Returns {@code true} if and only if there exists a causal path between
      * the node {@code source} and the node {@code target}.
      *
@@ -161,7 +169,44 @@ public interface IStaticCausalGraph {
      * @return {@code true} if and only if there exists a causal path between
      * the node {@code source} and the node {@code target}.
      */
-    public boolean existsPath(INode source, INode target);
+    public default boolean existsPath(INode source, INode target) {
+        return getAllReachableNodes(source).contains(target);
+    }
+
+    /**
+     * Returns the minimum possible reachable nodes that are reachable from the
+     * given node. This method takes care of possible OR nodes.
+     *
+     * @param node the node from which the minimum number of reachable nodes are
+     * computed.
+     * @return the minimum possible reachable nodes that are reachable from the
+     * given node.
+     */
+    public Set<INode> getAllMinReachableNodes(INode node);
+
+    /**
+     * Returns the minimum possible reachable nodes that are reachable from the
+     * given node. This method takes care of possible OR nodes as well as the
+     * current status of the current partial solution (i.e., if there exist
+     * active formulas).
+     *
+     * @param node the node from which the minimum number of reachable nodes are
+     * computed.
+     * @return the minimum possible reachable nodes that are reachable from the
+     * given node.
+     */
+    public Set<INode> getMinReachableNodes(INode node);
+
+    /**
+     * Returns a lower bound for the resolution of the given node. This method
+     * takes care of possible OR nodes as well as the current status of the
+     * current partial solution (i.e., if there exist active formulas).
+     *
+     * @param node the node from which lower bound for the resolution is
+     * computed.
+     * @return the lower bound for the resolution of the given node.
+     */
+    public double getMinCausalDistance(INode node);
 
     /**
      * Adds a listener to the given static causal graph for detecting
@@ -187,45 +232,6 @@ public interface IStaticCausalGraph {
          * @return a collection containing all the edges exiting from this node.
          */
         public Collection<IEdge> getExitingEdges();
-
-        /**
-         * Returns all the nodes that are reachable from this node.
-         *
-         * @return all the nodes that are reachable from this node.
-         */
-        public Set<INode> getAllReachableNodes();
-
-        /**
-         * Returns all the edges that are walkable from this node.
-         *
-         * @return all the edges that are walkable from this node.
-         */
-        public Set<IEdge> getAllWalkableEdges();
-
-        /**
-         * Returns the minimum number of reachable nodes that are reachable from
-         * this node. This method takes care of possible OR nodes.
-         *
-         * @return the minimum number of reachable nodes that are reachable from
-         * this node.
-         */
-        public Set<INode> getMinReachableNodes();
-
-        /**
-         * Returns the minimum number of walkable edges that are walkable from
-         * this node.
-         *
-         * @return the minimum number of walkable edges that are walkable from
-         * this node.
-         */
-        public Set<IEdge> getMinWalkableEdges();
-
-        /**
-         * Returns the minimum sum of walkable edges weights.
-         *
-         * @return the minimum sum of walkable edges weights.
-         */
-        public double getMinWalkableEdgesWeight();
     }
 
     public interface IEdge {
@@ -245,13 +251,6 @@ public interface IStaticCausalGraph {
          * @return the target of this edge.
          */
         public INode getTarget();
-
-        /**
-         * Returns the weight of this edge.
-         *
-         * @return the weight of this edge.
-         */
-        public double getWeight();
 
         public enum Type {
 
@@ -303,31 +302,6 @@ public interface IStaticCausalGraph {
 
         @Override
         public default Collection<IEdge> getExitingEdges() {
-            throw new AssertionError("No-op nodes do not have exiting edges..");
-        }
-
-        @Override
-        public default Set<INode> getAllReachableNodes() {
-            throw new AssertionError("No-op nodes do not have exiting edges..");
-        }
-
-        @Override
-        public default Set<INode> getMinReachableNodes() {
-            throw new AssertionError("No-op nodes do not have exiting edges..");
-        }
-
-        @Override
-        public default Set<IEdge> getAllWalkableEdges() {
-            throw new AssertionError("No-op nodes do not have exiting edges..");
-        }
-
-        @Override
-        public default Set<IEdge> getMinWalkableEdges() {
-            throw new AssertionError("No-op nodes do not have exiting edges..");
-        }
-
-        @Override
-        public default double getMinWalkableEdgesWeight() {
             throw new AssertionError("No-op nodes do not have exiting edges..");
         }
     }
