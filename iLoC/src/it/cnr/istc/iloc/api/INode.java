@@ -82,11 +82,14 @@ public interface INode {
 
     /**
      * Performs causal propagation (i.e., resolves all the flaws having a single
-     * resolver).
+     * resolver). In order to avoid infinite propagation, a bound is given.
      *
-     * @return {@code false} if an early inconsistency has been detected.
+     * @param bound a bound on the propagation.
+     * @return {@code true} if propagation suceeds, {@code false} if an early
+     * inconsistency has been detected and {@code null} if the bound has been
+     * reached.
      */
-    public boolean propagate();
+    public Boolean propagate(int bound);
 
     /**
      * Enqueues a flaw to this node object.
@@ -118,7 +121,10 @@ public interface INode {
      * inconsistency is detected, the solver will move to another search space
      * node.
      *
-     * @return {@code false} if it is not possible to make this node consistent.
+     * @param bound a bound on the propagation.
+     * @return {@code true} if propagation suceeds, {@code false} if an early
+     * inconsistency has been detected and {@code null} if the bound has been
+     * reached.
      */
-    public boolean checkConsistency();
+    public Boolean checkConsistency(int bound);
 }

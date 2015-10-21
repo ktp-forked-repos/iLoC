@@ -78,9 +78,10 @@ public interface ISolver extends IScope, IEnvironment {
      *
      * @param node the target node.
      * @return {@code true} if the target node is reachable and no inconsistency
-     * has been detected.
+     * has been detected, {@code false} if an early inconsistency has been
+     * detected and {@code null} if the bound has been reached.
      */
-    public boolean goTo(INode node);
+    public Boolean goTo(INode node);
 
     /**
      * Solves the given reasoning problem by propagating constraints and
