@@ -140,10 +140,9 @@ public interface IStaticCausalGraph {
      * @param type the type of the edge
      * @param source the source of the edge.
      * @param target the target of the edge.
-     * @param weight the weight of the edge.
      * @return the new edge between the given nodes.
      */
-    public IEdge addEdge(IEdge.Type type, INode source, INode target, double weight);
+    public IEdge addEdge(IEdge.Type type, INode source, INode target);
 
     /**
      * Removes an edge from this static causal graph.
