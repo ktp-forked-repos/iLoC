@@ -79,7 +79,7 @@ public interface ISolver extends IScope, IEnvironment {
      * @param node the target node.
      * @return {@code true} if the target node is reachable and no inconsistency
      * has been detected, {@code false} if an early inconsistency has been
-     * detected and {@code null} if the bound has been reached.
+     * detected and {@code null} if the propagation bound has been reached.
      */
     public Boolean goTo(INode node);
 

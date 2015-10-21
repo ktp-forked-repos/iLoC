@@ -85,9 +85,9 @@ public interface INode {
      * resolver). In order to avoid infinite propagation, a bound is given.
      *
      * @param bound a bound on the propagation.
-     * @return {@code true} if propagation suceeds, {@code false} if an early
-     * inconsistency has been detected and {@code null} if the bound has been
-     * reached.
+     * @return {@code true} if propagation has succeeded, {@code false} if an
+     * early inconsistency has been detected and {@code null} if the bound has
+     * been reached.
      */
     public Boolean propagate(int bound);
 
@@ -122,7 +122,7 @@ public interface INode {
      * node.
      *
      * @param bound a bound on the propagation.
-     * @return {@code true} if propagation suceeds, {@code false} if an early
+     * @return {@code true} if the node is consistent, {@code false} if an early
      * inconsistency has been detected and {@code null} if the bound has been
      * reached.
      */
