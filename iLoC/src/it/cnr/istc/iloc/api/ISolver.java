@@ -127,6 +127,20 @@ public interface ISolver extends IScope, IEnvironment {
      */
     public INode getCurrentNode();
 
+    /**
+     * Returns the number of nodes of the search space.
+     *
+     * @return the number of nodes of the search space.
+     */
+    public int getSearchSpaceSize();
+
+    /**
+     * Returns the number of nodes in the fringe of the search space.
+     *
+     * @return the number of nodes in the fringe of the search space.
+     */
+    public int getFringeSize();
+
     public void addSolverListener(ISolverListener listener);
 
     public void removeSolverListener(ISolverListener listener);
