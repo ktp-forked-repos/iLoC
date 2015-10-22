@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -316,12 +317,8 @@ class StaticCausalGraph implements IStaticCausalGraph {
                 }
                 return min_distance;
             } else if (!(node instanceof INoOpNode)) {
-                Collection<IEdge> exitingEdges = node.getExitingEdges();
-                if (exitingEdges.isEmpty()) {
-                    return 0;
-                } else {
-                    return 1 + node.getExitingEdges().stream().filter(edge -> edge.getType() == IEdge.Type.Goal).mapToInt(edge -> getMinCausalDistance(edge.getTarget(), visited)).max().getAsInt();
-                }
+                OptionalInt max = node.getExitingEdges().stream().filter(edge -> edge.getType() == IEdge.Type.Goal).mapToInt(edge -> getMinCausalDistance(edge.getTarget(), visited)).max();
+                return 1 + (max.isPresent() ? max.getAsInt() : 0);
             }
             return 0;
         } else {
