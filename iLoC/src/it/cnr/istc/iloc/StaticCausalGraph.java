@@ -16,8 +16,10 @@
  */
 package it.cnr.istc.iloc;
 
+import it.cnr.istc.iloc.api.FormulaState;
 import it.cnr.istc.iloc.api.IDisjunct;
 import it.cnr.istc.iloc.api.IDisjunction;
+import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.IPredicate;
 import it.cnr.istc.iloc.api.IPreference;
 import it.cnr.istc.iloc.api.IScope;
@@ -264,7 +266,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
     private Set<INode> getMinReachableNodes(INode node, Set<INode> visited) {
         if (!visited.contains(node)) {
             if (node instanceof IPredicateNode) {
-                if (((IPredicateNode) node).getPredicate().getInstances().isEmpty()) {
+                if (((IPredicateNode) node).getPredicate().getInstances().stream().map(instance -> (IFormula) instance).noneMatch(formula -> formula.getFormulaState() == FormulaState.Active)) {
                     visited.add(node);
                 } else {
                     return visited;
@@ -274,7 +276,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
                 int min_nodes_size = Integer.MAX_VALUE;
                 Set<INode> min_nodes = null;
                 for (IDisjunct disjunct : ((IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
-                    Set<INode> c_nodes = getAllMinReachableNodes(getNode(disjunct), new HashSet<>(visited));
+                    Set<INode> c_nodes = getMinReachableNodes(getNode(disjunct), new HashSet<>(visited));
                     if (c_nodes.size() < min_nodes_size) {
                         min_nodes_size = c_nodes.size();
                         min_nodes = c_nodes;
@@ -282,7 +284,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
                 }
                 visited.addAll(min_nodes);
             } else if (!(node instanceof INoOpNode)) {
-                visited.addAll(node.getExitingEdges().stream().flatMap(edge -> getAllMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
+                visited.addAll(node.getExitingEdges().stream().flatMap(edge -> getMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
             }
             return visited;
         } else {
@@ -298,7 +300,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
     private int getMinCausalDistance(INode node, Set<INode> visited) {
         if (!visited.contains(node)) {
             if (node instanceof IPredicateNode) {
-                if (((IPredicateNode) node).getPredicate().getInstances().isEmpty()) {
+                if (((IPredicateNode) node).getPredicate().getInstances().stream().map(instance -> (IFormula) instance).noneMatch(formula -> formula.getFormulaState() == FormulaState.Active)) {
                     visited.add(node);
                 } else {
                     return 0;

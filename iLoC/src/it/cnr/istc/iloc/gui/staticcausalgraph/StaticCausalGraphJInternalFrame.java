@@ -157,9 +157,11 @@ public class StaticCausalGraphJInternalFrame extends JInternalFrame implements S
     public void solverChanged(ISolver solver) {
         if (this.solver != null) {
             this.solver.getStaticCausalGraph().removeCausalGraphListener(this.staticCausalGraphViewer);
+            this.solver.getDynamicCausalGraph().removeCausalGraphListener(this.staticCausalGraphViewer);
         }
         this.staticCausalGraphViewer.init();
         this.solver = solver;
         this.solver.getStaticCausalGraph().addCausalGraphListener(this.staticCausalGraphViewer);
+        this.solver.getDynamicCausalGraph().addCausalGraphListener(this.staticCausalGraphViewer);
     }
 }

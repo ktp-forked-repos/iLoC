@@ -1,5 +1,8 @@
 package it.cnr.istc.iloc.gui.staticcausalgraph;
 
+import it.cnr.istc.iloc.api.IBool;
+import it.cnr.istc.iloc.api.IDynamicCausalGraphListener;
+import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import it.cnr.istc.iloc.api.IStaticCausalGraphListener;
 import it.cnr.istc.iloc.api.IType;
@@ -7,6 +10,7 @@ import it.cnr.istc.iloc.gui.SolverManager;
 import java.awt.geom.Rectangle2D;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import prefuse.Constants;
 import prefuse.Display;
@@ -43,7 +47,7 @@ import prefuse.visual.VisualItem;
  *
  * @author Riccardo De Benedictis
  */
-public class StaticCausalGraphViewer extends Display implements IStaticCausalGraphListener {
+public class StaticCausalGraphViewer extends Display implements IStaticCausalGraphListener, IDynamicCausalGraphListener {
 
     private static final String GRAPH = "graph";
     private static final String NODES = "graph.nodes";
@@ -53,6 +57,7 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
     private static final String EDGE_DECORATORS = "edgeDeco";
     private static final String NODE_DECORATORS = "nodeDeco";
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema();
+    private CostFunction costFunction = CostFunction.Default;
     private final Graph g = new Graph(true);
     private final VisualGraph vg;
     private final AggregateTable at;
@@ -174,6 +179,7 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
     }
 
     public void setCostFunction(CostFunction costFunction) {
+        this.costFunction = costFunction;
         synchronized (m_vis) {
             switch (costFunction) {
                 case Default:
@@ -275,6 +281,34 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
             if (edges.containsKey(edge)) {
                 g.removeEdge(edges.get(edge));
             }
+        }
+    }
+
+    @Override
+    public void formulaAdded(IFormula formula) {
+    }
+
+    @Override
+    public void formulaRemoved(IFormula formula) {
+    }
+
+    @Override
+    public void formulaActivated(IFormula formula) {
+    }
+
+    @Override
+    public void formulaUnified(IFormula formula, List<IFormula> formulas, List<IBool> constraints) {
+    }
+
+    @Override
+    public void formulaInactivated(IFormula formula) {
+        switch (costFunction) {
+            case MinReachableNodes:
+                setCostFunction(costFunction);
+                break;
+            case MinCausalDistance:
+                setCostFunction(costFunction);
+                break;
         }
     }
 
