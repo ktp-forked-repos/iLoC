@@ -1,0 +1,201 @@
+PDDL(domain, problem) ::= <<
+<domain>
+
+<problem>
+>>
+
+Domain(domain) ::= <<
+/**
+* Domain: <domain.name>
+*/
+<domain.types.values : {type |
+
+<if(!(type.superclass))>
+<TopType(type)>
+<else>
+<SubType(type)>
+<endif>}>
+
+class <domain.name>State extends PropositionalState {
+
+<if(domain.actions)>
+    <domain.name>ImpulsiveAgent agent;
+    <domain.constants.values : {constant |<constant.type.name> <constant.name>;}; separator="\n">
+
+    <domain.name>State(<domain.name>ImpulsiveAgent agent<if(domain.constants.values)>, <domain.constants.values : {constant |<constant.type.name> <constant.name>}; separator=", "><endif>){
+        this.agent = agent;
+        <domain.constants.values : {constant |this.<constant.name> = <constant.name>;}; separator="\n">
+    }
+<endif>
+<if(domain.durativeActions)>
+    <domain.name>Agent agent;
+    <domain.constants.values : {constant |<constant.type.name> <constant.name>;}; separator="\n">
+
+    <domain.name>State(<domain.name>Agent agent<if(domain.constants.values)>, <domain.constants.values : {constant |<constant.type.name> <constant.name>}; separator=", "><endif>){
+        this.agent = agent;
+        <domain.constants.values : {constant |this.<constant.name> = <constant.name>;}; separator="\n">
+    }
+<endif>
+<domain.predicates.values : {predicate |
+
+    predicate <predicate.name>True(<predicate.variables : {variable |<variable.type.name> <variable.name>}; separator=", ">) {
+        duration >= 1;
+        <predicate; format="True">
+    \}
+
+    predicate <predicate.name>False(<predicate.variables : {variable |<variable.type.name> <variable.name>}; separator=", ">) {
+        duration >= 1;
+        <predicate; format="False">
+    \}}>
+<domain.functions.values : {function |
+
+    predicate <function.name>(<function.variables : {variable |<variable.type.name> <variable.name>}; separator=", "><if(function.variables)>, <endif><function.type.name> value) {
+        duration >= 1;
+        <function>
+    \}}>
+\}
+<if(domain.actions)>
+
+class <domain.name>ImpulsiveAgent extends PropositionalImpulsiveAgent {
+
+    <domain.name>State propositional_state;
+    <domain.constants.values : {constant |<constant.type.name> <constant.name>;}; separator="\n">
+
+    <domain.name>ImpulsiveAgent(<domain.constants.values : {constant |<constant.type.name> <constant.name>}; separator=", ">) {
+        propositional_state = new <domain.name>State(this<if(domain.constants.values)>, <domain.constants.values : {constant |<constant.name>}; separator=", "><endif>);
+        <domain.constants.values : {constant |this.<constant.name> = <constant.name>;}; separator="\n">
+    }
+<domain.actions.values : {action |
+
+    predicate <action.name>(<action.variables : {variable |<variable.type.name> <variable.name>}; separator=", ">) {
+        <action>
+    \}}>
+\}<endif>
+<if(domain.durativeActions)>
+
+class <domain.name>Agent extends PropositionalAgent {
+
+    <domain.name>State propositional_state;
+    <domain.constants.values : {constant |<constant.type.name> <constant.name>;}; separator="\n">
+
+    <domain.name>Agent(<domain.constants.values : {constant |<constant.type.name> <constant.name>}; separator=", ">) {
+        propositional_state = new <domain.name>State(this<if(domain.constants.values)>, <domain.constants.values : {constant |<constant.name>}; separator=", "><endif>);
+        <domain.constants.values : {constant |this.<constant.name> = <constant.name>;}; separator="\n">
+    }
+<domain.durativeActions.values : {action |
+
+    predicate <action.name>(<action.variables : {variable |<variable.type.name> <variable.name>}; separator=", ">) {
+        <action>
+    \}}>
+\}<endif>
+>>
+
+Action(name, action_name, assignments) ::= <<
+goal <name> = new agent.<action_name>(<assignments : {assignment |<assignment>}; separator=", "><if(assignments)>, <endif>at:start);
+>>
+
+AtStartDurativeAction(name, action_name, assignments) ::= <<
+goal <name> = new agent.<action_name>(<assignments : {assignment |<assignment>}; separator=", "><if(assignments)>, <endif>start:start);
+>>
+
+AtEndDurativeAction(name, action_name, assignments) ::= <<
+goal <name> = new agent.<action_name>(<assignments : {assignment |<assignment>}; separator=", "><if(assignments)>, <endif>end:start);
+>>
+
+PredicatePrecondition(name, predicate_name, assignments) ::= <<
+goal <name> = new propositional_state.<predicate_name>(<assignments : {assignment |<assignment>}; separator=", ">);
+<name>.start \<= at - 1;
+<name>.end >= at;
+>>
+
+PredicateEffect(action_name, name, predicate_name, assignments) ::= <<
+fact <name> = new <predicate_name>(<assignments : {assignment |<assignment>}; separator=", ">);
+<name>.start \<= <action_name>.at;
+<name>.end >= <action_name>.at + 1;
+>>
+
+PredicateAtStartCondition(name, predicate_name, assignments) ::= <<
+goal <name> = new propositional_state.<predicate_name>(<assignments : {assignment |<assignment>}; separator=", ">);
+<name>.start \<= start - 1;
+<name>.end >= start;
+>>
+
+PredicateOverAllCondition(name, predicate_name, assignments) ::= <<
+goal <name> = new propositional_state.<predicate_name>(<assignments : {assignment |<assignment>}; separator=", ">);
+<name>.start \<= start;
+<name>.end >= end;
+>>
+
+PredicateAtEndCondition(name, predicate_name, assignments) ::= <<
+goal <name> = new propositional_state.<predicate_name>(<assignments : {assignment |<assignment>}; separator=", ">);
+<name>.start \<= end - 1;
+<name>.end >= end;
+>>
+
+PredicateAtStartEffect(action_name, name, predicate_name, assignments) ::= <<
+fact <name> = new <predicate_name>(<assignments : {assignment |<assignment>}; separator=", ">);
+<name>.start \<= <action_name>.start;
+<name>.end >= <action_name>.start + 1;
+>>
+
+PredicateAtEndEffect(action_name, name, predicate_name, assignments) ::= <<
+fact <name> = new <predicate_name>(<assignments : {assignment |<assignment>}; separator=", ">);
+<name>.start \<= <action_name>.end;
+<name>.end >= <action_name>.end + 1;
+>>
+
+PredicateInit(name, predicate_name, assignments) ::= <<
+fact <name> = new agent.propositional_state.<predicate_name>(<assignments : {assignment |<assignment>}; separator=", "><if(assignments)>, <endif>start:origin);
+<name>.duration >= 1;
+>>
+
+PredicateGoal(name, predicate_name, assignments) ::= <<
+goal <name> = new agent.propositional_state.<predicate_name>(<assignments : {assignment |<assignment>}; separator=", "><if(assignments)>, <endif>end:horizon);
+>>
+
+Problem(problem) ::= <<
+/**
+* Domain: <problem.domain.name>
+* Problem: <problem.name>
+*/
+
+<[problem.domain.constants.values, problem.objects.values] : {object |
+<object.type.name> <object.name> = new <object.type.name>(<i>);
+}>
+
+<if(problem.domain.actions)>
+<problem.domain.name>ImpulsiveAgent agent = new <problem.domain.name>ImpulsiveAgent(<problem.domain.constants.values : {constant | <constant.name>}; separator=", ">);
+<endif>
+<if(problem.domain.durativeActions)>
+<problem.domain.name>Agent agent = new <problem.domain.name>Agent(<problem.domain.constants.values : {constant | <constant.name>}; separator=", ">);
+<endif>
+
+>>
+
+Disjunction(disjuncts) ::= <<
+{
+<disjuncts : {disjunct |
+    <disjunct>
+}; separator="} or {
+">}
+>>
+
+TopType(type) ::= <<
+class <type.name> {
+
+    int id;
+
+    <type.name>(int id) {
+        this.id = id;
+    }
+}
+>>
+
+SubType(type) ::= <<
+class <type.name> extends <type.superclass.name> {
+
+    <type.name>(int id) {
+        super(id);
+    }
+}
+>>
