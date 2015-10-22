@@ -103,7 +103,7 @@ class Node implements INode {
     @Override
     public Boolean propagate(int bound) {
         int c_level = level;
-        while (!flaws.isEmpty()) {
+        while (!flaws.isEmpty() && c_level < bound) {
             Collection<IFlaw> solved_flaws = new ArrayList<>(flaws.size());
             // We check for all the flaws having one resolver, we resolve it and we propagate the constraint network..
             for (IFlaw flaw : flaws) {
@@ -118,9 +118,8 @@ class Node implements INode {
                         // We have found an inconsistency..
                         return false;
                     }
-                    c_level++;
-                    if (c_level >= bound) {
-                        return null;
+                    if (c_level++ >= bound) {
+                        break;
                     }
                 }
             }
@@ -132,7 +131,11 @@ class Node implements INode {
                 flaws.removeAll(solved_flaws);
             }
         }
-        return true;
+        if (c_level >= bound) {
+            return null;
+        } else {
+            return true;
+        }
     }
 
     @Override
