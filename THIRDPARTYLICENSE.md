@@ -2,8 +2,6 @@
 Antlr v.4.5.1             [The BSD License]
 -------------------------------------------
 
- - iLoC/lib/antlr-runtime-4.5.1.jar
-
 Copyright (c) 2012 Terence Parr and Sam Harwell
 All rights reserved.
 
@@ -20,8 +18,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 StringTemplate v.4.0.8    [The BSD License]
 -------------------------------------------
 
- - iLoC/lib/ST-4.0.8.jar
-
 Copyright (c) 2012 Terence Parr
 All rights reserved.
 
@@ -37,13 +33,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 -------------------------------------------
 Z3 v.4.4.1                  [The MIT License]
 -------------------------------------------
-
- - iLoC/lib/windows/x86/libz3.ddl
- - iLoC/lib/windows/x86/libz3java.ddl
- - iLoC/lib/windows/x86/Microsoft.Z3.ddl
- - iLoC/lib/windows/amd64/libz3.ddl
- - iLoC/lib/windows/amd64/libz3java.ddl
- - iLoC/lib/windows/amd64/Microsoft.Z3.ddl
 
 Copyright (c) Microsoft Corporation
 All rights reserved.
