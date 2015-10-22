@@ -39,7 +39,18 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="allReachableNodesJRadioButtonMenuItemActionPerformed"/>
                   </Events>
                 </MenuItem>
-                <MenuItem class="javax.swing.JRadioButtonMenuItem" name="minReachableNodesJRadioButtonMenuItem">
+                <MenuItem class="javax.swing.JRadioButtonMenuItem" name="allMinReachableNodesJRadioButtonMenuItem">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="costFunctionButtonGroup"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="All min reachable"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="allMinReachableNodesJRadioButtonMenuItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JRadioButtonMenuItem" name="minReachableJRadioButtonMenuItem">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="costFunctionButtonGroup"/>
@@ -47,29 +58,18 @@
                     <Property name="text" type="java.lang.String" value="Min reachable"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="minReachableNodesJRadioButtonMenuItemActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="minReachableJRadioButtonMenuItemActionPerformed"/>
                   </Events>
                 </MenuItem>
-                <MenuItem class="javax.swing.JRadioButtonMenuItem" name="allWalkableEdgesJRadioButtonMenuItem">
+                <MenuItem class="javax.swing.JRadioButtonMenuItem" name="minCausalDistanceJRadioButtonMenuItem">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="costFunctionButtonGroup"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="All walkable edges"/>
+                    <Property name="text" type="java.lang.String" value="Min causal distance"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="allWalkableEdgesJRadioButtonMenuItemActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JRadioButtonMenuItem" name="minWalkableEdgesJRadioButtonMenuItem">
-                  <Properties>
-                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                      <ComponentRef name="costFunctionButtonGroup"/>
-                    </Property>
-                    <Property name="text" type="java.lang.String" value="Min walkable edges"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="minWalkableEdgesJRadioButtonMenuItemActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="minCausalDistanceJRadioButtonMenuItemActionPerformed"/>
                   </Events>
                 </MenuItem>
               </SubComponents>
