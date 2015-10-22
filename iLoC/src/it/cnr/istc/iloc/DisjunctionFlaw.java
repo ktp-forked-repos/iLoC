@@ -18,11 +18,16 @@
  */
 package it.cnr.istc.iloc;
 
+import it.cnr.istc.iloc.api.IDisjunct;
 import it.cnr.istc.iloc.api.IDisjunction;
 import it.cnr.istc.iloc.api.IDisjunctionFlaw;
 import it.cnr.istc.iloc.api.IEnvironment;
 import it.cnr.istc.iloc.api.IResolver;
+import it.cnr.istc.iloc.api.IStaticCausalGraph;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -33,11 +38,13 @@ public class DisjunctionFlaw implements IDisjunctionFlaw {
 
     private final IEnvironment environment;
     private final IDisjunction disjunction;
+    private final IStaticCausalGraph staticCausalGraph;
 
     public DisjunctionFlaw(IEnvironment environment, IDisjunction disjunction) {
         assert !disjunction.getDisjuncts().isEmpty();
         this.environment = environment;
         this.disjunction = disjunction;
+        this.staticCausalGraph = environment.getSolver().getStaticCausalGraph();
     }
 
     @Override
@@ -47,12 +54,14 @@ public class DisjunctionFlaw implements IDisjunctionFlaw {
 
     @Override
     public double getEstimatedCost() {
-        return environment.getSolver().getStaticCausalGraph().getMinReachableNodes(environment.getSolver().getStaticCausalGraph().getNode(disjunction)).size();
+        return environment.getSolver().getStaticCausalGraph().estimateCost(environment.getSolver().getStaticCausalGraph().getNode(disjunction));
     }
 
     @Override
     public Collection<IResolver> getResolvers() {
-        return disjunction.getDisjuncts().stream().map(disjunct -> new IResolver() {
+        List<IDisjunct> disjuncts = new ArrayList<>(disjunction.getDisjuncts());
+        Collections.sort(disjuncts, (IDisjunct d0, IDisjunct d1) -> Double.compare(staticCausalGraph.estimateCost(staticCausalGraph.getNode(d0)), staticCausalGraph.estimateCost(staticCausalGraph.getNode(d1))));
+        return disjuncts.stream().map(disjunct -> new IResolver() {
 
             private boolean expanded = false;
             private boolean resolved = false;

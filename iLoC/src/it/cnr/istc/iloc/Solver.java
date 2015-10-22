@@ -45,12 +45,13 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
@@ -81,7 +82,7 @@ public class Solver implements ISolver {
     }
     private final Properties properties;
     private final LanguageParser parser;
-    private final PriorityQueue<INode> fringe = new PriorityQueue<>((INode n0, INode n1) -> Double.compare(n0.getKnownCost() + n0.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum(), n1.getKnownCost() + n1.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum()));
+    private final Deque<INode> fringe = new LinkedList<>();
     private final Collection<INode> breached = new ArrayList<>();
     private INode currentNode;
     private int bound;
@@ -380,7 +381,7 @@ public class Solver implements ISolver {
         bound = properties.containsKey("Bound") ? Integer.parseInt(properties.getProperty("Bound")) : predicates.size() + types.values().stream().mapToInt(type -> type.getPredicates().size()).sum();
         while (true) {
             while (!fringe.isEmpty()) {
-                Boolean reached = goTo(fringe.poll());
+                Boolean reached = goTo(fringe.pollFirst());
                 if (reached == null) {
                     breached.add(currentNode);
                 } else if (reached) {
@@ -394,7 +395,7 @@ public class Solver implements ISolver {
                         });
 
                         // We re-add the solution node into the fringe for subsequent updates
-                        fringe.add(currentNode);
+                        fringe.addFirst(currentNode);
 
                         // We have found a solution..
                         return true;
@@ -429,10 +430,11 @@ public class Solver implements ISolver {
             childs.add(child);
         });
         n_nodes += childs.size();
-        fringe.addAll(childs);
         listeners.stream().forEach(listener -> {
             listener.branch(currentNode, childs);
         });
+        Collections.reverse(childs);
+        childs.stream().forEach(child -> fringe.addFirst(child));
     }
 
     @Override

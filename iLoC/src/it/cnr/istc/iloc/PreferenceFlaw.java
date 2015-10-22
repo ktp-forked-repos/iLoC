@@ -46,7 +46,7 @@ public class PreferenceFlaw implements IPreferenceFlaw {
 
     @Override
     public double getEstimatedCost() {
-        return environment.getSolver().getStaticCausalGraph().getMinReachableNodes(environment.getSolver().getStaticCausalGraph().getNode(preference)).size();
+        return environment.getSolver().getStaticCausalGraph().estimateCost(environment.getSolver().getStaticCausalGraph().getNode(preference));
     }
 
     @Override

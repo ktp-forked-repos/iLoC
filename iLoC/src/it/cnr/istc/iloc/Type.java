@@ -265,7 +265,35 @@ public class Type extends Scope implements IType {
 
     @Override
     public void factCreated(IFormula fact) {
-        solver.getCurrentNode().enqueue(new Fact(fact));
+//        solver.getCurrentNode().enqueue(new Fact(fact));
+        solver.getCurrentNode().addResolver(new IResolver() {
+
+            private boolean resolved = false;
+
+            @Override
+            public double getKnownCost() {
+                return Double.MIN_NORMAL;
+            }
+
+            @Override
+            public void resolve() {
+                assert !resolved;
+                fact.setActiveState();
+                resolved = true;
+            }
+
+            @Override
+            public boolean isResolved() {
+                return resolved;
+            }
+
+            @Override
+            public void retract() {
+                assert resolved;
+                fact.setInactiveState();
+                resolved = false;
+            }
+        });
     }
 
     @Override

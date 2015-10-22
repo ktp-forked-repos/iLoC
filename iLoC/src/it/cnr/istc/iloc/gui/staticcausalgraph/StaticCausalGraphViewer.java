@@ -57,6 +57,7 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
     private static final String EDGE_DECORATORS = "edgeDeco";
     private static final String NODE_DECORATORS = "nodeDeco";
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema();
+
     static {
         DECORATOR_SCHEMA.setDefault(VisualItem.INTERACTIVE, false);
         DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(128));
@@ -71,7 +72,6 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
     private final Map<IStaticCausalGraph.IEdge, Edge> edges = new IdentityHashMap<>();
     private final ColorAction defaultNodeFill = new ColorAction(NODES, VisualItem.FILLCOLOR);
     private final ColorAction costNodeFill = new DataColorAction(NODES, NODE_COST, Constants.ORDINAL, VisualItem.FILLCOLOR, ColorLib.getHotPalette());
-
 
     public StaticCausalGraphViewer() {
         // initialize display and data
@@ -294,6 +294,14 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
 
     @Override
     public void formulaActivated(IFormula formula) {
+        switch (costFunction) {
+            case MinReachableNodes:
+                setCostFunction(costFunction);
+                break;
+            case MinCausalDistance:
+                setCostFunction(costFunction);
+                break;
+        }
     }
 
     @Override
@@ -311,7 +319,6 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
                 break;
         }
     }
-
 
     /**
      * Set label positions. Labels are assumed to be DecoratorItem instances,

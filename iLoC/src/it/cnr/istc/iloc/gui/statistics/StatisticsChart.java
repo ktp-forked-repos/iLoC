@@ -3,6 +3,7 @@ package it.cnr.istc.iloc.gui.statistics;
 import it.cnr.istc.iloc.api.IModel;
 import it.cnr.istc.iloc.api.INode;
 import it.cnr.istc.iloc.api.ISolverListener;
+import it.cnr.istc.iloc.gui.SolverManager;
 import java.awt.BasicStroke;
 import java.awt.Font;
 import java.util.List;
@@ -27,8 +28,8 @@ public class StatisticsChart extends ChartPanel implements ISolverListener {
     private static final JFreeChart CHART = new JFreeChart(new XYPlot());
     private final XYSeriesCollection solver_collection = new XYSeriesCollection();
     private final XYSeriesCollection heuristics_collection = new XYSeriesCollection();
-//    private final XYSeries fringe = new XYSeries("Fringe");
-//    private final XYSeries nodes = new XYSeries("Nodes");
+    private final XYSeries fringe = new XYSeries("Fringe");
+    private final XYSeries nodes = new XYSeries("Nodes");
     private final XYSeries flaws = new XYSeries("Flaws");
     private final XYSeries depth = new XYSeries("Depth");
     private final XYSeries heuristic = new XYSeries("Heuristic");
@@ -42,8 +43,8 @@ public class StatisticsChart extends ChartPanel implements ISolverListener {
         combined_plot.setGap(3.0);
         combined_plot.setOrientation(PlotOrientation.VERTICAL);
 
-//        solver_collection.addSeries(fringe);
-//        solver_collection.addSeries(nodes);
+        solver_collection.addSeries(fringe);
+        solver_collection.addSeries(nodes);
         solver_collection.addSeries(depth);
 
         XYLineAndShapeRenderer solver_renderer = new XYLineAndShapeRenderer();
@@ -80,8 +81,8 @@ public class StatisticsChart extends ChartPanel implements ISolverListener {
 
     public void init() {
         c_step = 0;
-//        nodes.clear();
-//        fringe.clear();
+        nodes.clear();
+        fringe.clear();
         depth.clear();
         flaws.clear();
         heuristic.clear();
@@ -98,8 +99,8 @@ public class StatisticsChart extends ChartPanel implements ISolverListener {
     }
 
     private void newStep(INode n) {
-//        nodes.add(c_step, SolverManager.getInstance().getSolver().getSearchSpaceSize());
-//        fringe.add(c_step, SolverManager.getInstance().getSolver().getFringeSize());
+        nodes.add(c_step, SolverManager.getInstance().getSolver().getSearchSpaceSize());
+        fringe.add(c_step, SolverManager.getInstance().getSolver().getFringeSize());
         depth.add(c_step, n.getLevel());
 
         flaws.add(c_step, n.getFlaws().size());

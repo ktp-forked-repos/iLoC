@@ -308,17 +308,20 @@ class StaticCausalGraph implements IStaticCausalGraph {
             }
             if (node instanceof IDisjunctionNode) {
                 int min_distance = Integer.MAX_VALUE;
-                Set<INode> min_nodes = null;
                 for (IDisjunct disjunct : ((IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
                     int c_distance = getMinCausalDistance(getNode(disjunct), new HashSet<>(visited));
                     if (c_distance < min_distance) {
                         min_distance = c_distance;
                     }
                 }
-                visited.addAll(min_nodes);
                 return min_distance;
             } else if (!(node instanceof INoOpNode)) {
-                return 1 + node.getExitingEdges().stream().mapToInt(edge -> getMinCausalDistance(edge.getTarget(), visited)).min().getAsInt();
+                Collection<IEdge> exitingEdges = node.getExitingEdges();
+                if (exitingEdges.isEmpty()) {
+                    return 1;
+                } else {
+                    return 1 + node.getExitingEdges().stream().mapToInt(edge -> getMinCausalDistance(edge.getTarget(), visited)).min().getAsInt();
+                }
             }
             return 0;
         } else {
@@ -375,6 +378,11 @@ class StaticCausalGraph implements IStaticCausalGraph {
         public IPredicate getPredicate() {
             return predicate;
         }
+
+        @Override
+        public String toString() {
+            return predicate.toString();
+        }
     }
 
     private class DisjunctionNode extends Node implements IDisjunctionNode {
@@ -388,6 +396,11 @@ class StaticCausalGraph implements IStaticCausalGraph {
         @Override
         public IDisjunction getDisjunction() {
             return disjunction;
+        }
+
+        @Override
+        public String toString() {
+            return disjunction.toString();
         }
     }
 
@@ -403,6 +416,11 @@ class StaticCausalGraph implements IStaticCausalGraph {
         public IDisjunct getDisjunct() {
             return disjunct;
         }
+
+        @Override
+        public String toString() {
+            return disjunct.toString();
+        }
     }
 
     private class PreferenceNode extends Node implements IPreferenceNode {
@@ -416,6 +434,11 @@ class StaticCausalGraph implements IStaticCausalGraph {
         @Override
         public IPreference getPreference() {
             return preference;
+        }
+
+        @Override
+        public String toString() {
+            return preference.toString();
         }
     }
 

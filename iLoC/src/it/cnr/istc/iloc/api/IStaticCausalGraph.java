@@ -208,6 +208,18 @@ public interface IStaticCausalGraph {
     public int getMinCausalDistance(INode node);
 
     /**
+     * Returns the estimated cost for the given node according to the chosen
+     * heuristic.
+     *
+     * @param node the node to be estimated.
+     * @return a value indicating an estimated cost for solving a flaw similar
+     * to the given node.
+     */
+    public default double estimateCost(INode node) {
+        return getMinCausalDistance(node);
+    }
+
+    /**
      * Adds a listener to the given static causal graph for detecting
      * addition/removal of nodes and edges.
      *

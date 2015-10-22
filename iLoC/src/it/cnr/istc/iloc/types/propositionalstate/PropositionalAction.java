@@ -47,7 +47,7 @@ class PropositionalAction implements IGoal {
 
     @Override
     public double getEstimatedCost() {
-        return formula.getSolver().getStaticCausalGraph().getMinReachableNodes(formula.getSolver().getStaticCausalGraph().getNode(formula.getType())).size();
+        return 0;
     }
 
     @Override

@@ -54,7 +54,7 @@ class Goal implements IGoal {
 
     @Override
     public double getEstimatedCost() {
-        return formula.getSolver().getStaticCausalGraph().getMinReachableNodes(formula.getSolver().getStaticCausalGraph().getNode(formula.getType())).size();
+        return formula.getSolver().getStaticCausalGraph().estimateCost(formula.getSolver().getStaticCausalGraph().getNode(formula.getType()));
     }
 
     @Override
