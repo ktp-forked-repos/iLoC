@@ -57,6 +57,11 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
     private static final String EDGE_DECORATORS = "edgeDeco";
     private static final String NODE_DECORATORS = "nodeDeco";
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema();
+    static {
+        DECORATOR_SCHEMA.setDefault(VisualItem.INTERACTIVE, false);
+        DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(128));
+        DECORATOR_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 7));
+    }
     private CostFunction costFunction = CostFunction.Default;
     private final Graph g = new Graph(true);
     private final VisualGraph vg;
@@ -67,11 +72,6 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
     private final ColorAction defaultNodeFill = new ColorAction(NODES, VisualItem.FILLCOLOR);
     private final ColorAction costNodeFill = new DataColorAction(NODES, NODE_COST, Constants.ORDINAL, VisualItem.FILLCOLOR, ColorLib.getHotPalette());
 
-    static {
-        DECORATOR_SCHEMA.setDefault(VisualItem.INTERACTIVE, false);
-        DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(128));
-        DECORATOR_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 7));
-    }
 
     public StaticCausalGraphViewer() {
         // initialize display and data
@@ -312,10 +312,6 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
         }
     }
 
-    public enum CostFunction {
-
-        Default, AllReachableNodes, AllMinReachableNodes, MinReachableNodes, MinCausalDistance;
-    }
 
     /**
      * Set label positions. Labels are assumed to be DecoratorItem instances,
@@ -344,5 +340,10 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
                 setY(decorator, null, y);
             }
         }
+    }
+
+    public enum CostFunction {
+
+        Default, AllReachableNodes, AllMinReachableNodes, MinReachableNodes, MinCausalDistance
     }
 }
