@@ -35,7 +35,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 -------------------------------------------
-Z3 4.4.1                  [The MIT License]
+Z3 v.4.4.1                  [The MIT License]
 -------------------------------------------
 
  - iLoC/lib/windows/x86/libz3.ddl
