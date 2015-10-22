@@ -48,10 +48,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
     private final Map<INode, IScope> nodes = new IdentityHashMap<>();
     private final Map<INode, Map<INode, Collection<IEdge>>> links = new IdentityHashMap<>();
     private final Map<INode, Set<INode>> all_reachable_nodes = new HashMap<>();
-    private final Map<INode, Set<IEdge>> all_walkable_edges = new HashMap<>();
-    private final Map<INode, Set<INode>> min_reachable_nodes = new HashMap<>();
-    private final Map<INode, Set<IEdge>> min_walkable_edges = new HashMap<>();
-    private final Map<INode, Double> min_walkable_edges_weight = new HashMap<>();
+    private final Map<INode, Set<INode>> all_min_reachable_nodes = new HashMap<>();
     private final Collection<IStaticCausalGraphListener> listeners = new ArrayList<>();
 
     @Override
@@ -228,17 +225,103 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
     @Override
     public Set<INode> getAllMinReachableNodes(INode node) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (!all_min_reachable_nodes.containsKey(node)) {
+            all_min_reachable_nodes.put(node, getAllMinReachableNodes(node, new HashSet<>(nodes.size())));
+        }
+        return all_min_reachable_nodes.get(node);
+    }
+
+    private Set<INode> getAllMinReachableNodes(INode node, Set<INode> visited) {
+        if (!visited.contains(node)) {
+            if (node instanceof IPredicateNode) {
+                visited.add(node);
+            }
+            if (node instanceof IDisjunctionNode) {
+                int min_nodes_size = Integer.MAX_VALUE;
+                Set<INode> min_nodes = null;
+                for (IDisjunct disjunct : ((IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
+                    Set<INode> c_nodes = getAllMinReachableNodes(getNode(disjunct), new HashSet<>(visited));
+                    if (c_nodes.size() < min_nodes_size) {
+                        min_nodes_size = c_nodes.size();
+                        min_nodes = c_nodes;
+                    }
+                }
+                visited.addAll(min_nodes);
+            } else if (!(node instanceof INoOpNode)) {
+                visited.addAll(node.getExitingEdges().stream().flatMap(edge -> getAllMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
+            }
+            return visited;
+        } else {
+            return Collections.emptySet();
+        }
     }
 
     @Override
     public Set<INode> getMinReachableNodes(INode node) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getMinReachableNodes(node, new HashSet<>(nodes.size()));
+    }
+
+    private Set<INode> getMinReachableNodes(INode node, Set<INode> visited) {
+        if (!visited.contains(node)) {
+            if (node instanceof IPredicateNode) {
+                if (((IPredicateNode) node).getPredicate().getInstances().isEmpty()) {
+                    visited.add(node);
+                } else {
+                    return visited;
+                }
+            }
+            if (node instanceof IDisjunctionNode) {
+                int min_nodes_size = Integer.MAX_VALUE;
+                Set<INode> min_nodes = null;
+                for (IDisjunct disjunct : ((IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
+                    Set<INode> c_nodes = getAllMinReachableNodes(getNode(disjunct), new HashSet<>(visited));
+                    if (c_nodes.size() < min_nodes_size) {
+                        min_nodes_size = c_nodes.size();
+                        min_nodes = c_nodes;
+                    }
+                }
+                visited.addAll(min_nodes);
+            } else if (!(node instanceof INoOpNode)) {
+                visited.addAll(node.getExitingEdges().stream().flatMap(edge -> getAllMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
+            }
+            return visited;
+        } else {
+            return Collections.emptySet();
+        }
     }
 
     @Override
-    public double getMinCausalDistance(INode node) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int getMinCausalDistance(INode node) {
+        return getMinCausalDistance(node, new HashSet<>(nodes.size()));
+    }
+
+    private int getMinCausalDistance(INode node, Set<INode> visited) {
+        if (!visited.contains(node)) {
+            if (node instanceof IPredicateNode) {
+                if (((IPredicateNode) node).getPredicate().getInstances().isEmpty()) {
+                    visited.add(node);
+                } else {
+                    return 0;
+                }
+            }
+            if (node instanceof IDisjunctionNode) {
+                int min_distance = Integer.MAX_VALUE;
+                Set<INode> min_nodes = null;
+                for (IDisjunct disjunct : ((IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
+                    int c_distance = getMinCausalDistance(getNode(disjunct), new HashSet<>(visited));
+                    if (c_distance < min_distance) {
+                        min_distance = c_distance;
+                    }
+                }
+                visited.addAll(min_nodes);
+                return min_distance;
+            } else if (!(node instanceof INoOpNode)) {
+                return 1 + node.getExitingEdges().stream().mapToInt(edge -> getMinCausalDistance(edge.getTarget(), visited)).min().getAsInt();
+            }
+            return 0;
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -266,10 +349,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
     private void clear() {
         all_reachable_nodes.clear();
-        all_walkable_edges.clear();
-        min_reachable_nodes.clear();
-        min_walkable_edges.clear();
-        min_walkable_edges_weight.clear();
+        all_min_reachable_nodes.clear();
     }
 
     //<editor-fold defaultstate="collapsed" desc="Nodes and edges..">

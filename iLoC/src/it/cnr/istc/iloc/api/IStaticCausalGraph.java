@@ -205,7 +205,7 @@ public interface IStaticCausalGraph {
      * computed.
      * @return the lower bound for the resolution of the given node.
      */
-    public double getMinCausalDistance(INode node);
+    public int getMinCausalDistance(INode node);
 
     /**
      * Adds a listener to the given static causal graph for detecting
