@@ -264,6 +264,16 @@ public class Type extends Scope implements IType {
     }
 
     @Override
+    public void factCreated(IFormula fact) {
+        solver.getCurrentNode().enqueue(new Fact(fact));
+    }
+
+    @Override
+    public void goalCreated(IFormula goal) {
+        solver.getCurrentNode().enqueue(new Goal(goal));
+    }
+
+    @Override
     public void formulaActivated(IFormula formula) {
         if (superclass != null) {
             superclass.formulaActivated(formula);
