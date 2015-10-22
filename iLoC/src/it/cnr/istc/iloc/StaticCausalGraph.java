@@ -250,7 +250,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
                 }
                 visited.addAll(min_nodes);
             } else if (!(node instanceof INoOpNode)) {
-                visited.addAll(node.getExitingEdges().stream().flatMap(edge -> getAllMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
+                visited.addAll(node.getExitingEdges().stream().filter(edge -> edge.getType() == IEdge.Type.Goal).flatMap(edge -> getAllMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
             }
             return visited;
         } else {
@@ -284,7 +284,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
                 }
                 visited.addAll(min_nodes);
             } else if (!(node instanceof INoOpNode)) {
-                visited.addAll(node.getExitingEdges().stream().flatMap(edge -> getMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
+                visited.addAll(node.getExitingEdges().stream().filter(edge -> edge.getType() == IEdge.Type.Goal).flatMap(edge -> getMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
             }
             return visited;
         } else {
@@ -318,9 +318,9 @@ class StaticCausalGraph implements IStaticCausalGraph {
             } else if (!(node instanceof INoOpNode)) {
                 Collection<IEdge> exitingEdges = node.getExitingEdges();
                 if (exitingEdges.isEmpty()) {
-                    return 1;
+                    return 0;
                 } else {
-                    return 1 + node.getExitingEdges().stream().mapToInt(edge -> getMinCausalDistance(edge.getTarget(), visited)).min().getAsInt();
+                    return 1 + node.getExitingEdges().stream().filter(edge -> edge.getType() == IEdge.Type.Goal).mapToInt(edge -> getMinCausalDistance(edge.getTarget(), visited)).max().getAsInt();
                 }
             }
             return 0;
