@@ -568,7 +568,7 @@ That's all there is to it!
 
 
 -------------------------------------------
-JCommon v.1.0.22         [The LGPL License]
+JCommon v.1.0.23         [The LGPL License]
 -------------------------------------------
                   GNU LESSER GENERAL PUBLIC LICENSE
                        Version 2.1, February 1999
