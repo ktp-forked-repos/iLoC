@@ -66,7 +66,8 @@ class PredicateTerm implements Term {
 
     @Override
     public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new PredicateTerm(directed, domain.getPredicate(predicate.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_")) + "_"), Collections.emptyList());
+        String predicate_name = predicate.getVariables().isEmpty() ? predicate.getName() : predicate.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_")) + "_";
+        return new PredicateTerm(directed, domain.getPredicate(predicate_name), Collections.emptyList());
     }
 
     @Override

@@ -17,6 +17,7 @@
 package it.cnr.istc.iloc;
 
 import it.cnr.istc.iloc.api.IBool;
+import it.cnr.istc.iloc.api.IDisjunctionFlaw;
 import it.cnr.istc.iloc.api.IFlaw;
 import it.cnr.istc.iloc.api.IModel;
 import it.cnr.istc.iloc.api.INode;
@@ -107,6 +108,9 @@ class Node implements INode {
             Collection<IFlaw> solved_flaws = new ArrayList<>(flaws.size());
             // We check for all the flaws having one resolver, we resolve it and we propagate the constraint network..
             for (IFlaw flaw : flaws) {
+                if (flaw instanceof IDisjunctionFlaw) {
+                    continue;
+                }
                 Collection<IResolver> c_resolvers = flaw.getResolvers();
                 assert !c_resolvers.isEmpty() : "Flaws should have at least one resolver..";
                 if (c_resolvers.size() == 1) {

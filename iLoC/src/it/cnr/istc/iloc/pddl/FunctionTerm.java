@@ -60,7 +60,8 @@ class FunctionTerm implements Term {
 
     @Override
     public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new FunctionTerm(domain.getFunction(function.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_")) + "_"), Collections.emptyList());
+        String function_name = function.getVariables().isEmpty() ? function.getName() : function.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_")) + "_";
+        return new FunctionTerm(domain.getFunction(function_name), Collections.emptyList());
     }
 
     @Override

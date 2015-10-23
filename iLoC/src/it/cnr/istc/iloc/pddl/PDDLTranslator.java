@@ -256,23 +256,25 @@ public class PDDLTranslator {
          */
         problem.setGoal(term_visitor.visit(problem_context.goal().pre_GD()));
 
+        ProblemInstance ground_instance = makeGround(new ProblemInstance(domain, problem));
+
         STGroupFile file = new STGroupFile(PDDLTranslator.class.getResource("PDDLTemplate.stg").getPath());
         file.registerRenderer(Domain.class, new DomainRenderer(file));
         file.registerRenderer(Problem.class, new ProblemRenderer(file));
         file.registerRenderer(Action.class, new ActionRenderer(file));
         file.registerRenderer(DurativeAction.class, new DurativeActionRenderer(file));
-        file.registerRenderer(Predicate.class, new PredicateRenderer(file, domain));
-        file.registerRenderer(Function.class, new FunctionRenderer(file, domain));
+        file.registerRenderer(Predicate.class, new PredicateRenderer(file, ground_instance.domain));
+        file.registerRenderer(Function.class, new FunctionRenderer(file, ground_instance.domain));
         ST translation = file.getInstanceOf("PDDL");
-        translation.add("domain", domain);
-        translation.add("problem", problem);
+        translation.add("domain", ground_instance.domain);
+        translation.add("problem", ground_instance.problem);
 
         return translation.render();
     }
 
-    private static void makeGround(Domain domain, Problem problem) {
-        Domain ground_domain = new Domain(domain.getName());
-        domain.getPredicates().values().stream().forEach(predicate -> {
+    private static ProblemInstance makeGround(ProblemInstance instance) {
+        Domain ground_domain = new Domain(instance.domain.getName());
+        instance.domain.getPredicates().values().stream().forEach(predicate -> {
             if (predicate.getVariables().isEmpty()) {
                 ground_domain.addPredicate(predicate);
             } else {
@@ -283,7 +285,7 @@ public class PDDLTranslator {
             }
         });
 
-        domain.getFunctions().values().stream().forEach(function -> {
+        instance.domain.getFunctions().values().stream().forEach(function -> {
             if (function.getVariables().isEmpty()) {
                 ground_domain.addFunction(function);
             } else {
@@ -294,7 +296,7 @@ public class PDDLTranslator {
             }
         });
 
-        domain.getActions().values().stream().forEach(action -> {
+        instance.domain.getActions().values().stream().forEach(action -> {
             if (action.getVariables().isEmpty()) {
                 ground_domain.addAction(action);
             } else {
@@ -305,12 +307,12 @@ public class PDDLTranslator {
                     for (int i = 0; i < cs.length; i++) {
                         known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(cs[i].getName()));
                     }
-                    ground_domain.addAction(new Action(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getPrecondition().ground(domain, known_terms), action.getEffect().ground(domain, known_terms)));
+                    ground_domain.addAction(new Action(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getPrecondition().ground(ground_domain, known_terms), action.getEffect().ground(ground_domain, known_terms)));
                 }
             }
         });
 
-        domain.getDurativeActions().values().stream().forEach(action -> {
+        instance.domain.getDurativeActions().values().stream().forEach(action -> {
             if (action.getVariables().isEmpty()) {
                 ground_domain.addDurativeAction(action);
             } else {
@@ -321,12 +323,35 @@ public class PDDLTranslator {
                     for (int i = 0; i < cs.length; i++) {
                         known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(cs[i].getName()));
                     }
-                    ground_domain.addDurativeAction(new DurativeAction(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getDuration().ground(domain, known_terms), action.getCondition().ground(domain, known_terms), action.getEffect().ground(domain, known_terms)));
+                    ground_domain.addDurativeAction(new DurativeAction(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getDuration().ground(ground_domain, known_terms), action.getCondition().ground(ground_domain, known_terms), action.getEffect().ground(ground_domain, known_terms)));
                 }
             }
         });
+
+        Problem ground_problem = new Problem(ground_domain, instance.problem.getName());
+
+        Map<String, Term> known_terms = new HashMap<>();
+        instance.domain.getTypes().values().stream().flatMap(type -> type.getInstances().stream()).forEach(c -> {
+            known_terms.put(c.getName(), new ConstantTerm(c.getName()));
+        });
+        instance.problem.getInitEls().stream().forEach(init_el -> {
+            ground_problem.addInitEl(init_el.ground(ground_domain, known_terms));
+        });
+        ground_problem.setGoal(instance.problem.getGoal().ground(ground_domain, known_terms));
+        return new ProblemInstance(ground_domain, ground_problem);
     }
 
     private PDDLTranslator() {
+    }
+
+    static class ProblemInstance {
+
+        final Domain domain;
+        final Problem problem;
+
+        ProblemInstance(Domain domain, Problem problem) {
+            this.domain = domain;
+            this.problem = problem;
+        }
     }
 }
