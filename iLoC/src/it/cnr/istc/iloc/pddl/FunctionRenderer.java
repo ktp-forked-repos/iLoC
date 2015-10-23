@@ -150,6 +150,7 @@ class FunctionRenderer implements AttributeRenderer {
         });
 
         if (disjuncts.isEmpty()) {
+            // TODO: It is a static function!! It should be handled as a static function..
             return "";
         } else if (disjuncts.size() == 1) {
             return disjuncts.get(0);

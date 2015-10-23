@@ -143,6 +143,7 @@ class PredicateRenderer implements AttributeRenderer {
         });
 
         if (disjuncts.isEmpty()) {
+            // TODO: It is a static predicate!! It should be handled as a static predicate..
             return "";
         } else if (disjuncts.size() == 1) {
             return disjuncts.get(0);
