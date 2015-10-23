@@ -58,7 +58,7 @@ class ForAllTerm implements Term {
     @Override
     public String toString(STGroupFile file, Map<String, String> known_terms, Set<Term> to_skip, Mode mode) {
         StringBuilder sb = new StringBuilder();
-        CartesianProductGenerator<Constant> cartesian_product = new CartesianProductGenerator<>(variables.stream().map(var -> var.getType().getInstances().toArray(new Constant[var.getType().getInstances().size()])).toArray(Constant[]::new));
+        CartesianProductGenerator<Constant> cartesian_product = new CartesianProductGenerator<>(variables.stream().flatMap(var -> var.getType().getInstances().stream()).toArray(Constant[]::new));
         for (Constant[] cs : cartesian_product) {
             assert cs.length == variables.size();
             Map<String, String> c_known_terms = new HashMap<>(known_terms);
