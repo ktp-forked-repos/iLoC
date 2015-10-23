@@ -43,16 +43,6 @@ class ComparisonTerm implements Term {
     }
 
     @Override
-    public List<Term> containsPredicate(boolean directed, Predicate predicate) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<Term> containsFunction(Function function) {
-        return Stream.concat(firstTerm.containsFunction(function).stream(), secondTerm.containsFunction(function).stream()).collect(Collectors.toList());
-    }
-
-    @Override
     public Term negate() {
         switch (comp) {
             case Gt:
@@ -68,6 +58,21 @@ class ComparisonTerm implements Term {
             default:
                 throw new AssertionError(comp.name());
         }
+    }
+
+    @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<Term> containsPredicate(boolean directed, Predicate predicate) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<Term> containsFunction(Function function) {
+        return Stream.concat(firstTerm.containsFunction(function).stream(), secondTerm.containsFunction(function).stream()).collect(Collectors.toList());
     }
 
     @Override

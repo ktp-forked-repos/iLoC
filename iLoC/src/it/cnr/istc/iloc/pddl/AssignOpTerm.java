@@ -51,6 +51,20 @@ class AssignOpTerm implements Term {
         return functionTerm;
     }
 
+    public Term getValue() {
+        return value;
+    }
+
+    @Override
+    public Term negate() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        return new AssignOpTerm(assignOp, (FunctionTerm) functionTerm.ground(domain, known_terms), value.ground(domain, known_terms));
+    }
+
     @Override
     public List<Term> containsPredicate(boolean directed, Predicate predicate) {
         return Collections.emptyList();
@@ -63,15 +77,6 @@ class AssignOpTerm implements Term {
         } else {
             return Collections.emptyList();
         }
-    }
-
-    public Term getValue() {
-        return value;
-    }
-
-    @Override
-    public Term negate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

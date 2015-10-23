@@ -56,6 +56,16 @@ class EqTerm implements Term {
     }
 
     @Override
+    public Term negate() {
+        return new EqTerm(!directed, firstTerm, secondTerm);
+    }
+
+    @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public List<Term> containsPredicate(boolean directed, Predicate predicate) {
         return Collections.emptyList();
     }
@@ -63,11 +73,6 @@ class EqTerm implements Term {
     @Override
     public List<Term> containsFunction(Function function) {
         return Stream.concat(firstTerm.containsFunction(function).stream(), secondTerm.containsFunction(function).stream()).collect(Collectors.toList());
-    }
-
-    @Override
-    public Term negate() {
-        return new EqTerm(!directed, firstTerm, secondTerm);
     }
 
     @Override

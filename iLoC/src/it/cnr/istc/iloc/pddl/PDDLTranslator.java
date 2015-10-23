@@ -18,10 +18,14 @@
  */
 package it.cnr.istc.iloc.pddl;
 
+import it.cnr.istc.iloc.utils.CartesianProductGenerator;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -264,6 +268,63 @@ public class PDDLTranslator {
         translation.add("problem", problem);
 
         return translation.render();
+    }
+
+    private static void makeGround(Domain domain, Problem problem) {
+        Domain ground_domain = new Domain(domain.getName());
+        domain.getPredicates().values().stream().forEach(predicate -> {
+            if (predicate.getVariables().isEmpty()) {
+                ground_domain.addPredicate(predicate);
+            } else {
+                CartesianProductGenerator<Constant> cartesian_product = new CartesianProductGenerator<>(predicate.getVariables().stream().map(var -> var.getType().getInstances().toArray(new Constant[var.getType().getInstances().size()])).toArray(Constant[][]::new));
+                for (Constant[] cs : cartesian_product) {
+                    ground_domain.addPredicate(new Predicate(predicate.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")) + "_"));
+                }
+            }
+        });
+
+        domain.getFunctions().values().stream().forEach(function -> {
+            if (function.getVariables().isEmpty()) {
+                ground_domain.addFunction(function);
+            } else {
+                CartesianProductGenerator<Constant> cartesian_product = new CartesianProductGenerator<>(function.getVariables().stream().map(var -> var.getType().getInstances().toArray(new Constant[var.getType().getInstances().size()])).toArray(Constant[][]::new));
+                for (Constant[] cs : cartesian_product) {
+                    ground_domain.addPredicate(new Predicate(function.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")) + "_"));
+                }
+            }
+        });
+
+        domain.getActions().values().stream().forEach(action -> {
+            if (action.getVariables().isEmpty()) {
+                ground_domain.addAction(action);
+            } else {
+                CartesianProductGenerator<Constant> cartesian_product = new CartesianProductGenerator<>(action.getVariables().stream().map(var -> var.getType().getInstances().toArray(new Constant[var.getType().getInstances().size()])).toArray(Constant[][]::new));
+                for (Constant[] cs : cartesian_product) {
+                    // We make terms ground..
+                    Map<String, Term> known_terms = new HashMap<>(cs.length);
+                    for (int i = 0; i < cs.length; i++) {
+                        known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(cs[i].getName()));
+                    }
+                    ground_domain.addAction(new Action(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getPrecondition().ground(domain, known_terms), action.getEffect().ground(domain, known_terms)));
+                }
+            }
+        });
+
+        domain.getDurativeActions().values().stream().forEach(action -> {
+            if (action.getVariables().isEmpty()) {
+                ground_domain.addDurativeAction(action);
+            } else {
+                CartesianProductGenerator<Constant> cartesian_product = new CartesianProductGenerator<>(action.getVariables().stream().map(var -> var.getType().getInstances().toArray(new Constant[var.getType().getInstances().size()])).toArray(Constant[][]::new));
+                for (Constant[] cs : cartesian_product) {
+                    // We make terms ground..
+                    Map<String, Term> known_terms = new HashMap<>(cs.length);
+                    for (int i = 0; i < cs.length; i++) {
+                        known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(cs[i].getName()));
+                    }
+                    ground_domain.addDurativeAction(new DurativeAction(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getDuration().ground(domain, known_terms), action.getCondition().ground(domain, known_terms), action.getEffect().ground(domain, known_terms)));
+                }
+            }
+        });
     }
 
     private PDDLTranslator() {

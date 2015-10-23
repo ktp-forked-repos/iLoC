@@ -60,6 +60,16 @@ class PredicateTerm implements Term {
     }
 
     @Override
+    public Term negate() {
+        return new PredicateTerm(!directed, predicate, arguments);
+    }
+
+    @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        return new PredicateTerm(directed, domain.getPredicate(predicate.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_")) + "_"), Collections.emptyList());
+    }
+
+    @Override
     public List<Term> containsPredicate(boolean directed, Predicate predicate) {
         if (this.directed == directed && this.predicate == predicate) {
             return Arrays.asList(this);
@@ -71,11 +81,6 @@ class PredicateTerm implements Term {
     @Override
     public List<Term> containsFunction(Function function) {
         return Collections.emptyList();
-    }
-
-    @Override
-    public Term negate() {
-        return new PredicateTerm(!directed, predicate, arguments);
     }
 
     @Override

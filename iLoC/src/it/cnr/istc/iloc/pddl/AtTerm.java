@@ -53,6 +53,11 @@ class AtTerm implements Term {
     }
 
     @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        return new AtTerm(at, (PredicateTerm) predicateTerm.ground(domain, known_terms));
+    }
+
+    @Override
     public List<Term> containsPredicate(boolean directed, Predicate predicate) {
         return predicateTerm.containsPredicate(directed, predicate);
     }

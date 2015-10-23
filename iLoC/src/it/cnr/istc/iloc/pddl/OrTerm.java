@@ -43,6 +43,16 @@ class OrTerm implements Term {
     }
 
     @Override
+    public Term negate() {
+        return new AndTerm(terms.stream().map(term -> term.negate()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        return new OrTerm(terms.stream().map(term -> term.ground(domain, known_terms)).collect(Collectors.toList()));
+    }
+
+    @Override
     public List<Term> containsPredicate(boolean directed, Predicate predicate) {
         return terms.stream().flatMap(term -> term.containsPredicate(directed, predicate).stream()).collect(Collectors.toList());
     }
@@ -50,11 +60,6 @@ class OrTerm implements Term {
     @Override
     public List<Term> containsFunction(Function function) {
         return terms.stream().flatMap(term -> term.containsFunction(function).stream()).collect(Collectors.toList());
-    }
-
-    @Override
-    public Term negate() {
-        return new AndTerm(terms.stream().map(term -> term.negate()).collect(Collectors.toList()));
     }
 
     @Override

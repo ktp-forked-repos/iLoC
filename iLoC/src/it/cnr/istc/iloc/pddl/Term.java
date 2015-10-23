@@ -31,6 +31,8 @@ interface Term {
 
     Term negate();
 
+    Term ground(Domain domain, Map<String, Term> known_terms);
+
     List<Term> containsPredicate(boolean directed, Predicate predicate);
 
     List<Term> containsFunction(Function function);

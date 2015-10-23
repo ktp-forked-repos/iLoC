@@ -45,6 +45,11 @@ class WhenTerm implements Term {
     }
 
     @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        return new WhenTerm(condition.ground(domain, known_terms), effect.ground(domain, known_terms));
+    }
+
+    @Override
     public List<Term> containsPredicate(boolean directed, Predicate predicate) {
         return effect.containsPredicate(directed, predicate);
     }

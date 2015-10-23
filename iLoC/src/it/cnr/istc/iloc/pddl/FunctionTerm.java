@@ -54,6 +54,16 @@ class FunctionTerm implements Term {
     }
 
     @Override
+    public Term negate() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        return new FunctionTerm(domain.getFunction(function.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_")) + "_"), Collections.emptyList());
+    }
+
+    @Override
     public List<Term> containsPredicate(boolean directed, Predicate predicate) {
         return Collections.emptyList();
     }
@@ -65,11 +75,6 @@ class FunctionTerm implements Term {
         } else {
             return Collections.emptyList();
         }
-    }
-
-    @Override
-    public Term negate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

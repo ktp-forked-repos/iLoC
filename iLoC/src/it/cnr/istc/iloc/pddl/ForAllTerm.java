@@ -46,6 +46,11 @@ class ForAllTerm implements Term {
     }
 
     @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public List<Term> containsPredicate(boolean directed, Predicate predicate) {
         return formula.containsPredicate(directed, predicate);
     }
