@@ -119,7 +119,7 @@ public class PDDLTranslator {
                     assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText();
                     Type c_type = type;
                     ctx.name().stream().forEach(name -> {
-                        domain.addConstant(new Constant(Utils.lowercase(name.getText()), c_type));
+                        domain.addConstant(c_type.newInstance(Utils.lowercase(name.getText())));
                     });
                 }
             }, domain_context.constants_def());
