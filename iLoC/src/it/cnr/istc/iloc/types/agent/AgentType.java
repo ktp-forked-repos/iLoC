@@ -38,10 +38,12 @@ public class AgentType extends Type {
 
     public static final String TYPE_NAME = "Agent";
     private final Properties properties;
+    private final boolean lazy_scheduling;
 
     public AgentType(ISolver solver, Properties properties) {
         super(solver, solver, TYPE_NAME);
         this.properties = properties;
+        this.lazy_scheduling = Boolean.parseBoolean(properties.getProperty("AgentLazyScheduling", "false"));
     }
 
     @Override

@@ -52,6 +52,8 @@ class StaticCausalGraph implements IStaticCausalGraph {
     private final Map<INode, Map<INode, Collection<IEdge>>> links = new IdentityHashMap<>();
     private final Map<INode, Set<INode>> all_reachable_nodes = new HashMap<>();
     private final Map<INode, Set<INode>> all_min_reachable_nodes = new HashMap<>();
+    private final Map<INode, Set<INode>> min_reachable_nodes = new HashMap<>();
+    private final Map<INode, Integer> min_causal_distance = new HashMap<>();
     private final Collection<IStaticCausalGraphListener> listeners = new ArrayList<>();
 
     @Override
@@ -261,7 +263,10 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
     @Override
     public Set<INode> getMinReachableNodes(INode node) {
-        return getMinReachableNodes(node, new HashSet<>(nodes.size()));
+        if (!min_reachable_nodes.containsKey(node)) {
+            min_reachable_nodes.put(node, getMinReachableNodes(node, new HashSet<>(nodes.size())));
+        }
+        return min_reachable_nodes.get(node);
     }
 
     private Set<INode> getMinReachableNodes(INode node, Set<INode> visited) {
@@ -295,7 +300,10 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
     @Override
     public int getMinCausalDistance(INode node) {
-        return getMinCausalDistance(node, new HashSet<>(nodes.size()));
+        if (!min_causal_distance.containsKey(node)) {
+            min_causal_distance.put(node, getMinCausalDistance(node, new HashSet<>(nodes.size())));
+        }
+        return min_causal_distance.get(node);
     }
 
     private int getMinCausalDistance(INode node, Set<INode> visited) {

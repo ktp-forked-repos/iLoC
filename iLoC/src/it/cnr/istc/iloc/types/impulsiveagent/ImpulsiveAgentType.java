@@ -38,10 +38,12 @@ public class ImpulsiveAgentType extends Type {
 
     public static final String TYPE_NAME = "ImpulsiveAgent";
     private final Properties properties;
+    private final boolean lazy_scheduling;
 
     public ImpulsiveAgentType(ISolver solver, Properties properties) {
         super(solver, solver, TYPE_NAME);
         this.properties = properties;
+        this.lazy_scheduling = Boolean.parseBoolean(properties.getProperty("ImpulsiveAgentLazyScheduling", "false"));
     }
 
     @Override
