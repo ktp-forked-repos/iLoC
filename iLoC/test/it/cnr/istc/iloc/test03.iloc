@@ -1,0 +1,19 @@
+class C {
+
+    int id;
+
+    Klin(int id) {
+        this.id = id;
+    }
+}
+
+C c0 = new C(0);
+C c1 = new C(1);
+C c2 = new C(2);
+C c3 = new C(3);
+C c4 = new C(4);
+
+C enum_0;
+C enum_1;
+
+enum_0 != enum_1;

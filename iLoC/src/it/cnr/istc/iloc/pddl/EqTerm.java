@@ -62,7 +62,7 @@ class EqTerm implements Term {
 
     @Override
     public Term ground(Domain domain, Map<String, Term> known_terms) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new EqTerm(directed, firstTerm.ground(domain, known_terms), secondTerm.ground(domain, known_terms));
     }
 
     @Override

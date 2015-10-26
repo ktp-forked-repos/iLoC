@@ -1,0 +1,3270 @@
+/**
+* Domain: Blocks
+*/
+
+class Object {
+
+    int id;
+
+    Object(int id) {
+        this.id = id;
+    }
+}
+
+
+class BlocksState extends PropositionalState {
+
+    BlocksImpulsiveAgent agent;
+
+    BlocksState(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate On_a_a_True() {
+        duration >= 1;
+        goal stack_a_a = new agent.Stack_a_a(at:start);
+        fact holding_a__false = new Holding_a_False();
+        holding_a__false.start <= stack_a_a.at;
+        holding_a__false.end >= stack_a_a.at + 1;
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= stack_a_a.at;
+        clear_a__false.end >= stack_a_a.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= stack_a_a.at;
+        clear_a__true.end >= stack_a_a.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_a_a.at;
+        handempty_true.end >= stack_a_a.at + 1;
+    }
+
+    predicate On_a_a_False() {
+        duration >= 1;
+        goal unstack_a_a = new agent.Unstack_a_a(at:start);
+        fact holding_a__true = new Holding_a_True();
+        holding_a__true.start <= unstack_a_a.at;
+        holding_a__true.end >= unstack_a_a.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= unstack_a_a.at;
+        clear_a__true.end >= unstack_a_a.at + 1;
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= unstack_a_a.at;
+        clear_a__false.end >= unstack_a_a.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_a_a.at;
+        handempty_false.end >= unstack_a_a.at + 1;
+    }
+
+    predicate On_a_b_True() {
+        duration >= 1;
+        goal stack_a_b = new agent.Stack_a_b(at:start);
+        fact holding_a__false = new Holding_a_False();
+        holding_a__false.start <= stack_a_b.at;
+        holding_a__false.end >= stack_a_b.at + 1;
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= stack_a_b.at;
+        clear_b__false.end >= stack_a_b.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= stack_a_b.at;
+        clear_a__true.end >= stack_a_b.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_a_b.at;
+        handempty_true.end >= stack_a_b.at + 1;
+    }
+
+    predicate On_a_b_False() {
+        duration >= 1;
+        goal unstack_a_b = new agent.Unstack_a_b(at:start);
+        fact holding_a__true = new Holding_a_True();
+        holding_a__true.start <= unstack_a_b.at;
+        holding_a__true.end >= unstack_a_b.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= unstack_a_b.at;
+        clear_b__true.end >= unstack_a_b.at + 1;
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= unstack_a_b.at;
+        clear_a__false.end >= unstack_a_b.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_a_b.at;
+        handempty_false.end >= unstack_a_b.at + 1;
+    }
+
+    predicate On_a_c_True() {
+        duration >= 1;
+        goal stack_a_c = new agent.Stack_a_c(at:start);
+        fact holding_a__false = new Holding_a_False();
+        holding_a__false.start <= stack_a_c.at;
+        holding_a__false.end >= stack_a_c.at + 1;
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= stack_a_c.at;
+        clear_c__false.end >= stack_a_c.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= stack_a_c.at;
+        clear_a__true.end >= stack_a_c.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_a_c.at;
+        handempty_true.end >= stack_a_c.at + 1;
+    }
+
+    predicate On_a_c_False() {
+        duration >= 1;
+        goal unstack_a_c = new agent.Unstack_a_c(at:start);
+        fact holding_a__true = new Holding_a_True();
+        holding_a__true.start <= unstack_a_c.at;
+        holding_a__true.end >= unstack_a_c.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= unstack_a_c.at;
+        clear_c__true.end >= unstack_a_c.at + 1;
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= unstack_a_c.at;
+        clear_a__false.end >= unstack_a_c.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_a_c.at;
+        handempty_false.end >= unstack_a_c.at + 1;
+    }
+
+    predicate On_a_d_True() {
+        duration >= 1;
+        goal stack_a_d = new agent.Stack_a_d(at:start);
+        fact holding_a__false = new Holding_a_False();
+        holding_a__false.start <= stack_a_d.at;
+        holding_a__false.end >= stack_a_d.at + 1;
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= stack_a_d.at;
+        clear_d__false.end >= stack_a_d.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= stack_a_d.at;
+        clear_a__true.end >= stack_a_d.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_a_d.at;
+        handempty_true.end >= stack_a_d.at + 1;
+    }
+
+    predicate On_a_d_False() {
+        duration >= 1;
+        goal unstack_a_d = new agent.Unstack_a_d(at:start);
+        fact holding_a__true = new Holding_a_True();
+        holding_a__true.start <= unstack_a_d.at;
+        holding_a__true.end >= unstack_a_d.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= unstack_a_d.at;
+        clear_d__true.end >= unstack_a_d.at + 1;
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= unstack_a_d.at;
+        clear_a__false.end >= unstack_a_d.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_a_d.at;
+        handempty_false.end >= unstack_a_d.at + 1;
+    }
+
+    predicate On_b_a_True() {
+        duration >= 1;
+        goal stack_b_a = new agent.Stack_b_a(at:start);
+        fact holding_b__false = new Holding_b_False();
+        holding_b__false.start <= stack_b_a.at;
+        holding_b__false.end >= stack_b_a.at + 1;
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= stack_b_a.at;
+        clear_a__false.end >= stack_b_a.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= stack_b_a.at;
+        clear_b__true.end >= stack_b_a.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_b_a.at;
+        handempty_true.end >= stack_b_a.at + 1;
+    }
+
+    predicate On_b_a_False() {
+        duration >= 1;
+        goal unstack_b_a = new agent.Unstack_b_a(at:start);
+        fact holding_b__true = new Holding_b_True();
+        holding_b__true.start <= unstack_b_a.at;
+        holding_b__true.end >= unstack_b_a.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= unstack_b_a.at;
+        clear_a__true.end >= unstack_b_a.at + 1;
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= unstack_b_a.at;
+        clear_b__false.end >= unstack_b_a.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_b_a.at;
+        handempty_false.end >= unstack_b_a.at + 1;
+    }
+
+    predicate On_b_b_True() {
+        duration >= 1;
+        goal stack_b_b = new agent.Stack_b_b(at:start);
+        fact holding_b__false = new Holding_b_False();
+        holding_b__false.start <= stack_b_b.at;
+        holding_b__false.end >= stack_b_b.at + 1;
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= stack_b_b.at;
+        clear_b__false.end >= stack_b_b.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= stack_b_b.at;
+        clear_b__true.end >= stack_b_b.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_b_b.at;
+        handempty_true.end >= stack_b_b.at + 1;
+    }
+
+    predicate On_b_b_False() {
+        duration >= 1;
+        goal unstack_b_b = new agent.Unstack_b_b(at:start);
+        fact holding_b__true = new Holding_b_True();
+        holding_b__true.start <= unstack_b_b.at;
+        holding_b__true.end >= unstack_b_b.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= unstack_b_b.at;
+        clear_b__true.end >= unstack_b_b.at + 1;
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= unstack_b_b.at;
+        clear_b__false.end >= unstack_b_b.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_b_b.at;
+        handempty_false.end >= unstack_b_b.at + 1;
+    }
+
+    predicate On_b_c_True() {
+        duration >= 1;
+        goal stack_b_c = new agent.Stack_b_c(at:start);
+        fact holding_b__false = new Holding_b_False();
+        holding_b__false.start <= stack_b_c.at;
+        holding_b__false.end >= stack_b_c.at + 1;
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= stack_b_c.at;
+        clear_c__false.end >= stack_b_c.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= stack_b_c.at;
+        clear_b__true.end >= stack_b_c.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_b_c.at;
+        handempty_true.end >= stack_b_c.at + 1;
+    }
+
+    predicate On_b_c_False() {
+        duration >= 1;
+        goal unstack_b_c = new agent.Unstack_b_c(at:start);
+        fact holding_b__true = new Holding_b_True();
+        holding_b__true.start <= unstack_b_c.at;
+        holding_b__true.end >= unstack_b_c.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= unstack_b_c.at;
+        clear_c__true.end >= unstack_b_c.at + 1;
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= unstack_b_c.at;
+        clear_b__false.end >= unstack_b_c.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_b_c.at;
+        handempty_false.end >= unstack_b_c.at + 1;
+    }
+
+    predicate On_b_d_True() {
+        duration >= 1;
+        goal stack_b_d = new agent.Stack_b_d(at:start);
+        fact holding_b__false = new Holding_b_False();
+        holding_b__false.start <= stack_b_d.at;
+        holding_b__false.end >= stack_b_d.at + 1;
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= stack_b_d.at;
+        clear_d__false.end >= stack_b_d.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= stack_b_d.at;
+        clear_b__true.end >= stack_b_d.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_b_d.at;
+        handempty_true.end >= stack_b_d.at + 1;
+    }
+
+    predicate On_b_d_False() {
+        duration >= 1;
+        goal unstack_b_d = new agent.Unstack_b_d(at:start);
+        fact holding_b__true = new Holding_b_True();
+        holding_b__true.start <= unstack_b_d.at;
+        holding_b__true.end >= unstack_b_d.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= unstack_b_d.at;
+        clear_d__true.end >= unstack_b_d.at + 1;
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= unstack_b_d.at;
+        clear_b__false.end >= unstack_b_d.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_b_d.at;
+        handempty_false.end >= unstack_b_d.at + 1;
+    }
+
+    predicate On_c_a_True() {
+        duration >= 1;
+        goal stack_c_a = new agent.Stack_c_a(at:start);
+        fact holding_c__false = new Holding_c_False();
+        holding_c__false.start <= stack_c_a.at;
+        holding_c__false.end >= stack_c_a.at + 1;
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= stack_c_a.at;
+        clear_a__false.end >= stack_c_a.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= stack_c_a.at;
+        clear_c__true.end >= stack_c_a.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_c_a.at;
+        handempty_true.end >= stack_c_a.at + 1;
+    }
+
+    predicate On_c_a_False() {
+        duration >= 1;
+        goal unstack_c_a = new agent.Unstack_c_a(at:start);
+        fact holding_c__true = new Holding_c_True();
+        holding_c__true.start <= unstack_c_a.at;
+        holding_c__true.end >= unstack_c_a.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= unstack_c_a.at;
+        clear_a__true.end >= unstack_c_a.at + 1;
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= unstack_c_a.at;
+        clear_c__false.end >= unstack_c_a.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_c_a.at;
+        handempty_false.end >= unstack_c_a.at + 1;
+    }
+
+    predicate On_c_b_True() {
+        duration >= 1;
+        goal stack_c_b = new agent.Stack_c_b(at:start);
+        fact holding_c__false = new Holding_c_False();
+        holding_c__false.start <= stack_c_b.at;
+        holding_c__false.end >= stack_c_b.at + 1;
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= stack_c_b.at;
+        clear_b__false.end >= stack_c_b.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= stack_c_b.at;
+        clear_c__true.end >= stack_c_b.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_c_b.at;
+        handempty_true.end >= stack_c_b.at + 1;
+    }
+
+    predicate On_c_b_False() {
+        duration >= 1;
+        goal unstack_c_b = new agent.Unstack_c_b(at:start);
+        fact holding_c__true = new Holding_c_True();
+        holding_c__true.start <= unstack_c_b.at;
+        holding_c__true.end >= unstack_c_b.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= unstack_c_b.at;
+        clear_b__true.end >= unstack_c_b.at + 1;
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= unstack_c_b.at;
+        clear_c__false.end >= unstack_c_b.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_c_b.at;
+        handempty_false.end >= unstack_c_b.at + 1;
+    }
+
+    predicate On_c_c_True() {
+        duration >= 1;
+        goal stack_c_c = new agent.Stack_c_c(at:start);
+        fact holding_c__false = new Holding_c_False();
+        holding_c__false.start <= stack_c_c.at;
+        holding_c__false.end >= stack_c_c.at + 1;
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= stack_c_c.at;
+        clear_c__false.end >= stack_c_c.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= stack_c_c.at;
+        clear_c__true.end >= stack_c_c.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_c_c.at;
+        handempty_true.end >= stack_c_c.at + 1;
+    }
+
+    predicate On_c_c_False() {
+        duration >= 1;
+        goal unstack_c_c = new agent.Unstack_c_c(at:start);
+        fact holding_c__true = new Holding_c_True();
+        holding_c__true.start <= unstack_c_c.at;
+        holding_c__true.end >= unstack_c_c.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= unstack_c_c.at;
+        clear_c__true.end >= unstack_c_c.at + 1;
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= unstack_c_c.at;
+        clear_c__false.end >= unstack_c_c.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_c_c.at;
+        handempty_false.end >= unstack_c_c.at + 1;
+    }
+
+    predicate On_c_d_True() {
+        duration >= 1;
+        goal stack_c_d = new agent.Stack_c_d(at:start);
+        fact holding_c__false = new Holding_c_False();
+        holding_c__false.start <= stack_c_d.at;
+        holding_c__false.end >= stack_c_d.at + 1;
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= stack_c_d.at;
+        clear_d__false.end >= stack_c_d.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= stack_c_d.at;
+        clear_c__true.end >= stack_c_d.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_c_d.at;
+        handempty_true.end >= stack_c_d.at + 1;
+    }
+
+    predicate On_c_d_False() {
+        duration >= 1;
+        goal unstack_c_d = new agent.Unstack_c_d(at:start);
+        fact holding_c__true = new Holding_c_True();
+        holding_c__true.start <= unstack_c_d.at;
+        holding_c__true.end >= unstack_c_d.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= unstack_c_d.at;
+        clear_d__true.end >= unstack_c_d.at + 1;
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= unstack_c_d.at;
+        clear_c__false.end >= unstack_c_d.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_c_d.at;
+        handempty_false.end >= unstack_c_d.at + 1;
+    }
+
+    predicate On_d_a_True() {
+        duration >= 1;
+        goal stack_d_a = new agent.Stack_d_a(at:start);
+        fact holding_d__false = new Holding_d_False();
+        holding_d__false.start <= stack_d_a.at;
+        holding_d__false.end >= stack_d_a.at + 1;
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= stack_d_a.at;
+        clear_a__false.end >= stack_d_a.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= stack_d_a.at;
+        clear_d__true.end >= stack_d_a.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_d_a.at;
+        handempty_true.end >= stack_d_a.at + 1;
+    }
+
+    predicate On_d_a_False() {
+        duration >= 1;
+        goal unstack_d_a = new agent.Unstack_d_a(at:start);
+        fact holding_d__true = new Holding_d_True();
+        holding_d__true.start <= unstack_d_a.at;
+        holding_d__true.end >= unstack_d_a.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= unstack_d_a.at;
+        clear_a__true.end >= unstack_d_a.at + 1;
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= unstack_d_a.at;
+        clear_d__false.end >= unstack_d_a.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_d_a.at;
+        handempty_false.end >= unstack_d_a.at + 1;
+    }
+
+    predicate On_d_b_True() {
+        duration >= 1;
+        goal stack_d_b = new agent.Stack_d_b(at:start);
+        fact holding_d__false = new Holding_d_False();
+        holding_d__false.start <= stack_d_b.at;
+        holding_d__false.end >= stack_d_b.at + 1;
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= stack_d_b.at;
+        clear_b__false.end >= stack_d_b.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= stack_d_b.at;
+        clear_d__true.end >= stack_d_b.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_d_b.at;
+        handempty_true.end >= stack_d_b.at + 1;
+    }
+
+    predicate On_d_b_False() {
+        duration >= 1;
+        goal unstack_d_b = new agent.Unstack_d_b(at:start);
+        fact holding_d__true = new Holding_d_True();
+        holding_d__true.start <= unstack_d_b.at;
+        holding_d__true.end >= unstack_d_b.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= unstack_d_b.at;
+        clear_b__true.end >= unstack_d_b.at + 1;
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= unstack_d_b.at;
+        clear_d__false.end >= unstack_d_b.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_d_b.at;
+        handempty_false.end >= unstack_d_b.at + 1;
+    }
+
+    predicate On_d_c_True() {
+        duration >= 1;
+        goal stack_d_c = new agent.Stack_d_c(at:start);
+        fact holding_d__false = new Holding_d_False();
+        holding_d__false.start <= stack_d_c.at;
+        holding_d__false.end >= stack_d_c.at + 1;
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= stack_d_c.at;
+        clear_c__false.end >= stack_d_c.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= stack_d_c.at;
+        clear_d__true.end >= stack_d_c.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_d_c.at;
+        handempty_true.end >= stack_d_c.at + 1;
+    }
+
+    predicate On_d_c_False() {
+        duration >= 1;
+        goal unstack_d_c = new agent.Unstack_d_c(at:start);
+        fact holding_d__true = new Holding_d_True();
+        holding_d__true.start <= unstack_d_c.at;
+        holding_d__true.end >= unstack_d_c.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= unstack_d_c.at;
+        clear_c__true.end >= unstack_d_c.at + 1;
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= unstack_d_c.at;
+        clear_d__false.end >= unstack_d_c.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_d_c.at;
+        handempty_false.end >= unstack_d_c.at + 1;
+    }
+
+    predicate On_d_d_True() {
+        duration >= 1;
+        goal stack_d_d = new agent.Stack_d_d(at:start);
+        fact holding_d__false = new Holding_d_False();
+        holding_d__false.start <= stack_d_d.at;
+        holding_d__false.end >= stack_d_d.at + 1;
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= stack_d_d.at;
+        clear_d__false.end >= stack_d_d.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= stack_d_d.at;
+        clear_d__true.end >= stack_d_d.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= stack_d_d.at;
+        handempty_true.end >= stack_d_d.at + 1;
+    }
+
+    predicate On_d_d_False() {
+        duration >= 1;
+        goal unstack_d_d = new agent.Unstack_d_d(at:start);
+        fact holding_d__true = new Holding_d_True();
+        holding_d__true.start <= unstack_d_d.at;
+        holding_d__true.end >= unstack_d_d.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= unstack_d_d.at;
+        clear_d__true.end >= unstack_d_d.at + 1;
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= unstack_d_d.at;
+        clear_d__false.end >= unstack_d_d.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= unstack_d_d.at;
+        handempty_false.end >= unstack_d_d.at + 1;
+    }
+
+    predicate Ontable_a_True() {
+        duration >= 1;
+        goal put_down_a = new agent.Put_down_a(at:start);
+        fact holding_a__false = new Holding_a_False();
+        holding_a__false.start <= put_down_a.at;
+        holding_a__false.end >= put_down_a.at + 1;
+        fact clear_a__true = new Clear_a_True();
+        clear_a__true.start <= put_down_a.at;
+        clear_a__true.end >= put_down_a.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= put_down_a.at;
+        handempty_true.end >= put_down_a.at + 1;
+    }
+
+    predicate Ontable_a_False() {
+        duration >= 1;
+        goal pick_up_a = new agent.Pick_up_a(at:start);
+        fact clear_a__false = new Clear_a_False();
+        clear_a__false.start <= pick_up_a.at;
+        clear_a__false.end >= pick_up_a.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= pick_up_a.at;
+        handempty_false.end >= pick_up_a.at + 1;
+        fact holding_a__true = new Holding_a_True();
+        holding_a__true.start <= pick_up_a.at;
+        holding_a__true.end >= pick_up_a.at + 1;
+    }
+
+    predicate Ontable_b_True() {
+        duration >= 1;
+        goal put_down_b = new agent.Put_down_b(at:start);
+        fact holding_b__false = new Holding_b_False();
+        holding_b__false.start <= put_down_b.at;
+        holding_b__false.end >= put_down_b.at + 1;
+        fact clear_b__true = new Clear_b_True();
+        clear_b__true.start <= put_down_b.at;
+        clear_b__true.end >= put_down_b.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= put_down_b.at;
+        handempty_true.end >= put_down_b.at + 1;
+    }
+
+    predicate Ontable_b_False() {
+        duration >= 1;
+        goal pick_up_b = new agent.Pick_up_b(at:start);
+        fact clear_b__false = new Clear_b_False();
+        clear_b__false.start <= pick_up_b.at;
+        clear_b__false.end >= pick_up_b.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= pick_up_b.at;
+        handempty_false.end >= pick_up_b.at + 1;
+        fact holding_b__true = new Holding_b_True();
+        holding_b__true.start <= pick_up_b.at;
+        holding_b__true.end >= pick_up_b.at + 1;
+    }
+
+    predicate Ontable_c_True() {
+        duration >= 1;
+        goal put_down_c = new agent.Put_down_c(at:start);
+        fact holding_c__false = new Holding_c_False();
+        holding_c__false.start <= put_down_c.at;
+        holding_c__false.end >= put_down_c.at + 1;
+        fact clear_c__true = new Clear_c_True();
+        clear_c__true.start <= put_down_c.at;
+        clear_c__true.end >= put_down_c.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= put_down_c.at;
+        handempty_true.end >= put_down_c.at + 1;
+    }
+
+    predicate Ontable_c_False() {
+        duration >= 1;
+        goal pick_up_c = new agent.Pick_up_c(at:start);
+        fact clear_c__false = new Clear_c_False();
+        clear_c__false.start <= pick_up_c.at;
+        clear_c__false.end >= pick_up_c.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= pick_up_c.at;
+        handempty_false.end >= pick_up_c.at + 1;
+        fact holding_c__true = new Holding_c_True();
+        holding_c__true.start <= pick_up_c.at;
+        holding_c__true.end >= pick_up_c.at + 1;
+    }
+
+    predicate Ontable_d_True() {
+        duration >= 1;
+        goal put_down_d = new agent.Put_down_d(at:start);
+        fact holding_d__false = new Holding_d_False();
+        holding_d__false.start <= put_down_d.at;
+        holding_d__false.end >= put_down_d.at + 1;
+        fact clear_d__true = new Clear_d_True();
+        clear_d__true.start <= put_down_d.at;
+        clear_d__true.end >= put_down_d.at + 1;
+        fact handempty_true = new HandemptyTrue();
+        handempty_true.start <= put_down_d.at;
+        handempty_true.end >= put_down_d.at + 1;
+    }
+
+    predicate Ontable_d_False() {
+        duration >= 1;
+        goal pick_up_d = new agent.Pick_up_d(at:start);
+        fact clear_d__false = new Clear_d_False();
+        clear_d__false.start <= pick_up_d.at;
+        clear_d__false.end >= pick_up_d.at + 1;
+        fact handempty_false = new HandemptyFalse();
+        handempty_false.start <= pick_up_d.at;
+        handempty_false.end >= pick_up_d.at + 1;
+        fact holding_d__true = new Holding_d_True();
+        holding_d__true.start <= pick_up_d.at;
+        holding_d__true.end >= pick_up_d.at + 1;
+    }
+
+    predicate Clear_a_True() {
+        duration >= 1;
+        {
+            goal stack_a_c = new agent.Stack_a_c(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_c.at;
+            holding_a__false.end >= stack_a_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_a_c.at;
+            clear_c__false.end >= stack_a_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_c.at;
+            handempty_true.end >= stack_a_c.at + 1;
+            fact on_a_c__true = new On_a_c_True();
+            on_a_c__true.start <= stack_a_c.at;
+            on_a_c__true.end >= stack_a_c.at + 1;
+        } or {
+            goal unstack_a_a = new agent.Unstack_a_a(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_a.at;
+            holding_a__true.end >= unstack_a_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_a.at;
+            clear_a__false.end >= unstack_a_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_a.at;
+            handempty_false.end >= unstack_a_a.at + 1;
+            fact on_a_a__false = new On_a_a_False();
+            on_a_a__false.start <= unstack_a_a.at;
+            on_a_a__false.end >= unstack_a_a.at + 1;
+        } or {
+            goal stack_a_d = new agent.Stack_a_d(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_d.at;
+            holding_a__false.end >= stack_a_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_a_d.at;
+            clear_d__false.end >= stack_a_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_d.at;
+            handempty_true.end >= stack_a_d.at + 1;
+            fact on_a_d__true = new On_a_d_True();
+            on_a_d__true.start <= stack_a_d.at;
+            on_a_d__true.end >= stack_a_d.at + 1;
+        } or {
+            goal unstack_c_a = new agent.Unstack_c_a(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_a.at;
+            holding_c__true.end >= unstack_c_a.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_a.at;
+            clear_c__false.end >= unstack_c_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_a.at;
+            handempty_false.end >= unstack_c_a.at + 1;
+            fact on_c_a__false = new On_c_a_False();
+            on_c_a__false.start <= unstack_c_a.at;
+            on_c_a__false.end >= unstack_c_a.at + 1;
+        } or {
+            goal put_down_a = new agent.Put_down_a(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= put_down_a.at;
+            holding_a__false.end >= put_down_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= put_down_a.at;
+            handempty_true.end >= put_down_a.at + 1;
+            fact ontable_a__true = new Ontable_a_True();
+            ontable_a__true.start <= put_down_a.at;
+            ontable_a__true.end >= put_down_a.at + 1;
+        } or {
+            goal unstack_b_a = new agent.Unstack_b_a(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_a.at;
+            holding_b__true.end >= unstack_b_a.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_a.at;
+            clear_b__false.end >= unstack_b_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_a.at;
+            handempty_false.end >= unstack_b_a.at + 1;
+            fact on_b_a__false = new On_b_a_False();
+            on_b_a__false.start <= unstack_b_a.at;
+            on_b_a__false.end >= unstack_b_a.at + 1;
+        } or {
+            goal unstack_d_a = new agent.Unstack_d_a(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_a.at;
+            holding_d__true.end >= unstack_d_a.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_a.at;
+            clear_d__false.end >= unstack_d_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_a.at;
+            handempty_false.end >= unstack_d_a.at + 1;
+            fact on_d_a__false = new On_d_a_False();
+            on_d_a__false.start <= unstack_d_a.at;
+            on_d_a__false.end >= unstack_d_a.at + 1;
+        } or {
+            goal stack_a_a = new agent.Stack_a_a(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_a.at;
+            holding_a__false.end >= stack_a_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_a_a.at;
+            clear_a__false.end >= stack_a_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_a.at;
+            handempty_true.end >= stack_a_a.at + 1;
+            fact on_a_a__true = new On_a_a_True();
+            on_a_a__true.start <= stack_a_a.at;
+            on_a_a__true.end >= stack_a_a.at + 1;
+        } or {
+            goal stack_a_b = new agent.Stack_a_b(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_b.at;
+            holding_a__false.end >= stack_a_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_a_b.at;
+            clear_b__false.end >= stack_a_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_b.at;
+            handempty_true.end >= stack_a_b.at + 1;
+            fact on_a_b__true = new On_a_b_True();
+            on_a_b__true.start <= stack_a_b.at;
+            on_a_b__true.end >= stack_a_b.at + 1;
+        }
+    }
+
+    predicate Clear_a_False() {
+        duration >= 1;
+        {
+            goal stack_d_a = new agent.Stack_d_a(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_a.at;
+            holding_d__false.end >= stack_d_a.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_a.at;
+            clear_d__true.end >= stack_d_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_a.at;
+            handempty_true.end >= stack_d_a.at + 1;
+            fact on_d_a__true = new On_d_a_True();
+            on_d_a__true.start <= stack_d_a.at;
+            on_d_a__true.end >= stack_d_a.at + 1;
+        } or {
+            goal unstack_a_b = new agent.Unstack_a_b(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_b.at;
+            holding_a__true.end >= unstack_a_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_a_b.at;
+            clear_b__true.end >= unstack_a_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_b.at;
+            handempty_false.end >= unstack_a_b.at + 1;
+            fact on_a_b__false = new On_a_b_False();
+            on_a_b__false.start <= unstack_a_b.at;
+            on_a_b__false.end >= unstack_a_b.at + 1;
+        } or {
+            goal unstack_a_d = new agent.Unstack_a_d(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_d.at;
+            holding_a__true.end >= unstack_a_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_a_d.at;
+            clear_d__true.end >= unstack_a_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_d.at;
+            handempty_false.end >= unstack_a_d.at + 1;
+            fact on_a_d__false = new On_a_d_False();
+            on_a_d__false.start <= unstack_a_d.at;
+            on_a_d__false.end >= unstack_a_d.at + 1;
+        } or {
+            goal unstack_a_a = new agent.Unstack_a_a(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_a.at;
+            holding_a__true.end >= unstack_a_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_a_a.at;
+            clear_a__true.end >= unstack_a_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_a.at;
+            handempty_false.end >= unstack_a_a.at + 1;
+            fact on_a_a__false = new On_a_a_False();
+            on_a_a__false.start <= unstack_a_a.at;
+            on_a_a__false.end >= unstack_a_a.at + 1;
+        } or {
+            goal unstack_a_c = new agent.Unstack_a_c(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_c.at;
+            holding_a__true.end >= unstack_a_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_a_c.at;
+            clear_c__true.end >= unstack_a_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_c.at;
+            handempty_false.end >= unstack_a_c.at + 1;
+            fact on_a_c__false = new On_a_c_False();
+            on_a_c__false.start <= unstack_a_c.at;
+            on_a_c__false.end >= unstack_a_c.at + 1;
+        } or {
+            goal stack_b_a = new agent.Stack_b_a(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_a.at;
+            holding_b__false.end >= stack_b_a.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_a.at;
+            clear_b__true.end >= stack_b_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_a.at;
+            handempty_true.end >= stack_b_a.at + 1;
+            fact on_b_a__true = new On_b_a_True();
+            on_b_a__true.start <= stack_b_a.at;
+            on_b_a__true.end >= stack_b_a.at + 1;
+        } or {
+            goal stack_c_a = new agent.Stack_c_a(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_a.at;
+            holding_c__false.end >= stack_c_a.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_a.at;
+            clear_c__true.end >= stack_c_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_a.at;
+            handempty_true.end >= stack_c_a.at + 1;
+            fact on_c_a__true = new On_c_a_True();
+            on_c_a__true.start <= stack_c_a.at;
+            on_c_a__true.end >= stack_c_a.at + 1;
+        } or {
+            goal stack_a_a = new agent.Stack_a_a(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_a.at;
+            holding_a__false.end >= stack_a_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_a.at;
+            clear_a__true.end >= stack_a_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_a.at;
+            handempty_true.end >= stack_a_a.at + 1;
+            fact on_a_a__true = new On_a_a_True();
+            on_a_a__true.start <= stack_a_a.at;
+            on_a_a__true.end >= stack_a_a.at + 1;
+        } or {
+            goal pick_up_a = new agent.Pick_up_a(at:start);
+            fact ontable_a__false = new Ontable_a_False();
+            ontable_a__false.start <= pick_up_a.at;
+            ontable_a__false.end >= pick_up_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= pick_up_a.at;
+            handempty_false.end >= pick_up_a.at + 1;
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= pick_up_a.at;
+            holding_a__true.end >= pick_up_a.at + 1;
+        }
+    }
+
+    predicate Clear_b_True() {
+        duration >= 1;
+        {
+            goal unstack_a_b = new agent.Unstack_a_b(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_b.at;
+            holding_a__true.end >= unstack_a_b.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_b.at;
+            clear_a__false.end >= unstack_a_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_b.at;
+            handempty_false.end >= unstack_a_b.at + 1;
+            fact on_a_b__false = new On_a_b_False();
+            on_a_b__false.start <= unstack_a_b.at;
+            on_a_b__false.end >= unstack_a_b.at + 1;
+        } or {
+            goal unstack_c_b = new agent.Unstack_c_b(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_b.at;
+            holding_c__true.end >= unstack_c_b.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_b.at;
+            clear_c__false.end >= unstack_c_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_b.at;
+            handempty_false.end >= unstack_c_b.at + 1;
+            fact on_c_b__false = new On_c_b_False();
+            on_c_b__false.start <= unstack_c_b.at;
+            on_c_b__false.end >= unstack_c_b.at + 1;
+        } or {
+            goal stack_b_d = new agent.Stack_b_d(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_d.at;
+            holding_b__false.end >= stack_b_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_b_d.at;
+            clear_d__false.end >= stack_b_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_d.at;
+            handempty_true.end >= stack_b_d.at + 1;
+            fact on_b_d__true = new On_b_d_True();
+            on_b_d__true.start <= stack_b_d.at;
+            on_b_d__true.end >= stack_b_d.at + 1;
+        } or {
+            goal unstack_d_b = new agent.Unstack_d_b(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_b.at;
+            holding_d__true.end >= unstack_d_b.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_b.at;
+            clear_d__false.end >= unstack_d_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_b.at;
+            handempty_false.end >= unstack_d_b.at + 1;
+            fact on_d_b__false = new On_d_b_False();
+            on_d_b__false.start <= unstack_d_b.at;
+            on_d_b__false.end >= unstack_d_b.at + 1;
+        } or {
+            goal stack_b_a = new agent.Stack_b_a(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_a.at;
+            holding_b__false.end >= stack_b_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_b_a.at;
+            clear_a__false.end >= stack_b_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_a.at;
+            handempty_true.end >= stack_b_a.at + 1;
+            fact on_b_a__true = new On_b_a_True();
+            on_b_a__true.start <= stack_b_a.at;
+            on_b_a__true.end >= stack_b_a.at + 1;
+        } or {
+            goal put_down_b = new agent.Put_down_b(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= put_down_b.at;
+            holding_b__false.end >= put_down_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= put_down_b.at;
+            handempty_true.end >= put_down_b.at + 1;
+            fact ontable_b__true = new Ontable_b_True();
+            ontable_b__true.start <= put_down_b.at;
+            ontable_b__true.end >= put_down_b.at + 1;
+        } or {
+            goal stack_b_b = new agent.Stack_b_b(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_b.at;
+            holding_b__false.end >= stack_b_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_b_b.at;
+            clear_b__false.end >= stack_b_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_b.at;
+            handempty_true.end >= stack_b_b.at + 1;
+            fact on_b_b__true = new On_b_b_True();
+            on_b_b__true.start <= stack_b_b.at;
+            on_b_b__true.end >= stack_b_b.at + 1;
+        } or {
+            goal stack_b_c = new agent.Stack_b_c(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_c.at;
+            holding_b__false.end >= stack_b_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_b_c.at;
+            clear_c__false.end >= stack_b_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_c.at;
+            handempty_true.end >= stack_b_c.at + 1;
+            fact on_b_c__true = new On_b_c_True();
+            on_b_c__true.start <= stack_b_c.at;
+            on_b_c__true.end >= stack_b_c.at + 1;
+        } or {
+            goal unstack_b_b = new agent.Unstack_b_b(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_b.at;
+            holding_b__true.end >= unstack_b_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_b.at;
+            clear_b__false.end >= unstack_b_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_b.at;
+            handempty_false.end >= unstack_b_b.at + 1;
+            fact on_b_b__false = new On_b_b_False();
+            on_b_b__false.start <= unstack_b_b.at;
+            on_b_b__false.end >= unstack_b_b.at + 1;
+        }
+    }
+
+    predicate Clear_b_False() {
+        duration >= 1;
+        {
+            goal stack_d_b = new agent.Stack_d_b(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_b.at;
+            holding_d__false.end >= stack_d_b.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_b.at;
+            clear_d__true.end >= stack_d_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_b.at;
+            handempty_true.end >= stack_d_b.at + 1;
+            fact on_d_b__true = new On_d_b_True();
+            on_d_b__true.start <= stack_d_b.at;
+            on_d_b__true.end >= stack_d_b.at + 1;
+        } or {
+            goal pick_up_b = new agent.Pick_up_b(at:start);
+            fact ontable_b__false = new Ontable_b_False();
+            ontable_b__false.start <= pick_up_b.at;
+            ontable_b__false.end >= pick_up_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= pick_up_b.at;
+            handempty_false.end >= pick_up_b.at + 1;
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= pick_up_b.at;
+            holding_b__true.end >= pick_up_b.at + 1;
+        } or {
+            goal stack_c_b = new agent.Stack_c_b(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_b.at;
+            holding_c__false.end >= stack_c_b.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_b.at;
+            clear_c__true.end >= stack_c_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_b.at;
+            handempty_true.end >= stack_c_b.at + 1;
+            fact on_c_b__true = new On_c_b_True();
+            on_c_b__true.start <= stack_c_b.at;
+            on_c_b__true.end >= stack_c_b.at + 1;
+        } or {
+            goal unstack_b_a = new agent.Unstack_b_a(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_a.at;
+            holding_b__true.end >= unstack_b_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_b_a.at;
+            clear_a__true.end >= unstack_b_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_a.at;
+            handempty_false.end >= unstack_b_a.at + 1;
+            fact on_b_a__false = new On_b_a_False();
+            on_b_a__false.start <= unstack_b_a.at;
+            on_b_a__false.end >= unstack_b_a.at + 1;
+        } or {
+            goal unstack_b_c = new agent.Unstack_b_c(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_c.at;
+            holding_b__true.end >= unstack_b_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_b_c.at;
+            clear_c__true.end >= unstack_b_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_c.at;
+            handempty_false.end >= unstack_b_c.at + 1;
+            fact on_b_c__false = new On_b_c_False();
+            on_b_c__false.start <= unstack_b_c.at;
+            on_b_c__false.end >= unstack_b_c.at + 1;
+        } or {
+            goal unstack_b_d = new agent.Unstack_b_d(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_d.at;
+            holding_b__true.end >= unstack_b_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_b_d.at;
+            clear_d__true.end >= unstack_b_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_d.at;
+            handempty_false.end >= unstack_b_d.at + 1;
+            fact on_b_d__false = new On_b_d_False();
+            on_b_d__false.start <= unstack_b_d.at;
+            on_b_d__false.end >= unstack_b_d.at + 1;
+        } or {
+            goal stack_b_b = new agent.Stack_b_b(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_b.at;
+            holding_b__false.end >= stack_b_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_b.at;
+            clear_b__true.end >= stack_b_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_b.at;
+            handempty_true.end >= stack_b_b.at + 1;
+            fact on_b_b__true = new On_b_b_True();
+            on_b_b__true.start <= stack_b_b.at;
+            on_b_b__true.end >= stack_b_b.at + 1;
+        } or {
+            goal unstack_b_b = new agent.Unstack_b_b(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_b.at;
+            holding_b__true.end >= unstack_b_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_b_b.at;
+            clear_b__true.end >= unstack_b_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_b.at;
+            handempty_false.end >= unstack_b_b.at + 1;
+            fact on_b_b__false = new On_b_b_False();
+            on_b_b__false.start <= unstack_b_b.at;
+            on_b_b__false.end >= unstack_b_b.at + 1;
+        } or {
+            goal stack_a_b = new agent.Stack_a_b(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_b.at;
+            holding_a__false.end >= stack_a_b.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_b.at;
+            clear_a__true.end >= stack_a_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_b.at;
+            handempty_true.end >= stack_a_b.at + 1;
+            fact on_a_b__true = new On_a_b_True();
+            on_a_b__true.start <= stack_a_b.at;
+            on_a_b__true.end >= stack_a_b.at + 1;
+        }
+    }
+
+    predicate Clear_c_True() {
+        duration >= 1;
+        {
+            goal stack_c_c = new agent.Stack_c_c(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_c.at;
+            holding_c__false.end >= stack_c_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_c_c.at;
+            clear_c__false.end >= stack_c_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_c.at;
+            handempty_true.end >= stack_c_c.at + 1;
+            fact on_c_c__true = new On_c_c_True();
+            on_c_c__true.start <= stack_c_c.at;
+            on_c_c__true.end >= stack_c_c.at + 1;
+        } or {
+            goal unstack_d_c = new agent.Unstack_d_c(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_c.at;
+            holding_d__true.end >= unstack_d_c.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_c.at;
+            clear_d__false.end >= unstack_d_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_c.at;
+            handempty_false.end >= unstack_d_c.at + 1;
+            fact on_d_c__false = new On_d_c_False();
+            on_d_c__false.start <= unstack_d_c.at;
+            on_d_c__false.end >= unstack_d_c.at + 1;
+        } or {
+            goal unstack_a_c = new agent.Unstack_a_c(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_c.at;
+            holding_a__true.end >= unstack_a_c.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_c.at;
+            clear_a__false.end >= unstack_a_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_c.at;
+            handempty_false.end >= unstack_a_c.at + 1;
+            fact on_a_c__false = new On_a_c_False();
+            on_a_c__false.start <= unstack_a_c.at;
+            on_a_c__false.end >= unstack_a_c.at + 1;
+        } or {
+            goal put_down_c = new agent.Put_down_c(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= put_down_c.at;
+            holding_c__false.end >= put_down_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= put_down_c.at;
+            handempty_true.end >= put_down_c.at + 1;
+            fact ontable_c__true = new Ontable_c_True();
+            ontable_c__true.start <= put_down_c.at;
+            ontable_c__true.end >= put_down_c.at + 1;
+        } or {
+            goal unstack_c_c = new agent.Unstack_c_c(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_c.at;
+            holding_c__true.end >= unstack_c_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_c.at;
+            clear_c__false.end >= unstack_c_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_c.at;
+            handempty_false.end >= unstack_c_c.at + 1;
+            fact on_c_c__false = new On_c_c_False();
+            on_c_c__false.start <= unstack_c_c.at;
+            on_c_c__false.end >= unstack_c_c.at + 1;
+        } or {
+            goal stack_c_b = new agent.Stack_c_b(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_b.at;
+            holding_c__false.end >= stack_c_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_c_b.at;
+            clear_b__false.end >= stack_c_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_b.at;
+            handempty_true.end >= stack_c_b.at + 1;
+            fact on_c_b__true = new On_c_b_True();
+            on_c_b__true.start <= stack_c_b.at;
+            on_c_b__true.end >= stack_c_b.at + 1;
+        } or {
+            goal stack_c_a = new agent.Stack_c_a(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_a.at;
+            holding_c__false.end >= stack_c_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_c_a.at;
+            clear_a__false.end >= stack_c_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_a.at;
+            handempty_true.end >= stack_c_a.at + 1;
+            fact on_c_a__true = new On_c_a_True();
+            on_c_a__true.start <= stack_c_a.at;
+            on_c_a__true.end >= stack_c_a.at + 1;
+        } or {
+            goal stack_c_d = new agent.Stack_c_d(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_d.at;
+            holding_c__false.end >= stack_c_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_c_d.at;
+            clear_d__false.end >= stack_c_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_d.at;
+            handempty_true.end >= stack_c_d.at + 1;
+            fact on_c_d__true = new On_c_d_True();
+            on_c_d__true.start <= stack_c_d.at;
+            on_c_d__true.end >= stack_c_d.at + 1;
+        } or {
+            goal unstack_b_c = new agent.Unstack_b_c(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_c.at;
+            holding_b__true.end >= unstack_b_c.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_c.at;
+            clear_b__false.end >= unstack_b_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_c.at;
+            handempty_false.end >= unstack_b_c.at + 1;
+            fact on_b_c__false = new On_b_c_False();
+            on_b_c__false.start <= unstack_b_c.at;
+            on_b_c__false.end >= unstack_b_c.at + 1;
+        }
+    }
+
+    predicate Clear_c_False() {
+        duration >= 1;
+        {
+            goal stack_c_c = new agent.Stack_c_c(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_c.at;
+            holding_c__false.end >= stack_c_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_c.at;
+            clear_c__true.end >= stack_c_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_c.at;
+            handempty_true.end >= stack_c_c.at + 1;
+            fact on_c_c__true = new On_c_c_True();
+            on_c_c__true.start <= stack_c_c.at;
+            on_c_c__true.end >= stack_c_c.at + 1;
+        } or {
+            goal stack_a_c = new agent.Stack_a_c(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_c.at;
+            holding_a__false.end >= stack_a_c.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_c.at;
+            clear_a__true.end >= stack_a_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_c.at;
+            handempty_true.end >= stack_a_c.at + 1;
+            fact on_a_c__true = new On_a_c_True();
+            on_a_c__true.start <= stack_a_c.at;
+            on_a_c__true.end >= stack_a_c.at + 1;
+        } or {
+            goal pick_up_c = new agent.Pick_up_c(at:start);
+            fact ontable_c__false = new Ontable_c_False();
+            ontable_c__false.start <= pick_up_c.at;
+            ontable_c__false.end >= pick_up_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= pick_up_c.at;
+            handempty_false.end >= pick_up_c.at + 1;
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= pick_up_c.at;
+            holding_c__true.end >= pick_up_c.at + 1;
+        } or {
+            goal stack_d_c = new agent.Stack_d_c(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_c.at;
+            holding_d__false.end >= stack_d_c.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_c.at;
+            clear_d__true.end >= stack_d_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_c.at;
+            handempty_true.end >= stack_d_c.at + 1;
+            fact on_d_c__true = new On_d_c_True();
+            on_d_c__true.start <= stack_d_c.at;
+            on_d_c__true.end >= stack_d_c.at + 1;
+        } or {
+            goal unstack_c_a = new agent.Unstack_c_a(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_a.at;
+            holding_c__true.end >= unstack_c_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_c_a.at;
+            clear_a__true.end >= unstack_c_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_a.at;
+            handempty_false.end >= unstack_c_a.at + 1;
+            fact on_c_a__false = new On_c_a_False();
+            on_c_a__false.start <= unstack_c_a.at;
+            on_c_a__false.end >= unstack_c_a.at + 1;
+        } or {
+            goal unstack_c_b = new agent.Unstack_c_b(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_b.at;
+            holding_c__true.end >= unstack_c_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_c_b.at;
+            clear_b__true.end >= unstack_c_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_b.at;
+            handempty_false.end >= unstack_c_b.at + 1;
+            fact on_c_b__false = new On_c_b_False();
+            on_c_b__false.start <= unstack_c_b.at;
+            on_c_b__false.end >= unstack_c_b.at + 1;
+        } or {
+            goal unstack_c_d = new agent.Unstack_c_d(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_d.at;
+            holding_c__true.end >= unstack_c_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_c_d.at;
+            clear_d__true.end >= unstack_c_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_d.at;
+            handempty_false.end >= unstack_c_d.at + 1;
+            fact on_c_d__false = new On_c_d_False();
+            on_c_d__false.start <= unstack_c_d.at;
+            on_c_d__false.end >= unstack_c_d.at + 1;
+        } or {
+            goal unstack_c_c = new agent.Unstack_c_c(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_c.at;
+            holding_c__true.end >= unstack_c_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_c_c.at;
+            clear_c__true.end >= unstack_c_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_c.at;
+            handempty_false.end >= unstack_c_c.at + 1;
+            fact on_c_c__false = new On_c_c_False();
+            on_c_c__false.start <= unstack_c_c.at;
+            on_c_c__false.end >= unstack_c_c.at + 1;
+        } or {
+            goal stack_b_c = new agent.Stack_b_c(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_c.at;
+            holding_b__false.end >= stack_b_c.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_c.at;
+            clear_b__true.end >= stack_b_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_c.at;
+            handempty_true.end >= stack_b_c.at + 1;
+            fact on_b_c__true = new On_b_c_True();
+            on_b_c__true.start <= stack_b_c.at;
+            on_b_c__true.end >= stack_b_c.at + 1;
+        }
+    }
+
+    predicate Clear_d_True() {
+        duration >= 1;
+        {
+            goal stack_d_a = new agent.Stack_d_a(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_a.at;
+            holding_d__false.end >= stack_d_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_d_a.at;
+            clear_a__false.end >= stack_d_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_a.at;
+            handempty_true.end >= stack_d_a.at + 1;
+            fact on_d_a__true = new On_d_a_True();
+            on_d_a__true.start <= stack_d_a.at;
+            on_d_a__true.end >= stack_d_a.at + 1;
+        } or {
+            goal stack_d_b = new agent.Stack_d_b(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_b.at;
+            holding_d__false.end >= stack_d_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_d_b.at;
+            clear_b__false.end >= stack_d_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_b.at;
+            handempty_true.end >= stack_d_b.at + 1;
+            fact on_d_b__true = new On_d_b_True();
+            on_d_b__true.start <= stack_d_b.at;
+            on_d_b__true.end >= stack_d_b.at + 1;
+        } or {
+            goal unstack_a_d = new agent.Unstack_a_d(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_d.at;
+            holding_a__true.end >= unstack_a_d.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_d.at;
+            clear_a__false.end >= unstack_a_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_d.at;
+            handempty_false.end >= unstack_a_d.at + 1;
+            fact on_a_d__false = new On_a_d_False();
+            on_a_d__false.start <= unstack_a_d.at;
+            on_a_d__false.end >= unstack_a_d.at + 1;
+        } or {
+            goal stack_d_c = new agent.Stack_d_c(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_c.at;
+            holding_d__false.end >= stack_d_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_d_c.at;
+            clear_c__false.end >= stack_d_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_c.at;
+            handempty_true.end >= stack_d_c.at + 1;
+            fact on_d_c__true = new On_d_c_True();
+            on_d_c__true.start <= stack_d_c.at;
+            on_d_c__true.end >= stack_d_c.at + 1;
+        } or {
+            goal unstack_c_d = new agent.Unstack_c_d(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_d.at;
+            holding_c__true.end >= unstack_c_d.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_d.at;
+            clear_c__false.end >= unstack_c_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_d.at;
+            handempty_false.end >= unstack_c_d.at + 1;
+            fact on_c_d__false = new On_c_d_False();
+            on_c_d__false.start <= unstack_c_d.at;
+            on_c_d__false.end >= unstack_c_d.at + 1;
+        } or {
+            goal unstack_d_d = new agent.Unstack_d_d(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_d.at;
+            holding_d__true.end >= unstack_d_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_d.at;
+            clear_d__false.end >= unstack_d_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_d.at;
+            handempty_false.end >= unstack_d_d.at + 1;
+            fact on_d_d__false = new On_d_d_False();
+            on_d_d__false.start <= unstack_d_d.at;
+            on_d_d__false.end >= unstack_d_d.at + 1;
+        } or {
+            goal put_down_d = new agent.Put_down_d(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= put_down_d.at;
+            holding_d__false.end >= put_down_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= put_down_d.at;
+            handempty_true.end >= put_down_d.at + 1;
+            fact ontable_d__true = new Ontable_d_True();
+            ontable_d__true.start <= put_down_d.at;
+            ontable_d__true.end >= put_down_d.at + 1;
+        } or {
+            goal stack_d_d = new agent.Stack_d_d(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_d.at;
+            holding_d__false.end >= stack_d_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_d_d.at;
+            clear_d__false.end >= stack_d_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_d.at;
+            handempty_true.end >= stack_d_d.at + 1;
+            fact on_d_d__true = new On_d_d_True();
+            on_d_d__true.start <= stack_d_d.at;
+            on_d_d__true.end >= stack_d_d.at + 1;
+        } or {
+            goal unstack_b_d = new agent.Unstack_b_d(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_d.at;
+            holding_b__true.end >= unstack_b_d.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_d.at;
+            clear_b__false.end >= unstack_b_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_d.at;
+            handempty_false.end >= unstack_b_d.at + 1;
+            fact on_b_d__false = new On_b_d_False();
+            on_b_d__false.start <= unstack_b_d.at;
+            on_b_d__false.end >= unstack_b_d.at + 1;
+        }
+    }
+
+    predicate Clear_d_False() {
+        duration >= 1;
+        {
+            goal unstack_d_c = new agent.Unstack_d_c(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_c.at;
+            holding_d__true.end >= unstack_d_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_d_c.at;
+            clear_c__true.end >= unstack_d_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_c.at;
+            handempty_false.end >= unstack_d_c.at + 1;
+            fact on_d_c__false = new On_d_c_False();
+            on_d_c__false.start <= unstack_d_c.at;
+            on_d_c__false.end >= unstack_d_c.at + 1;
+        } or {
+            goal pick_up_d = new agent.Pick_up_d(at:start);
+            fact ontable_d__false = new Ontable_d_False();
+            ontable_d__false.start <= pick_up_d.at;
+            ontable_d__false.end >= pick_up_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= pick_up_d.at;
+            handempty_false.end >= pick_up_d.at + 1;
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= pick_up_d.at;
+            holding_d__true.end >= pick_up_d.at + 1;
+        } or {
+            goal stack_a_d = new agent.Stack_a_d(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_d.at;
+            holding_a__false.end >= stack_a_d.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_d.at;
+            clear_a__true.end >= stack_a_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_d.at;
+            handempty_true.end >= stack_a_d.at + 1;
+            fact on_a_d__true = new On_a_d_True();
+            on_a_d__true.start <= stack_a_d.at;
+            on_a_d__true.end >= stack_a_d.at + 1;
+        } or {
+            goal unstack_d_d = new agent.Unstack_d_d(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_d.at;
+            holding_d__true.end >= unstack_d_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_d_d.at;
+            clear_d__true.end >= unstack_d_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_d.at;
+            handempty_false.end >= unstack_d_d.at + 1;
+            fact on_d_d__false = new On_d_d_False();
+            on_d_d__false.start <= unstack_d_d.at;
+            on_d_d__false.end >= unstack_d_d.at + 1;
+        } or {
+            goal stack_b_d = new agent.Stack_b_d(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_d.at;
+            holding_b__false.end >= stack_b_d.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_d.at;
+            clear_b__true.end >= stack_b_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_d.at;
+            handempty_true.end >= stack_b_d.at + 1;
+            fact on_b_d__true = new On_b_d_True();
+            on_b_d__true.start <= stack_b_d.at;
+            on_b_d__true.end >= stack_b_d.at + 1;
+        } or {
+            goal unstack_d_b = new agent.Unstack_d_b(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_b.at;
+            holding_d__true.end >= unstack_d_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_d_b.at;
+            clear_b__true.end >= unstack_d_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_b.at;
+            handempty_false.end >= unstack_d_b.at + 1;
+            fact on_d_b__false = new On_d_b_False();
+            on_d_b__false.start <= unstack_d_b.at;
+            on_d_b__false.end >= unstack_d_b.at + 1;
+        } or {
+            goal stack_c_d = new agent.Stack_c_d(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_d.at;
+            holding_c__false.end >= stack_c_d.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_d.at;
+            clear_c__true.end >= stack_c_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_d.at;
+            handempty_true.end >= stack_c_d.at + 1;
+            fact on_c_d__true = new On_c_d_True();
+            on_c_d__true.start <= stack_c_d.at;
+            on_c_d__true.end >= stack_c_d.at + 1;
+        } or {
+            goal stack_d_d = new agent.Stack_d_d(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_d.at;
+            holding_d__false.end >= stack_d_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_d.at;
+            clear_d__true.end >= stack_d_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_d.at;
+            handempty_true.end >= stack_d_d.at + 1;
+            fact on_d_d__true = new On_d_d_True();
+            on_d_d__true.start <= stack_d_d.at;
+            on_d_d__true.end >= stack_d_d.at + 1;
+        } or {
+            goal unstack_d_a = new agent.Unstack_d_a(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_a.at;
+            holding_d__true.end >= unstack_d_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_d_a.at;
+            clear_a__true.end >= unstack_d_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_a.at;
+            handempty_false.end >= unstack_d_a.at + 1;
+            fact on_d_a__false = new On_d_a_False();
+            on_d_a__false.start <= unstack_d_a.at;
+            on_d_a__false.end >= unstack_d_a.at + 1;
+        }
+    }
+
+    predicate HandemptyTrue() {
+        duration >= 1;
+        {
+            goal stack_d_a = new agent.Stack_d_a(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_a.at;
+            holding_d__false.end >= stack_d_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_d_a.at;
+            clear_a__false.end >= stack_d_a.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_a.at;
+            clear_d__true.end >= stack_d_a.at + 1;
+            fact on_d_a__true = new On_d_a_True();
+            on_d_a__true.start <= stack_d_a.at;
+            on_d_a__true.end >= stack_d_a.at + 1;
+        } or {
+            goal stack_a_c = new agent.Stack_a_c(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_c.at;
+            holding_a__false.end >= stack_a_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_a_c.at;
+            clear_c__false.end >= stack_a_c.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_c.at;
+            clear_a__true.end >= stack_a_c.at + 1;
+            fact on_a_c__true = new On_a_c_True();
+            on_a_c__true.start <= stack_a_c.at;
+            on_a_c__true.end >= stack_a_c.at + 1;
+        } or {
+            goal stack_d_c = new agent.Stack_d_c(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_c.at;
+            holding_d__false.end >= stack_d_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_d_c.at;
+            clear_c__false.end >= stack_d_c.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_c.at;
+            clear_d__true.end >= stack_d_c.at + 1;
+            fact on_d_c__true = new On_d_c_True();
+            on_d_c__true.start <= stack_d_c.at;
+            on_d_c__true.end >= stack_d_c.at + 1;
+        } or {
+            goal stack_b_a = new agent.Stack_b_a(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_a.at;
+            holding_b__false.end >= stack_b_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_b_a.at;
+            clear_a__false.end >= stack_b_a.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_a.at;
+            clear_b__true.end >= stack_b_a.at + 1;
+            fact on_b_a__true = new On_b_a_True();
+            on_b_a__true.start <= stack_b_a.at;
+            on_b_a__true.end >= stack_b_a.at + 1;
+        } or {
+            goal stack_c_b = new agent.Stack_c_b(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_b.at;
+            holding_c__false.end >= stack_c_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_c_b.at;
+            clear_b__false.end >= stack_c_b.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_b.at;
+            clear_c__true.end >= stack_c_b.at + 1;
+            fact on_c_b__true = new On_c_b_True();
+            on_c_b__true.start <= stack_c_b.at;
+            on_c_b__true.end >= stack_c_b.at + 1;
+        } or {
+            goal stack_c_d = new agent.Stack_c_d(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_d.at;
+            holding_c__false.end >= stack_c_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_c_d.at;
+            clear_d__false.end >= stack_c_d.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_d.at;
+            clear_c__true.end >= stack_c_d.at + 1;
+            fact on_c_d__true = new On_c_d_True();
+            on_c_d__true.start <= stack_c_d.at;
+            on_c_d__true.end >= stack_c_d.at + 1;
+        } or {
+            goal put_down_b = new agent.Put_down_b(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= put_down_b.at;
+            holding_b__false.end >= put_down_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= put_down_b.at;
+            clear_b__true.end >= put_down_b.at + 1;
+            fact ontable_b__true = new Ontable_b_True();
+            ontable_b__true.start <= put_down_b.at;
+            ontable_b__true.end >= put_down_b.at + 1;
+        } or {
+            goal stack_a_a = new agent.Stack_a_a(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_a.at;
+            holding_a__false.end >= stack_a_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_a_a.at;
+            clear_a__false.end >= stack_a_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_a.at;
+            clear_a__true.end >= stack_a_a.at + 1;
+            fact on_a_a__true = new On_a_a_True();
+            on_a_a__true.start <= stack_a_a.at;
+            on_a_a__true.end >= stack_a_a.at + 1;
+        } or {
+            goal stack_c_c = new agent.Stack_c_c(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_c.at;
+            holding_c__false.end >= stack_c_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_c_c.at;
+            clear_c__false.end >= stack_c_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_c.at;
+            clear_c__true.end >= stack_c_c.at + 1;
+            fact on_c_c__true = new On_c_c_True();
+            on_c_c__true.start <= stack_c_c.at;
+            on_c_c__true.end >= stack_c_c.at + 1;
+        } or {
+            goal stack_d_b = new agent.Stack_d_b(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_b.at;
+            holding_d__false.end >= stack_d_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_d_b.at;
+            clear_b__false.end >= stack_d_b.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_b.at;
+            clear_d__true.end >= stack_d_b.at + 1;
+            fact on_d_b__true = new On_d_b_True();
+            on_d_b__true.start <= stack_d_b.at;
+            on_d_b__true.end >= stack_d_b.at + 1;
+        } or {
+            goal stack_a_d = new agent.Stack_a_d(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_d.at;
+            holding_a__false.end >= stack_a_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_a_d.at;
+            clear_d__false.end >= stack_a_d.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_d.at;
+            clear_a__true.end >= stack_a_d.at + 1;
+            fact on_a_d__true = new On_a_d_True();
+            on_a_d__true.start <= stack_a_d.at;
+            on_a_d__true.end >= stack_a_d.at + 1;
+        } or {
+            goal put_down_a = new agent.Put_down_a(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= put_down_a.at;
+            holding_a__false.end >= put_down_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= put_down_a.at;
+            clear_a__true.end >= put_down_a.at + 1;
+            fact ontable_a__true = new Ontable_a_True();
+            ontable_a__true.start <= put_down_a.at;
+            ontable_a__true.end >= put_down_a.at + 1;
+        } or {
+            goal put_down_c = new agent.Put_down_c(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= put_down_c.at;
+            holding_c__false.end >= put_down_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= put_down_c.at;
+            clear_c__true.end >= put_down_c.at + 1;
+            fact ontable_c__true = new Ontable_c_True();
+            ontable_c__true.start <= put_down_c.at;
+            ontable_c__true.end >= put_down_c.at + 1;
+        } or {
+            goal put_down_d = new agent.Put_down_d(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= put_down_d.at;
+            holding_d__false.end >= put_down_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= put_down_d.at;
+            clear_d__true.end >= put_down_d.at + 1;
+            fact ontable_d__true = new Ontable_d_True();
+            ontable_d__true.start <= put_down_d.at;
+            ontable_d__true.end >= put_down_d.at + 1;
+        } or {
+            goal stack_b_d = new agent.Stack_b_d(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_d.at;
+            holding_b__false.end >= stack_b_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_b_d.at;
+            clear_d__false.end >= stack_b_d.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_d.at;
+            clear_b__true.end >= stack_b_d.at + 1;
+            fact on_b_d__true = new On_b_d_True();
+            on_b_d__true.start <= stack_b_d.at;
+            on_b_d__true.end >= stack_b_d.at + 1;
+        } or {
+            goal stack_c_a = new agent.Stack_c_a(at:start);
+            fact holding_c__false = new Holding_c_False();
+            holding_c__false.start <= stack_c_a.at;
+            holding_c__false.end >= stack_c_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_c_a.at;
+            clear_a__false.end >= stack_c_a.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_a.at;
+            clear_c__true.end >= stack_c_a.at + 1;
+            fact on_c_a__true = new On_c_a_True();
+            on_c_a__true.start <= stack_c_a.at;
+            on_c_a__true.end >= stack_c_a.at + 1;
+        } or {
+            goal stack_d_d = new agent.Stack_d_d(at:start);
+            fact holding_d__false = new Holding_d_False();
+            holding_d__false.start <= stack_d_d.at;
+            holding_d__false.end >= stack_d_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_d_d.at;
+            clear_d__false.end >= stack_d_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_d.at;
+            clear_d__true.end >= stack_d_d.at + 1;
+            fact on_d_d__true = new On_d_d_True();
+            on_d_d__true.start <= stack_d_d.at;
+            on_d_d__true.end >= stack_d_d.at + 1;
+        } or {
+            goal stack_b_b = new agent.Stack_b_b(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_b.at;
+            holding_b__false.end >= stack_b_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_b_b.at;
+            clear_b__false.end >= stack_b_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_b.at;
+            clear_b__true.end >= stack_b_b.at + 1;
+            fact on_b_b__true = new On_b_b_True();
+            on_b_b__true.start <= stack_b_b.at;
+            on_b_b__true.end >= stack_b_b.at + 1;
+        } or {
+            goal stack_b_c = new agent.Stack_b_c(at:start);
+            fact holding_b__false = new Holding_b_False();
+            holding_b__false.start <= stack_b_c.at;
+            holding_b__false.end >= stack_b_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_b_c.at;
+            clear_c__false.end >= stack_b_c.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_c.at;
+            clear_b__true.end >= stack_b_c.at + 1;
+            fact on_b_c__true = new On_b_c_True();
+            on_b_c__true.start <= stack_b_c.at;
+            on_b_c__true.end >= stack_b_c.at + 1;
+        } or {
+            goal stack_a_b = new agent.Stack_a_b(at:start);
+            fact holding_a__false = new Holding_a_False();
+            holding_a__false.start <= stack_a_b.at;
+            holding_a__false.end >= stack_a_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_a_b.at;
+            clear_b__false.end >= stack_a_b.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_b.at;
+            clear_a__true.end >= stack_a_b.at + 1;
+            fact on_a_b__true = new On_a_b_True();
+            on_a_b__true.start <= stack_a_b.at;
+            on_a_b__true.end >= stack_a_b.at + 1;
+        }
+    }
+
+    predicate HandemptyFalse() {
+        duration >= 1;
+        {
+            goal unstack_d_c = new agent.Unstack_d_c(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_c.at;
+            holding_d__true.end >= unstack_d_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_d_c.at;
+            clear_c__true.end >= unstack_d_c.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_c.at;
+            clear_d__false.end >= unstack_d_c.at + 1;
+            fact on_d_c__false = new On_d_c_False();
+            on_d_c__false.start <= unstack_d_c.at;
+            on_d_c__false.end >= unstack_d_c.at + 1;
+        } or {
+            goal unstack_c_d = new agent.Unstack_c_d(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_d.at;
+            holding_c__true.end >= unstack_c_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_c_d.at;
+            clear_d__true.end >= unstack_c_d.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_d.at;
+            clear_c__false.end >= unstack_c_d.at + 1;
+            fact on_c_d__false = new On_c_d_False();
+            on_c_d__false.start <= unstack_c_d.at;
+            on_c_d__false.end >= unstack_c_d.at + 1;
+        } or {
+            goal unstack_a_c = new agent.Unstack_a_c(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_c.at;
+            holding_a__true.end >= unstack_a_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_a_c.at;
+            clear_c__true.end >= unstack_a_c.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_c.at;
+            clear_a__false.end >= unstack_a_c.at + 1;
+            fact on_a_c__false = new On_a_c_False();
+            on_a_c__false.start <= unstack_a_c.at;
+            on_a_c__false.end >= unstack_a_c.at + 1;
+        } or {
+            goal unstack_c_c = new agent.Unstack_c_c(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_c.at;
+            holding_c__true.end >= unstack_c_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_c_c.at;
+            clear_c__true.end >= unstack_c_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_c.at;
+            clear_c__false.end >= unstack_c_c.at + 1;
+            fact on_c_c__false = new On_c_c_False();
+            on_c_c__false.start <= unstack_c_c.at;
+            on_c_c__false.end >= unstack_c_c.at + 1;
+        } or {
+            goal unstack_b_a = new agent.Unstack_b_a(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_a.at;
+            holding_b__true.end >= unstack_b_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_b_a.at;
+            clear_a__true.end >= unstack_b_a.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_a.at;
+            clear_b__false.end >= unstack_b_a.at + 1;
+            fact on_b_a__false = new On_b_a_False();
+            on_b_a__false.start <= unstack_b_a.at;
+            on_b_a__false.end >= unstack_b_a.at + 1;
+        } or {
+            goal unstack_b_c = new agent.Unstack_b_c(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_c.at;
+            holding_b__true.end >= unstack_b_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_b_c.at;
+            clear_c__true.end >= unstack_b_c.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_c.at;
+            clear_b__false.end >= unstack_b_c.at + 1;
+            fact on_b_c__false = new On_b_c_False();
+            on_b_c__false.start <= unstack_b_c.at;
+            on_b_c__false.end >= unstack_b_c.at + 1;
+        } or {
+            goal unstack_b_d = new agent.Unstack_b_d(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_d.at;
+            holding_b__true.end >= unstack_b_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_b_d.at;
+            clear_d__true.end >= unstack_b_d.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_d.at;
+            clear_b__false.end >= unstack_b_d.at + 1;
+            fact on_b_d__false = new On_b_d_False();
+            on_b_d__false.start <= unstack_b_d.at;
+            on_b_d__false.end >= unstack_b_d.at + 1;
+        } or {
+            goal unstack_b_b = new agent.Unstack_b_b(at:start);
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= unstack_b_b.at;
+            holding_b__true.end >= unstack_b_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_b_b.at;
+            clear_b__true.end >= unstack_b_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_b.at;
+            clear_b__false.end >= unstack_b_b.at + 1;
+            fact on_b_b__false = new On_b_b_False();
+            on_b_b__false.start <= unstack_b_b.at;
+            on_b_b__false.end >= unstack_b_b.at + 1;
+        } or {
+            goal pick_up_a = new agent.Pick_up_a(at:start);
+            fact ontable_a__false = new Ontable_a_False();
+            ontable_a__false.start <= pick_up_a.at;
+            ontable_a__false.end >= pick_up_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= pick_up_a.at;
+            clear_a__false.end >= pick_up_a.at + 1;
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= pick_up_a.at;
+            holding_a__true.end >= pick_up_a.at + 1;
+        } or {
+            goal unstack_a_b = new agent.Unstack_a_b(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_b.at;
+            holding_a__true.end >= unstack_a_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_a_b.at;
+            clear_b__true.end >= unstack_a_b.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_b.at;
+            clear_a__false.end >= unstack_a_b.at + 1;
+            fact on_a_b__false = new On_a_b_False();
+            on_a_b__false.start <= unstack_a_b.at;
+            on_a_b__false.end >= unstack_a_b.at + 1;
+        } or {
+            goal pick_up_b = new agent.Pick_up_b(at:start);
+            fact ontable_b__false = new Ontable_b_False();
+            ontable_b__false.start <= pick_up_b.at;
+            ontable_b__false.end >= pick_up_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= pick_up_b.at;
+            clear_b__false.end >= pick_up_b.at + 1;
+            fact holding_b__true = new Holding_b_True();
+            holding_b__true.start <= pick_up_b.at;
+            holding_b__true.end >= pick_up_b.at + 1;
+        } or {
+            goal pick_up_c = new agent.Pick_up_c(at:start);
+            fact ontable_c__false = new Ontable_c_False();
+            ontable_c__false.start <= pick_up_c.at;
+            ontable_c__false.end >= pick_up_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= pick_up_c.at;
+            clear_c__false.end >= pick_up_c.at + 1;
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= pick_up_c.at;
+            holding_c__true.end >= pick_up_c.at + 1;
+        } or {
+            goal unstack_a_d = new agent.Unstack_a_d(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_d.at;
+            holding_a__true.end >= unstack_a_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_a_d.at;
+            clear_d__true.end >= unstack_a_d.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_d.at;
+            clear_a__false.end >= unstack_a_d.at + 1;
+            fact on_a_d__false = new On_a_d_False();
+            on_a_d__false.start <= unstack_a_d.at;
+            on_a_d__false.end >= unstack_a_d.at + 1;
+        } or {
+            goal pick_up_d = new agent.Pick_up_d(at:start);
+            fact ontable_d__false = new Ontable_d_False();
+            ontable_d__false.start <= pick_up_d.at;
+            ontable_d__false.end >= pick_up_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= pick_up_d.at;
+            clear_d__false.end >= pick_up_d.at + 1;
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= pick_up_d.at;
+            holding_d__true.end >= pick_up_d.at + 1;
+        } or {
+            goal unstack_a_a = new agent.Unstack_a_a(at:start);
+            fact holding_a__true = new Holding_a_True();
+            holding_a__true.start <= unstack_a_a.at;
+            holding_a__true.end >= unstack_a_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_a_a.at;
+            clear_a__true.end >= unstack_a_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_a.at;
+            clear_a__false.end >= unstack_a_a.at + 1;
+            fact on_a_a__false = new On_a_a_False();
+            on_a_a__false.start <= unstack_a_a.at;
+            on_a_a__false.end >= unstack_a_a.at + 1;
+        } or {
+            goal unstack_c_a = new agent.Unstack_c_a(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_a.at;
+            holding_c__true.end >= unstack_c_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_c_a.at;
+            clear_a__true.end >= unstack_c_a.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_a.at;
+            clear_c__false.end >= unstack_c_a.at + 1;
+            fact on_c_a__false = new On_c_a_False();
+            on_c_a__false.start <= unstack_c_a.at;
+            on_c_a__false.end >= unstack_c_a.at + 1;
+        } or {
+            goal unstack_c_b = new agent.Unstack_c_b(at:start);
+            fact holding_c__true = new Holding_c_True();
+            holding_c__true.start <= unstack_c_b.at;
+            holding_c__true.end >= unstack_c_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_c_b.at;
+            clear_b__true.end >= unstack_c_b.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_b.at;
+            clear_c__false.end >= unstack_c_b.at + 1;
+            fact on_c_b__false = new On_c_b_False();
+            on_c_b__false.start <= unstack_c_b.at;
+            on_c_b__false.end >= unstack_c_b.at + 1;
+        } or {
+            goal unstack_d_d = new agent.Unstack_d_d(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_d.at;
+            holding_d__true.end >= unstack_d_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_d_d.at;
+            clear_d__true.end >= unstack_d_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_d.at;
+            clear_d__false.end >= unstack_d_d.at + 1;
+            fact on_d_d__false = new On_d_d_False();
+            on_d_d__false.start <= unstack_d_d.at;
+            on_d_d__false.end >= unstack_d_d.at + 1;
+        } or {
+            goal unstack_d_b = new agent.Unstack_d_b(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_b.at;
+            holding_d__true.end >= unstack_d_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_d_b.at;
+            clear_b__true.end >= unstack_d_b.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_b.at;
+            clear_d__false.end >= unstack_d_b.at + 1;
+            fact on_d_b__false = new On_d_b_False();
+            on_d_b__false.start <= unstack_d_b.at;
+            on_d_b__false.end >= unstack_d_b.at + 1;
+        } or {
+            goal unstack_d_a = new agent.Unstack_d_a(at:start);
+            fact holding_d__true = new Holding_d_True();
+            holding_d__true.start <= unstack_d_a.at;
+            holding_d__true.end >= unstack_d_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_d_a.at;
+            clear_a__true.end >= unstack_d_a.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_a.at;
+            clear_d__false.end >= unstack_d_a.at + 1;
+            fact on_d_a__false = new On_d_a_False();
+            on_d_a__false.start <= unstack_d_a.at;
+            on_d_a__false.end >= unstack_d_a.at + 1;
+        }
+    }
+
+    predicate Holding_a_True() {
+        duration >= 1;
+        {
+            goal unstack_a_b = new agent.Unstack_a_b(at:start);
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_a_b.at;
+            clear_b__true.end >= unstack_a_b.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_b.at;
+            clear_a__false.end >= unstack_a_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_b.at;
+            handempty_false.end >= unstack_a_b.at + 1;
+            fact on_a_b__false = new On_a_b_False();
+            on_a_b__false.start <= unstack_a_b.at;
+            on_a_b__false.end >= unstack_a_b.at + 1;
+        } or {
+            goal unstack_a_d = new agent.Unstack_a_d(at:start);
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_a_d.at;
+            clear_d__true.end >= unstack_a_d.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_d.at;
+            clear_a__false.end >= unstack_a_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_d.at;
+            handempty_false.end >= unstack_a_d.at + 1;
+            fact on_a_d__false = new On_a_d_False();
+            on_a_d__false.start <= unstack_a_d.at;
+            on_a_d__false.end >= unstack_a_d.at + 1;
+        } or {
+            goal unstack_a_a = new agent.Unstack_a_a(at:start);
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_a_a.at;
+            clear_a__true.end >= unstack_a_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_a.at;
+            clear_a__false.end >= unstack_a_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_a.at;
+            handempty_false.end >= unstack_a_a.at + 1;
+            fact on_a_a__false = new On_a_a_False();
+            on_a_a__false.start <= unstack_a_a.at;
+            on_a_a__false.end >= unstack_a_a.at + 1;
+        } or {
+            goal unstack_a_c = new agent.Unstack_a_c(at:start);
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_a_c.at;
+            clear_c__true.end >= unstack_a_c.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= unstack_a_c.at;
+            clear_a__false.end >= unstack_a_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_a_c.at;
+            handempty_false.end >= unstack_a_c.at + 1;
+            fact on_a_c__false = new On_a_c_False();
+            on_a_c__false.start <= unstack_a_c.at;
+            on_a_c__false.end >= unstack_a_c.at + 1;
+        } or {
+            goal pick_up_a = new agent.Pick_up_a(at:start);
+            fact ontable_a__false = new Ontable_a_False();
+            ontable_a__false.start <= pick_up_a.at;
+            ontable_a__false.end >= pick_up_a.at + 1;
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= pick_up_a.at;
+            clear_a__false.end >= pick_up_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= pick_up_a.at;
+            handempty_false.end >= pick_up_a.at + 1;
+        }
+    }
+
+    predicate Holding_a_False() {
+        duration >= 1;
+        {
+            goal stack_a_c = new agent.Stack_a_c(at:start);
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_a_c.at;
+            clear_c__false.end >= stack_a_c.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_c.at;
+            clear_a__true.end >= stack_a_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_c.at;
+            handempty_true.end >= stack_a_c.at + 1;
+            fact on_a_c__true = new On_a_c_True();
+            on_a_c__true.start <= stack_a_c.at;
+            on_a_c__true.end >= stack_a_c.at + 1;
+        } or {
+            goal stack_a_d = new agent.Stack_a_d(at:start);
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_a_d.at;
+            clear_d__false.end >= stack_a_d.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_d.at;
+            clear_a__true.end >= stack_a_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_d.at;
+            handempty_true.end >= stack_a_d.at + 1;
+            fact on_a_d__true = new On_a_d_True();
+            on_a_d__true.start <= stack_a_d.at;
+            on_a_d__true.end >= stack_a_d.at + 1;
+        } or {
+            goal put_down_a = new agent.Put_down_a(at:start);
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= put_down_a.at;
+            clear_a__true.end >= put_down_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= put_down_a.at;
+            handempty_true.end >= put_down_a.at + 1;
+            fact ontable_a__true = new Ontable_a_True();
+            ontable_a__true.start <= put_down_a.at;
+            ontable_a__true.end >= put_down_a.at + 1;
+        } or {
+            goal stack_a_a = new agent.Stack_a_a(at:start);
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_a_a.at;
+            clear_a__false.end >= stack_a_a.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_a.at;
+            clear_a__true.end >= stack_a_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_a.at;
+            handempty_true.end >= stack_a_a.at + 1;
+            fact on_a_a__true = new On_a_a_True();
+            on_a_a__true.start <= stack_a_a.at;
+            on_a_a__true.end >= stack_a_a.at + 1;
+        } or {
+            goal stack_a_b = new agent.Stack_a_b(at:start);
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_a_b.at;
+            clear_b__false.end >= stack_a_b.at + 1;
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= stack_a_b.at;
+            clear_a__true.end >= stack_a_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_a_b.at;
+            handempty_true.end >= stack_a_b.at + 1;
+            fact on_a_b__true = new On_a_b_True();
+            on_a_b__true.start <= stack_a_b.at;
+            on_a_b__true.end >= stack_a_b.at + 1;
+        }
+    }
+
+    predicate Holding_b_True() {
+        duration >= 1;
+        {
+            goal pick_up_b = new agent.Pick_up_b(at:start);
+            fact ontable_b__false = new Ontable_b_False();
+            ontable_b__false.start <= pick_up_b.at;
+            ontable_b__false.end >= pick_up_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= pick_up_b.at;
+            clear_b__false.end >= pick_up_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= pick_up_b.at;
+            handempty_false.end >= pick_up_b.at + 1;
+        } or {
+            goal unstack_b_a = new agent.Unstack_b_a(at:start);
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_b_a.at;
+            clear_a__true.end >= unstack_b_a.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_a.at;
+            clear_b__false.end >= unstack_b_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_a.at;
+            handempty_false.end >= unstack_b_a.at + 1;
+            fact on_b_a__false = new On_b_a_False();
+            on_b_a__false.start <= unstack_b_a.at;
+            on_b_a__false.end >= unstack_b_a.at + 1;
+        } or {
+            goal unstack_b_c = new agent.Unstack_b_c(at:start);
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_b_c.at;
+            clear_c__true.end >= unstack_b_c.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_c.at;
+            clear_b__false.end >= unstack_b_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_c.at;
+            handempty_false.end >= unstack_b_c.at + 1;
+            fact on_b_c__false = new On_b_c_False();
+            on_b_c__false.start <= unstack_b_c.at;
+            on_b_c__false.end >= unstack_b_c.at + 1;
+        } or {
+            goal unstack_b_d = new agent.Unstack_b_d(at:start);
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_b_d.at;
+            clear_d__true.end >= unstack_b_d.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_d.at;
+            clear_b__false.end >= unstack_b_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_d.at;
+            handempty_false.end >= unstack_b_d.at + 1;
+            fact on_b_d__false = new On_b_d_False();
+            on_b_d__false.start <= unstack_b_d.at;
+            on_b_d__false.end >= unstack_b_d.at + 1;
+        } or {
+            goal unstack_b_b = new agent.Unstack_b_b(at:start);
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_b_b.at;
+            clear_b__true.end >= unstack_b_b.at + 1;
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= unstack_b_b.at;
+            clear_b__false.end >= unstack_b_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_b_b.at;
+            handempty_false.end >= unstack_b_b.at + 1;
+            fact on_b_b__false = new On_b_b_False();
+            on_b_b__false.start <= unstack_b_b.at;
+            on_b_b__false.end >= unstack_b_b.at + 1;
+        }
+    }
+
+    predicate Holding_b_False() {
+        duration >= 1;
+        {
+            goal stack_b_d = new agent.Stack_b_d(at:start);
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_b_d.at;
+            clear_d__false.end >= stack_b_d.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_d.at;
+            clear_b__true.end >= stack_b_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_d.at;
+            handempty_true.end >= stack_b_d.at + 1;
+            fact on_b_d__true = new On_b_d_True();
+            on_b_d__true.start <= stack_b_d.at;
+            on_b_d__true.end >= stack_b_d.at + 1;
+        } or {
+            goal stack_b_a = new agent.Stack_b_a(at:start);
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_b_a.at;
+            clear_a__false.end >= stack_b_a.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_a.at;
+            clear_b__true.end >= stack_b_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_a.at;
+            handempty_true.end >= stack_b_a.at + 1;
+            fact on_b_a__true = new On_b_a_True();
+            on_b_a__true.start <= stack_b_a.at;
+            on_b_a__true.end >= stack_b_a.at + 1;
+        } or {
+            goal put_down_b = new agent.Put_down_b(at:start);
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= put_down_b.at;
+            clear_b__true.end >= put_down_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= put_down_b.at;
+            handempty_true.end >= put_down_b.at + 1;
+            fact ontable_b__true = new Ontable_b_True();
+            ontable_b__true.start <= put_down_b.at;
+            ontable_b__true.end >= put_down_b.at + 1;
+        } or {
+            goal stack_b_b = new agent.Stack_b_b(at:start);
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_b_b.at;
+            clear_b__false.end >= stack_b_b.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_b.at;
+            clear_b__true.end >= stack_b_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_b.at;
+            handempty_true.end >= stack_b_b.at + 1;
+            fact on_b_b__true = new On_b_b_True();
+            on_b_b__true.start <= stack_b_b.at;
+            on_b_b__true.end >= stack_b_b.at + 1;
+        } or {
+            goal stack_b_c = new agent.Stack_b_c(at:start);
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_b_c.at;
+            clear_c__false.end >= stack_b_c.at + 1;
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= stack_b_c.at;
+            clear_b__true.end >= stack_b_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_b_c.at;
+            handempty_true.end >= stack_b_c.at + 1;
+            fact on_b_c__true = new On_b_c_True();
+            on_b_c__true.start <= stack_b_c.at;
+            on_b_c__true.end >= stack_b_c.at + 1;
+        }
+    }
+
+    predicate Holding_c_True() {
+        duration >= 1;
+        {
+            goal pick_up_c = new agent.Pick_up_c(at:start);
+            fact ontable_c__false = new Ontable_c_False();
+            ontable_c__false.start <= pick_up_c.at;
+            ontable_c__false.end >= pick_up_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= pick_up_c.at;
+            clear_c__false.end >= pick_up_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= pick_up_c.at;
+            handempty_false.end >= pick_up_c.at + 1;
+        } or {
+            goal unstack_c_a = new agent.Unstack_c_a(at:start);
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_c_a.at;
+            clear_a__true.end >= unstack_c_a.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_a.at;
+            clear_c__false.end >= unstack_c_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_a.at;
+            handempty_false.end >= unstack_c_a.at + 1;
+            fact on_c_a__false = new On_c_a_False();
+            on_c_a__false.start <= unstack_c_a.at;
+            on_c_a__false.end >= unstack_c_a.at + 1;
+        } or {
+            goal unstack_c_b = new agent.Unstack_c_b(at:start);
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_c_b.at;
+            clear_b__true.end >= unstack_c_b.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_b.at;
+            clear_c__false.end >= unstack_c_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_b.at;
+            handempty_false.end >= unstack_c_b.at + 1;
+            fact on_c_b__false = new On_c_b_False();
+            on_c_b__false.start <= unstack_c_b.at;
+            on_c_b__false.end >= unstack_c_b.at + 1;
+        } or {
+            goal unstack_c_d = new agent.Unstack_c_d(at:start);
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_c_d.at;
+            clear_d__true.end >= unstack_c_d.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_d.at;
+            clear_c__false.end >= unstack_c_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_d.at;
+            handempty_false.end >= unstack_c_d.at + 1;
+            fact on_c_d__false = new On_c_d_False();
+            on_c_d__false.start <= unstack_c_d.at;
+            on_c_d__false.end >= unstack_c_d.at + 1;
+        } or {
+            goal unstack_c_c = new agent.Unstack_c_c(at:start);
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_c_c.at;
+            clear_c__true.end >= unstack_c_c.at + 1;
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= unstack_c_c.at;
+            clear_c__false.end >= unstack_c_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_c_c.at;
+            handempty_false.end >= unstack_c_c.at + 1;
+            fact on_c_c__false = new On_c_c_False();
+            on_c_c__false.start <= unstack_c_c.at;
+            on_c_c__false.end >= unstack_c_c.at + 1;
+        }
+    }
+
+    predicate Holding_c_False() {
+        duration >= 1;
+        {
+            goal stack_c_c = new agent.Stack_c_c(at:start);
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_c_c.at;
+            clear_c__false.end >= stack_c_c.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_c.at;
+            clear_c__true.end >= stack_c_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_c.at;
+            handempty_true.end >= stack_c_c.at + 1;
+            fact on_c_c__true = new On_c_c_True();
+            on_c_c__true.start <= stack_c_c.at;
+            on_c_c__true.end >= stack_c_c.at + 1;
+        } or {
+            goal put_down_c = new agent.Put_down_c(at:start);
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= put_down_c.at;
+            clear_c__true.end >= put_down_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= put_down_c.at;
+            handempty_true.end >= put_down_c.at + 1;
+            fact ontable_c__true = new Ontable_c_True();
+            ontable_c__true.start <= put_down_c.at;
+            ontable_c__true.end >= put_down_c.at + 1;
+        } or {
+            goal stack_c_b = new agent.Stack_c_b(at:start);
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_c_b.at;
+            clear_b__false.end >= stack_c_b.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_b.at;
+            clear_c__true.end >= stack_c_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_b.at;
+            handempty_true.end >= stack_c_b.at + 1;
+            fact on_c_b__true = new On_c_b_True();
+            on_c_b__true.start <= stack_c_b.at;
+            on_c_b__true.end >= stack_c_b.at + 1;
+        } or {
+            goal stack_c_a = new agent.Stack_c_a(at:start);
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_c_a.at;
+            clear_a__false.end >= stack_c_a.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_a.at;
+            clear_c__true.end >= stack_c_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_a.at;
+            handempty_true.end >= stack_c_a.at + 1;
+            fact on_c_a__true = new On_c_a_True();
+            on_c_a__true.start <= stack_c_a.at;
+            on_c_a__true.end >= stack_c_a.at + 1;
+        } or {
+            goal stack_c_d = new agent.Stack_c_d(at:start);
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_c_d.at;
+            clear_d__false.end >= stack_c_d.at + 1;
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= stack_c_d.at;
+            clear_c__true.end >= stack_c_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_c_d.at;
+            handempty_true.end >= stack_c_d.at + 1;
+            fact on_c_d__true = new On_c_d_True();
+            on_c_d__true.start <= stack_c_d.at;
+            on_c_d__true.end >= stack_c_d.at + 1;
+        }
+    }
+
+    predicate Holding_d_True() {
+        duration >= 1;
+        {
+            goal unstack_d_c = new agent.Unstack_d_c(at:start);
+            fact clear_c__true = new Clear_c_True();
+            clear_c__true.start <= unstack_d_c.at;
+            clear_c__true.end >= unstack_d_c.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_c.at;
+            clear_d__false.end >= unstack_d_c.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_c.at;
+            handempty_false.end >= unstack_d_c.at + 1;
+            fact on_d_c__false = new On_d_c_False();
+            on_d_c__false.start <= unstack_d_c.at;
+            on_d_c__false.end >= unstack_d_c.at + 1;
+        } or {
+            goal pick_up_d = new agent.Pick_up_d(at:start);
+            fact ontable_d__false = new Ontable_d_False();
+            ontable_d__false.start <= pick_up_d.at;
+            ontable_d__false.end >= pick_up_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= pick_up_d.at;
+            clear_d__false.end >= pick_up_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= pick_up_d.at;
+            handempty_false.end >= pick_up_d.at + 1;
+        } or {
+            goal unstack_d_d = new agent.Unstack_d_d(at:start);
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= unstack_d_d.at;
+            clear_d__true.end >= unstack_d_d.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_d.at;
+            clear_d__false.end >= unstack_d_d.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_d.at;
+            handempty_false.end >= unstack_d_d.at + 1;
+            fact on_d_d__false = new On_d_d_False();
+            on_d_d__false.start <= unstack_d_d.at;
+            on_d_d__false.end >= unstack_d_d.at + 1;
+        } or {
+            goal unstack_d_b = new agent.Unstack_d_b(at:start);
+            fact clear_b__true = new Clear_b_True();
+            clear_b__true.start <= unstack_d_b.at;
+            clear_b__true.end >= unstack_d_b.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_b.at;
+            clear_d__false.end >= unstack_d_b.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_b.at;
+            handempty_false.end >= unstack_d_b.at + 1;
+            fact on_d_b__false = new On_d_b_False();
+            on_d_b__false.start <= unstack_d_b.at;
+            on_d_b__false.end >= unstack_d_b.at + 1;
+        } or {
+            goal unstack_d_a = new agent.Unstack_d_a(at:start);
+            fact clear_a__true = new Clear_a_True();
+            clear_a__true.start <= unstack_d_a.at;
+            clear_a__true.end >= unstack_d_a.at + 1;
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= unstack_d_a.at;
+            clear_d__false.end >= unstack_d_a.at + 1;
+            fact handempty_false = new HandemptyFalse();
+            handempty_false.start <= unstack_d_a.at;
+            handempty_false.end >= unstack_d_a.at + 1;
+            fact on_d_a__false = new On_d_a_False();
+            on_d_a__false.start <= unstack_d_a.at;
+            on_d_a__false.end >= unstack_d_a.at + 1;
+        }
+    }
+
+    predicate Holding_d_False() {
+        duration >= 1;
+        {
+            goal stack_d_a = new agent.Stack_d_a(at:start);
+            fact clear_a__false = new Clear_a_False();
+            clear_a__false.start <= stack_d_a.at;
+            clear_a__false.end >= stack_d_a.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_a.at;
+            clear_d__true.end >= stack_d_a.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_a.at;
+            handempty_true.end >= stack_d_a.at + 1;
+            fact on_d_a__true = new On_d_a_True();
+            on_d_a__true.start <= stack_d_a.at;
+            on_d_a__true.end >= stack_d_a.at + 1;
+        } or {
+            goal stack_d_b = new agent.Stack_d_b(at:start);
+            fact clear_b__false = new Clear_b_False();
+            clear_b__false.start <= stack_d_b.at;
+            clear_b__false.end >= stack_d_b.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_b.at;
+            clear_d__true.end >= stack_d_b.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_b.at;
+            handempty_true.end >= stack_d_b.at + 1;
+            fact on_d_b__true = new On_d_b_True();
+            on_d_b__true.start <= stack_d_b.at;
+            on_d_b__true.end >= stack_d_b.at + 1;
+        } or {
+            goal stack_d_c = new agent.Stack_d_c(at:start);
+            fact clear_c__false = new Clear_c_False();
+            clear_c__false.start <= stack_d_c.at;
+            clear_c__false.end >= stack_d_c.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_c.at;
+            clear_d__true.end >= stack_d_c.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_c.at;
+            handempty_true.end >= stack_d_c.at + 1;
+            fact on_d_c__true = new On_d_c_True();
+            on_d_c__true.start <= stack_d_c.at;
+            on_d_c__true.end >= stack_d_c.at + 1;
+        } or {
+            goal put_down_d = new agent.Put_down_d(at:start);
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= put_down_d.at;
+            clear_d__true.end >= put_down_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= put_down_d.at;
+            handempty_true.end >= put_down_d.at + 1;
+            fact ontable_d__true = new Ontable_d_True();
+            ontable_d__true.start <= put_down_d.at;
+            ontable_d__true.end >= put_down_d.at + 1;
+        } or {
+            goal stack_d_d = new agent.Stack_d_d(at:start);
+            fact clear_d__false = new Clear_d_False();
+            clear_d__false.start <= stack_d_d.at;
+            clear_d__false.end >= stack_d_d.at + 1;
+            fact clear_d__true = new Clear_d_True();
+            clear_d__true.start <= stack_d_d.at;
+            clear_d__true.end >= stack_d_d.at + 1;
+            fact handempty_true = new HandemptyTrue();
+            handempty_true.start <= stack_d_d.at;
+            handempty_true.end >= stack_d_d.at + 1;
+            fact on_d_d__true = new On_d_d_True();
+            on_d_d__true.start <= stack_d_d.at;
+            on_d_d__true.end >= stack_d_d.at + 1;
+        }
+    }
+}
+
+class BlocksImpulsiveAgent extends PropositionalImpulsiveAgent {
+
+    BlocksState propositional_state;
+
+    BlocksImpulsiveAgent() {
+        propositional_state = new BlocksState(this);
+    }
+
+    predicate Pick_up_a() {
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+        goal ontable_a__true = new propositional_state.Ontable_a_True();
+        ontable_a__true.start <= at - 1;
+        ontable_a__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Pick_up_b() {
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+        goal ontable_b__true = new propositional_state.Ontable_b_True();
+        ontable_b__true.start <= at - 1;
+        ontable_b__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Pick_up_c() {
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+        goal ontable_c__true = new propositional_state.Ontable_c_True();
+        ontable_c__true.start <= at - 1;
+        ontable_c__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Pick_up_d() {
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+        goal ontable_d__true = new propositional_state.Ontable_d_True();
+        ontable_d__true.start <= at - 1;
+        ontable_d__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Put_down_a() {
+        goal holding_a__true = new propositional_state.Holding_a_True();
+        holding_a__true.start <= at - 1;
+        holding_a__true.end >= at;
+    }
+
+    predicate Put_down_b() {
+        goal holding_b__true = new propositional_state.Holding_b_True();
+        holding_b__true.start <= at - 1;
+        holding_b__true.end >= at;
+    }
+
+    predicate Put_down_c() {
+        goal holding_c__true = new propositional_state.Holding_c_True();
+        holding_c__true.start <= at - 1;
+        holding_c__true.end >= at;
+    }
+
+    predicate Put_down_d() {
+        goal holding_d__true = new propositional_state.Holding_d_True();
+        holding_d__true.start <= at - 1;
+        holding_d__true.end >= at;
+    }
+
+    predicate Stack_a_a() {
+        goal holding_a__true = new propositional_state.Holding_a_True();
+        holding_a__true.start <= at - 1;
+        holding_a__true.end >= at;
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+    }
+
+    predicate Stack_a_b() {
+        goal holding_a__true = new propositional_state.Holding_a_True();
+        holding_a__true.start <= at - 1;
+        holding_a__true.end >= at;
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+    }
+
+    predicate Stack_a_c() {
+        goal holding_a__true = new propositional_state.Holding_a_True();
+        holding_a__true.start <= at - 1;
+        holding_a__true.end >= at;
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+    }
+
+    predicate Stack_a_d() {
+        goal holding_a__true = new propositional_state.Holding_a_True();
+        holding_a__true.start <= at - 1;
+        holding_a__true.end >= at;
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+    }
+
+    predicate Stack_b_a() {
+        goal holding_b__true = new propositional_state.Holding_b_True();
+        holding_b__true.start <= at - 1;
+        holding_b__true.end >= at;
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+    }
+
+    predicate Stack_b_b() {
+        goal holding_b__true = new propositional_state.Holding_b_True();
+        holding_b__true.start <= at - 1;
+        holding_b__true.end >= at;
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+    }
+
+    predicate Stack_b_c() {
+        goal holding_b__true = new propositional_state.Holding_b_True();
+        holding_b__true.start <= at - 1;
+        holding_b__true.end >= at;
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+    }
+
+    predicate Stack_b_d() {
+        goal holding_b__true = new propositional_state.Holding_b_True();
+        holding_b__true.start <= at - 1;
+        holding_b__true.end >= at;
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+    }
+
+    predicate Stack_c_a() {
+        goal holding_c__true = new propositional_state.Holding_c_True();
+        holding_c__true.start <= at - 1;
+        holding_c__true.end >= at;
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+    }
+
+    predicate Stack_c_b() {
+        goal holding_c__true = new propositional_state.Holding_c_True();
+        holding_c__true.start <= at - 1;
+        holding_c__true.end >= at;
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+    }
+
+    predicate Stack_c_c() {
+        goal holding_c__true = new propositional_state.Holding_c_True();
+        holding_c__true.start <= at - 1;
+        holding_c__true.end >= at;
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+    }
+
+    predicate Stack_c_d() {
+        goal holding_c__true = new propositional_state.Holding_c_True();
+        holding_c__true.start <= at - 1;
+        holding_c__true.end >= at;
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+    }
+
+    predicate Stack_d_a() {
+        goal holding_d__true = new propositional_state.Holding_d_True();
+        holding_d__true.start <= at - 1;
+        holding_d__true.end >= at;
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+    }
+
+    predicate Stack_d_b() {
+        goal holding_d__true = new propositional_state.Holding_d_True();
+        holding_d__true.start <= at - 1;
+        holding_d__true.end >= at;
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+    }
+
+    predicate Stack_d_c() {
+        goal holding_d__true = new propositional_state.Holding_d_True();
+        holding_d__true.start <= at - 1;
+        holding_d__true.end >= at;
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+    }
+
+    predicate Stack_d_d() {
+        goal holding_d__true = new propositional_state.Holding_d_True();
+        holding_d__true.start <= at - 1;
+        holding_d__true.end >= at;
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+    }
+
+    predicate Unstack_a_a() {
+        goal on_a_a__true = new propositional_state.On_a_a_True();
+        on_a_a__true.start <= at - 1;
+        on_a_a__true.end >= at;
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_a_b() {
+        goal on_a_b__true = new propositional_state.On_a_b_True();
+        on_a_b__true.start <= at - 1;
+        on_a_b__true.end >= at;
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_a_c() {
+        goal on_a_c__true = new propositional_state.On_a_c_True();
+        on_a_c__true.start <= at - 1;
+        on_a_c__true.end >= at;
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_a_d() {
+        goal on_a_d__true = new propositional_state.On_a_d_True();
+        on_a_d__true.start <= at - 1;
+        on_a_d__true.end >= at;
+        goal clear_a__true = new propositional_state.Clear_a_True();
+        clear_a__true.start <= at - 1;
+        clear_a__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_b_a() {
+        goal on_b_a__true = new propositional_state.On_b_a_True();
+        on_b_a__true.start <= at - 1;
+        on_b_a__true.end >= at;
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_b_b() {
+        goal on_b_b__true = new propositional_state.On_b_b_True();
+        on_b_b__true.start <= at - 1;
+        on_b_b__true.end >= at;
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_b_c() {
+        goal on_b_c__true = new propositional_state.On_b_c_True();
+        on_b_c__true.start <= at - 1;
+        on_b_c__true.end >= at;
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_b_d() {
+        goal on_b_d__true = new propositional_state.On_b_d_True();
+        on_b_d__true.start <= at - 1;
+        on_b_d__true.end >= at;
+        goal clear_b__true = new propositional_state.Clear_b_True();
+        clear_b__true.start <= at - 1;
+        clear_b__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_c_a() {
+        goal on_c_a__true = new propositional_state.On_c_a_True();
+        on_c_a__true.start <= at - 1;
+        on_c_a__true.end >= at;
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_c_b() {
+        goal on_c_b__true = new propositional_state.On_c_b_True();
+        on_c_b__true.start <= at - 1;
+        on_c_b__true.end >= at;
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_c_c() {
+        goal on_c_c__true = new propositional_state.On_c_c_True();
+        on_c_c__true.start <= at - 1;
+        on_c_c__true.end >= at;
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_c_d() {
+        goal on_c_d__true = new propositional_state.On_c_d_True();
+        on_c_d__true.start <= at - 1;
+        on_c_d__true.end >= at;
+        goal clear_c__true = new propositional_state.Clear_c_True();
+        clear_c__true.start <= at - 1;
+        clear_c__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_d_a() {
+        goal on_d_a__true = new propositional_state.On_d_a_True();
+        on_d_a__true.start <= at - 1;
+        on_d_a__true.end >= at;
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_d_b() {
+        goal on_d_b__true = new propositional_state.On_d_b_True();
+        on_d_b__true.start <= at - 1;
+        on_d_b__true.end >= at;
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_d_c() {
+        goal on_d_c__true = new propositional_state.On_d_c_True();
+        on_d_c__true.start <= at - 1;
+        on_d_c__true.end >= at;
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+
+    predicate Unstack_d_d() {
+        goal on_d_d__true = new propositional_state.On_d_d_True();
+        on_d_d__true.start <= at - 1;
+        on_d_d__true.end >= at;
+        goal clear_d__true = new propositional_state.Clear_d_True();
+        clear_d__true.start <= at - 1;
+        clear_d__true.end >= at;
+        goal handempty_true = new propositional_state.HandemptyTrue();
+        handempty_true.start <= at - 1;
+        handempty_true.end >= at;
+    }
+}
+
+/**
+* Domain: Blocks
+* Problem: Blocks
+*/
+
+
+BlocksImpulsiveAgent agent = new BlocksImpulsiveAgent();
+fact clear_a__true = new agent.propositional_state.Clear_a_True(start:origin);
+clear_a__true.duration >= 1;
+fact clear_b__true = new agent.propositional_state.Clear_b_True(start:origin);
+clear_b__true.duration >= 1;
+fact clear_c__true = new agent.propositional_state.Clear_c_True(start:origin);
+clear_c__true.duration >= 1;
+fact clear_d__true = new agent.propositional_state.Clear_d_True(start:origin);
+clear_d__true.duration >= 1;
+fact ontable_a__true = new agent.propositional_state.Ontable_a_True(start:origin);
+ontable_a__true.duration >= 1;
+fact ontable_b__true = new agent.propositional_state.Ontable_b_True(start:origin);
+ontable_b__true.duration >= 1;
+fact ontable_c__true = new agent.propositional_state.Ontable_c_True(start:origin);
+ontable_c__true.duration >= 1;
+fact ontable_d__true = new agent.propositional_state.Ontable_d_True(start:origin);
+ontable_d__true.duration >= 1;
+fact handempty_true = new agent.propositional_state.HandemptyTrue(start:origin);
+handempty_true.duration >= 1;
+goal on_d_c__true = new agent.propositional_state.On_d_c_True(end:horizon);
+goal on_c_b__true = new agent.propositional_state.On_c_b_True(end:horizon);
+goal on_b_a__true = new agent.propositional_state.On_b_a_True(end:horizon);

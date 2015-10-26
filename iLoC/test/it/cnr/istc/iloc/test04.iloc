@@ -1,0 +1,10 @@
+class Navigator extends StateVariable {
+
+    predicate At(number x) {
+        duration >= 1;
+    }
+}
+
+Navigator navigator = new Navigator();
+goal at0 = new navigator.At(start:origin, x:0);
+goal at1 = new navigator.At(end:horizon, x:1);

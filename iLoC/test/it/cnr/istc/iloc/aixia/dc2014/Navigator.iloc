@@ -1,0 +1,19 @@
+class Navigator extends StateVariable {
+
+    Map map;
+
+    Navigator(Map map) {
+        this.map = map;
+    }
+
+    predicate At(Location location) {
+        duration >= 1;
+        goal going = new Navigating(end:start, to:location);
+    }
+
+    predicate Navigating(Location from, Location to) {
+        goal dist = new map.Distance(from:from, to:to);
+        duration >= dist.distance/speed;
+        goal at = new At(end:start, location:from);
+    }
+}

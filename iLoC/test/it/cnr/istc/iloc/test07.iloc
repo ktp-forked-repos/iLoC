@@ -1,0 +1,33 @@
+class Location {
+
+    number id;
+
+    Location(number id) {
+        this.id = id;
+    }
+}
+
+class Map {
+
+    Location city_a = new Location(0);
+    Location city_b = new Location(1);
+    Location city_c = new Location(2);
+    Location city_d = new Location(3);
+
+    predicate Distance(Location from, Location to, number distance) {
+        (from == city_a && to == city_b) -> distance == 600;
+        (from == city_b && to == city_a) -> distance == 600;
+        (from == city_b && to == city_c) -> distance == 800;
+        (from == city_c && to == city_b) -> distance == 800;
+        (from == city_a && to == city_c) -> distance == 1000;
+        (from == city_c && to == city_a) -> distance == 1000;
+        (from == city_c && to == city_d) -> distance == 1000;
+        (from == city_d && to == city_c) -> distance == 1000;
+    }
+}
+
+Map map = new Map();
+
+goal dist_ab = new map.Distance(from:map.city_a, to:map.city_b);
+goal dist_ac = new map.Distance(from:map.city_a, to:map.city_c);
+goal dist_bc = new map.Distance(from:map.city_b, to:map.city_c);

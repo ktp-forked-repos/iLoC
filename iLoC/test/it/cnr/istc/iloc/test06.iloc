@@ -1,0 +1,6 @@
+ConsumableResource cr = new ConsumableResource(0, 10, 0, 0);
+
+goal prod0 = new cr.Produce(amount:10, duration:10);
+goal prod1 = new cr.Produce(amount:10, duration:10);
+goal cons0 = new cr.Consume(amount:10, duration:10);
+goal cons1 = new cr.Consume(amount:10, duration:10);

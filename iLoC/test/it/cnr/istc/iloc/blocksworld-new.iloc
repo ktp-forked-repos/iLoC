@@ -1,0 +1,175 @@
+/**
+* Domain: Blocks_object_fluents
+*/
+
+class Object {
+
+    int id;
+
+    Object(int id) {
+        this.id = id;
+    }
+}
+
+class Block extends Object {
+
+    Block(int id) {
+        super(id);
+    }
+}
+
+
+class Blocks_object_fluentsState extends PropositionalState {
+
+    Blocks_object_fluentsImpulsiveAgent agent;
+    Block no_block;
+
+    Blocks_object_fluentsState(Blocks_object_fluentsImpulsiveAgent agent, Block no_block){
+        this.agent = agent;
+        this.no_block = no_block;
+    }
+
+    predicate On_tableTrue(Block x) {
+        duration >= 1;
+        goal put_down = new agent.Put_down(x:x, at:start);
+        fact in_hand = new In_hand(value:no_block);
+        in_hand.start <= put_down.at;
+        in_hand.end >= put_down.at + 1;
+    }
+
+    predicate On_tableFalse(Block x) {
+        duration >= 1;
+        goal pick_up = new agent.Pick_up(x:x, at:start);
+        fact in_hand = new In_hand(value:x);
+        in_hand.start <= pick_up.at;
+        in_hand.end >= pick_up.at + 1;
+    }
+
+    predicate In_hand(Block value) {
+        duration >= 1;
+        {
+            value == no_block;
+            goal put_down = new agent.Put_down(at:start);
+            fact on_table = new On_tableTrue(x:put_down.x);
+            on_table.start <= put_down.at;
+            on_table.end >= put_down.at + 1;
+        } or {
+            goal unstack = new agent.Unstack(x:value, at:start);
+            fact on_block = new On_block(x:unstack.y, value:no_block);
+            on_block.start <= unstack.at;
+            on_block.end >= unstack.at + 1;
+        } or {
+            value == no_block;
+            goal stack = new agent.Stack(at:start);
+            fact on_block = new On_block(x:stack.y, value:stack.x);
+            on_block.start <= stack.at;
+            on_block.end >= stack.at + 1;
+        } or {
+            goal pick_up = new agent.Pick_up(x:value, at:start);
+            fact on_table = new On_tableFalse(x:value);
+            on_table.start <= pick_up.at;
+            on_table.end >= pick_up.at + 1;
+        }
+    }
+
+    predicate On_block(Block x, Block value) {
+        duration >= 1;
+        {
+            value == no_block;
+            goal unstack = new agent.Unstack(y:x, at:start);
+            fact in_hand = new In_hand(value:unstack.x);
+            in_hand.start <= unstack.at;
+            in_hand.end >= unstack.at + 1;
+        } or {
+            goal stack = new agent.Stack(x:value, y:x, at:start);
+            fact in_hand = new In_hand(value:no_block);
+            in_hand.start <= stack.at;
+            in_hand.end >= stack.at + 1;
+        }
+    }
+}
+
+class Blocks_object_fluentsImpulsiveAgent extends PropositionalImpulsiveAgent {
+
+    Blocks_object_fluentsState propositional_state;
+    Block no_block;
+
+    Blocks_object_fluentsImpulsiveAgent(Block no_block) {
+        propositional_state = new Blocks_object_fluentsState(this, no_block);
+        this.no_block = no_block;
+    }
+
+    predicate Pick_up(Block x) {
+        goal on_block = new propositional_state.On_block(x:x, value:no_block);
+        on_block.start <= at - 1;
+        on_block.end >= at;
+        goal on_table = new propositional_state.On_tableTrue(x:x);
+        on_table.start <= at - 1;
+        on_table.end >= at;
+        goal in_hand = new propositional_state.In_hand(value:no_block);
+        in_hand.start <= at - 1;
+        in_hand.end >= at;
+    }
+
+    predicate Put_down(Block x) {
+        goal in_hand = new propositional_state.In_hand(value:x);
+        in_hand.start <= at - 1;
+        in_hand.end >= at;
+    }
+
+    predicate Stack(Block x, Block y) {
+        goal in_hand = new propositional_state.In_hand(value:x);
+        in_hand.start <= at - 1;
+        in_hand.end >= at;
+        goal on_block = new propositional_state.On_block(x:y, value:no_block);
+        on_block.start <= at - 1;
+        on_block.end >= at;
+    }
+
+    predicate Unstack(Block x, Block y) {
+        goal on_block = new propositional_state.On_block(x:y, value:x);
+        on_block.start <= at - 1;
+        on_block.end >= at;
+        goal on_block = new propositional_state.On_block(x:x, value:no_block);
+        on_block.start <= at - 1;
+        on_block.end >= at;
+        goal in_hand = new propositional_state.In_hand(value:no_block);
+        in_hand.start <= at - 1;
+        in_hand.end >= at;
+    }
+}
+
+/**
+* Domain: Blocks_object_fluents
+* Problem: Blocks_object_fluents
+*/
+
+Block no_block = new Block(1);
+Block a = new Block(2);
+Block b = new Block(3);
+Block c = new Block(4);
+Block d = new Block(5);
+
+
+Blocks_object_fluentsImpulsiveAgent agent = new Blocks_object_fluentsImpulsiveAgent(no_block);
+fact on_block = new agent.propositional_state.On_block(x:a, value:no_block, start:origin);
+on_block.duration >= 1;
+fact on_block = new agent.propositional_state.On_block(x:b, value:no_block, start:origin);
+on_block.duration >= 1;
+fact on_block = new agent.propositional_state.On_block(x:c, value:no_block, start:origin);
+on_block.duration >= 1;
+fact on_block = new agent.propositional_state.On_block(x:d, value:no_block, start:origin);
+on_block.duration >= 1;
+fact on_table = new agent.propositional_state.On_tableTrue(x:a, start:origin);
+on_table.duration >= 1;
+fact on_table = new agent.propositional_state.On_tableTrue(x:b, start:origin);
+on_table.duration >= 1;
+fact on_table = new agent.propositional_state.On_tableTrue(x:c, start:origin);
+on_table.duration >= 1;
+fact on_table = new agent.propositional_state.On_tableTrue(x:d, start:origin);
+on_table.duration >= 1;
+fact in_hand = new agent.propositional_state.In_hand(value:no_block, start:origin);
+in_hand.duration >= 1;
+goal on_block = new agent.propositional_state.On_block(x:c, value:d, end:horizon);
+goal on_block = new agent.propositional_state.On_block(x:b, value:c, end:horizon);
+goal on_block = new agent.propositional_state.On_block(x:a, value:b, end:horizon);

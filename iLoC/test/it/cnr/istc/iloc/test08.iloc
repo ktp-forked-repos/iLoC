@@ -1,0 +1,19 @@
+class Navigator extends StateVariable {
+
+    predicate At(int location) {
+        duration >= 1;
+        goal going = new Navigating(end:start, to:location);
+    }
+
+    predicate Navigating(int from, int to) {
+        duration >= 5;
+        goal at = new At(end:start, location:from);
+    }
+}
+
+Navigator nav = new Navigator();
+
+fact at0 = new nav.At(location:0, start:origin);
+at0.duration >= 10;
+
+goal g_at0 = new nav.At(location:1);

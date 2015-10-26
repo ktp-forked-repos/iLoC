@@ -1,0 +1,29 @@
+class Map {
+
+    Location l_a = new Location(0);
+    Location l_b = new Location(1);
+    Location l_c = new Location(2);
+    Location l_d = new Location(3);
+    Location l_e = new Location(4);
+    Location l_f = new Location(5);
+
+    Map() {
+    }
+
+    predicate Distance(Location from, Location to, number distance) {
+        (from == l_a && to == l_b) -> distance == 600;
+        (from == l_b && to == l_a) -> distance == 600;
+        (from == l_b && to == l_c) -> distance == 800;
+        (from == l_c && to == l_b) -> distance == 800;
+        (from == l_a && to == l_c) -> distance == 1000;
+        (from == l_c && to == l_a) -> distance == 1000;
+        (from == l_c && to == l_d) -> distance == 1000;
+        (from == l_d && to == l_c) -> distance == 1000;
+        (from == l_a && to == l_e) -> distance == 1100;
+        (from == l_e && to == l_a) -> distance == 1100;
+        (from == l_e && to == l_d) -> distance == 1500;
+        (from == l_d && to == l_e) -> distance == 1500;
+        (from == l_e && to == l_f) -> distance == 200;
+        (from == l_f && to == l_e) -> distance == 200;
+    }
+}

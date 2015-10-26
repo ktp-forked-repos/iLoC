@@ -1,0 +1,381 @@
+/**
+* Domain: Blocks
+*/
+
+class Object {
+
+    int id;
+
+    Object(int id) {
+        this.id = id;
+    }
+}
+
+class Block extends Object {
+
+    Block(int id) {
+        super(id);
+    }
+}
+
+
+class BlocksState extends PropositionalState {
+
+    BlocksImpulsiveAgent agent;
+
+    BlocksState(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate OnTrue(Block x, Block y) {
+        duration >= 1;
+        goal stack = new agent.Stack(x:x, y:y, at:start);
+        fact holding = new HoldingFalse(x:x);
+        holding.start <= stack.at;
+        holding.end >= stack.at + 1;
+        fact clear = new ClearFalse(x:y);
+        clear.start <= stack.at;
+        clear.end >= stack.at + 1;
+        fact clear = new ClearTrue(x:x);
+        clear.start <= stack.at;
+        clear.end >= stack.at + 1;
+        fact handempty = new HandemptyTrue();
+        handempty.start <= stack.at;
+        handempty.end >= stack.at + 1;
+    }
+
+    predicate OnFalse(Block x, Block y) {
+        duration >= 1;
+        goal unstack = new agent.Unstack(x:x, y:y, at:start);
+        fact holding = new HoldingTrue(x:x);
+        holding.start <= unstack.at;
+        holding.end >= unstack.at + 1;
+        fact clear = new ClearTrue(x:y);
+        clear.start <= unstack.at;
+        clear.end >= unstack.at + 1;
+        fact clear = new ClearFalse(x:x);
+        clear.start <= unstack.at;
+        clear.end >= unstack.at + 1;
+        fact handempty = new HandemptyFalse();
+        handempty.start <= unstack.at;
+        handempty.end >= unstack.at + 1;
+    }
+
+    predicate OntableTrue(Block x) {
+        duration >= 1;
+        goal put_down = new agent.Put_down(x:x, at:start);
+        fact holding = new HoldingFalse(x:x);
+        holding.start <= put_down.at;
+        holding.end >= put_down.at + 1;
+        fact clear = new ClearTrue(x:x);
+        clear.start <= put_down.at;
+        clear.end >= put_down.at + 1;
+        fact handempty = new HandemptyTrue();
+        handempty.start <= put_down.at;
+        handempty.end >= put_down.at + 1;
+    }
+
+    predicate OntableFalse(Block x) {
+        duration >= 1;
+        goal pick_up = new agent.Pick_up(x:x, at:start);
+        fact clear = new ClearFalse(x:x);
+        clear.start <= pick_up.at;
+        clear.end >= pick_up.at + 1;
+        fact handempty = new HandemptyFalse();
+        handempty.start <= pick_up.at;
+        handempty.end >= pick_up.at + 1;
+        fact holding = new HoldingTrue(x:x);
+        holding.start <= pick_up.at;
+        holding.end >= pick_up.at + 1;
+    }
+
+    predicate ClearTrue(Block x) {
+        duration >= 1;
+        {
+            goal unstack = new agent.Unstack(y:x, at:start);
+            fact holding = new HoldingTrue(x:unstack.x);
+            holding.start <= unstack.at;
+            holding.end >= unstack.at + 1;
+            fact clear = new ClearFalse(x:unstack.x);
+            clear.start <= unstack.at;
+            clear.end >= unstack.at + 1;
+            fact handempty = new HandemptyFalse();
+            handempty.start <= unstack.at;
+            handempty.end >= unstack.at + 1;
+            fact on = new OnFalse(x:unstack.x, y:x);
+            on.start <= unstack.at;
+            on.end >= unstack.at + 1;
+        } or {
+            goal stack = new agent.Stack(x:x, at:start);
+            fact holding = new HoldingFalse(x:x);
+            holding.start <= stack.at;
+            holding.end >= stack.at + 1;
+            fact clear = new ClearFalse(x:stack.y);
+            clear.start <= stack.at;
+            clear.end >= stack.at + 1;
+            fact handempty = new HandemptyTrue();
+            handempty.start <= stack.at;
+            handempty.end >= stack.at + 1;
+            fact on = new OnTrue(x:x, y:stack.y);
+            on.start <= stack.at;
+            on.end >= stack.at + 1;
+        } or {
+            goal put_down = new agent.Put_down(x:x, at:start);
+            fact holding = new HoldingFalse(x:x);
+            holding.start <= put_down.at;
+            holding.end >= put_down.at + 1;
+            fact handempty = new HandemptyTrue();
+            handempty.start <= put_down.at;
+            handempty.end >= put_down.at + 1;
+            fact ontable = new OntableTrue(x:x);
+            ontable.start <= put_down.at;
+            ontable.end >= put_down.at + 1;
+        }
+    }
+
+    predicate ClearFalse(Block x) {
+        duration >= 1;
+        {
+            goal unstack = new agent.Unstack(x:x, at:start);
+            fact holding = new HoldingTrue(x:x);
+            holding.start <= unstack.at;
+            holding.end >= unstack.at + 1;
+            fact clear = new ClearTrue(x:unstack.y);
+            clear.start <= unstack.at;
+            clear.end >= unstack.at + 1;
+            fact handempty = new HandemptyFalse();
+            handempty.start <= unstack.at;
+            handempty.end >= unstack.at + 1;
+            fact on = new OnFalse(x:x, y:unstack.y);
+            on.start <= unstack.at;
+            on.end >= unstack.at + 1;
+        } or {
+            goal pick_up = new agent.Pick_up(x:x, at:start);
+            fact ontable = new OntableFalse(x:x);
+            ontable.start <= pick_up.at;
+            ontable.end >= pick_up.at + 1;
+            fact handempty = new HandemptyFalse();
+            handempty.start <= pick_up.at;
+            handempty.end >= pick_up.at + 1;
+            fact holding = new HoldingTrue(x:x);
+            holding.start <= pick_up.at;
+            holding.end >= pick_up.at + 1;
+        } or {
+            goal stack = new agent.Stack(y:x, at:start);
+            fact holding = new HoldingFalse(x:stack.x);
+            holding.start <= stack.at;
+            holding.end >= stack.at + 1;
+            fact clear = new ClearTrue(x:stack.x);
+            clear.start <= stack.at;
+            clear.end >= stack.at + 1;
+            fact handempty = new HandemptyTrue();
+            handempty.start <= stack.at;
+            handempty.end >= stack.at + 1;
+            fact on = new OnTrue(x:stack.x, y:x);
+            on.start <= stack.at;
+            on.end >= stack.at + 1;
+        }
+    }
+
+    predicate HandemptyTrue() {
+        duration >= 1;
+        {
+            goal stack = new agent.Stack(at:start);
+            fact holding = new HoldingFalse(x:stack.x);
+            holding.start <= stack.at;
+            holding.end >= stack.at + 1;
+            fact clear = new ClearFalse(x:stack.y);
+            clear.start <= stack.at;
+            clear.end >= stack.at + 1;
+            fact clear = new ClearTrue(x:stack.x);
+            clear.start <= stack.at;
+            clear.end >= stack.at + 1;
+            fact on = new OnTrue(x:stack.x, y:stack.y);
+            on.start <= stack.at;
+            on.end >= stack.at + 1;
+        } or {
+            goal put_down = new agent.Put_down(at:start);
+            fact holding = new HoldingFalse(x:put_down.x);
+            holding.start <= put_down.at;
+            holding.end >= put_down.at + 1;
+            fact clear = new ClearTrue(x:put_down.x);
+            clear.start <= put_down.at;
+            clear.end >= put_down.at + 1;
+            fact ontable = new OntableTrue(x:put_down.x);
+            ontable.start <= put_down.at;
+            ontable.end >= put_down.at + 1;
+        }
+    }
+
+    predicate HandemptyFalse() {
+        duration >= 1;
+        {
+            goal unstack = new agent.Unstack(at:start);
+            fact holding = new HoldingTrue(x:unstack.x);
+            holding.start <= unstack.at;
+            holding.end >= unstack.at + 1;
+            fact clear = new ClearTrue(x:unstack.y);
+            clear.start <= unstack.at;
+            clear.end >= unstack.at + 1;
+            fact clear = new ClearFalse(x:unstack.x);
+            clear.start <= unstack.at;
+            clear.end >= unstack.at + 1;
+            fact on = new OnFalse(x:unstack.x, y:unstack.y);
+            on.start <= unstack.at;
+            on.end >= unstack.at + 1;
+        } or {
+            goal pick_up = new agent.Pick_up(at:start);
+            fact ontable = new OntableFalse(x:pick_up.x);
+            ontable.start <= pick_up.at;
+            ontable.end >= pick_up.at + 1;
+            fact clear = new ClearFalse(x:pick_up.x);
+            clear.start <= pick_up.at;
+            clear.end >= pick_up.at + 1;
+            fact holding = new HoldingTrue(x:pick_up.x);
+            holding.start <= pick_up.at;
+            holding.end >= pick_up.at + 1;
+        }
+    }
+
+    predicate HoldingTrue(Block x) {
+        duration >= 1;
+        {
+            goal unstack = new agent.Unstack(x:x, at:start);
+            fact clear = new ClearTrue(x:unstack.y);
+            clear.start <= unstack.at;
+            clear.end >= unstack.at + 1;
+            fact clear = new ClearFalse(x:x);
+            clear.start <= unstack.at;
+            clear.end >= unstack.at + 1;
+            fact handempty = new HandemptyFalse();
+            handempty.start <= unstack.at;
+            handempty.end >= unstack.at + 1;
+            fact on = new OnFalse(x:x, y:unstack.y);
+            on.start <= unstack.at;
+            on.end >= unstack.at + 1;
+        } or {
+            goal pick_up = new agent.Pick_up(x:x, at:start);
+            fact ontable = new OntableFalse(x:x);
+            ontable.start <= pick_up.at;
+            ontable.end >= pick_up.at + 1;
+            fact clear = new ClearFalse(x:x);
+            clear.start <= pick_up.at;
+            clear.end >= pick_up.at + 1;
+            fact handempty = new HandemptyFalse();
+            handempty.start <= pick_up.at;
+            handempty.end >= pick_up.at + 1;
+        }
+    }
+
+    predicate HoldingFalse(Block x) {
+        duration >= 1;
+        {
+            goal stack = new agent.Stack(x:x, at:start);
+            fact clear = new ClearFalse(x:stack.y);
+            clear.start <= stack.at;
+            clear.end >= stack.at + 1;
+            fact clear = new ClearTrue(x:x);
+            clear.start <= stack.at;
+            clear.end >= stack.at + 1;
+            fact handempty = new HandemptyTrue();
+            handempty.start <= stack.at;
+            handempty.end >= stack.at + 1;
+            fact on = new OnTrue(x:x, y:stack.y);
+            on.start <= stack.at;
+            on.end >= stack.at + 1;
+        } or {
+            goal put_down = new agent.Put_down(x:x, at:start);
+            fact clear = new ClearTrue(x:x);
+            clear.start <= put_down.at;
+            clear.end >= put_down.at + 1;
+            fact handempty = new HandemptyTrue();
+            handempty.start <= put_down.at;
+            handempty.end >= put_down.at + 1;
+            fact ontable = new OntableTrue(x:x);
+            ontable.start <= put_down.at;
+            ontable.end >= put_down.at + 1;
+        }
+    }
+}
+
+class BlocksImpulsiveAgent extends PropositionalImpulsiveAgent {
+
+    BlocksState propositional_state;
+
+    BlocksImpulsiveAgent() {
+        propositional_state = new BlocksState(this);
+    }
+
+    predicate Pick_up(Block x) {
+        goal clear = new propositional_state.ClearTrue(x:x);
+        clear.start <= at - 1;
+        clear.end >= at;
+        goal ontable = new propositional_state.OntableTrue(x:x);
+        ontable.start <= at - 1;
+        ontable.end >= at;
+        goal handempty = new propositional_state.HandemptyTrue();
+        handempty.start <= at - 1;
+        handempty.end >= at;
+    }
+
+    predicate Put_down(Block x) {
+        goal holding = new propositional_state.HoldingTrue(x:x);
+        holding.start <= at - 1;
+        holding.end >= at;
+    }
+
+    predicate Stack(Block x, Block y) {
+        goal holding = new propositional_state.HoldingTrue(x:x);
+        holding.start <= at - 1;
+        holding.end >= at;
+        goal clear = new propositional_state.ClearTrue(x:y);
+        clear.start <= at - 1;
+        clear.end >= at;
+    }
+
+    predicate Unstack(Block x, Block y) {
+        goal on = new propositional_state.OnTrue(x:x, y:y);
+        on.start <= at - 1;
+        on.end >= at;
+        goal clear = new propositional_state.ClearTrue(x:x);
+        clear.start <= at - 1;
+        clear.end >= at;
+        goal handempty = new propositional_state.HandemptyTrue();
+        handempty.start <= at - 1;
+        handempty.end >= at;
+    }
+}
+
+/**
+* Domain: Blocks
+* Problem: Blocks
+*/
+
+Block a = new Block(1);
+Block b = new Block(2);
+Block c = new Block(3);
+Block d = new Block(4);
+
+
+BlocksImpulsiveAgent agent = new BlocksImpulsiveAgent();
+fact clear = new agent.propositional_state.ClearTrue(x:a, start:origin);
+clear.duration >= 1;
+fact clear = new agent.propositional_state.ClearTrue(x:b, start:origin);
+clear.duration >= 1;
+fact clear = new agent.propositional_state.ClearTrue(x:c, start:origin);
+clear.duration >= 1;
+fact clear = new agent.propositional_state.ClearTrue(x:d, start:origin);
+clear.duration >= 1;
+fact ontable = new agent.propositional_state.OntableTrue(x:a, start:origin);
+ontable.duration >= 1;
+fact ontable = new agent.propositional_state.OntableTrue(x:b, start:origin);
+ontable.duration >= 1;
+fact ontable = new agent.propositional_state.OntableTrue(x:c, start:origin);
+ontable.duration >= 1;
+fact ontable = new agent.propositional_state.OntableTrue(x:d, start:origin);
+ontable.duration >= 1;
+fact handempty = new agent.propositional_state.HandemptyTrue(start:origin);
+handempty.duration >= 1;
+goal on = new agent.propositional_state.OnTrue(x:d, y:c, end:horizon);
+goal on = new agent.propositional_state.OnTrue(x:c, y:b, end:horizon);
+goal on = new agent.propositional_state.OnTrue(x:b, y:a, end:horizon);

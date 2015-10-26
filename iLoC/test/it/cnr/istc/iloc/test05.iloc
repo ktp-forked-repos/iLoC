@@ -1,0 +1,5 @@
+ReusableResource cr = new ReusableResource(5);
+
+goal use0 = new cr.Use(amount:5, duration:10);
+goal use1 = new cr.Use(amount:5, duration:10);
+goal use2 = new cr.Use(amount:5, duration:10);

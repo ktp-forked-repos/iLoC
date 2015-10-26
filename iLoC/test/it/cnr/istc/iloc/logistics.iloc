@@ -1,0 +1,241 @@
+/**
+* Domain: Logistics
+*/
+
+class Object {
+
+    int id;
+
+    Object(int id) {
+        this.id = id;
+    }
+}
+
+class Vehicle extends Thing {
+
+    Vehicle(int id) {
+        super(id);
+    }
+}
+
+class Truck extends Vehicle {
+
+    Truck(int id) {
+        super(id);
+    }
+}
+
+class Airplane extends Vehicle {
+
+    Airplane(int id) {
+        super(id);
+    }
+}
+
+class Thing extends Object {
+
+    Thing(int id) {
+        super(id);
+    }
+}
+
+class Package extends Thing {
+
+    Package(int id) {
+        super(id);
+    }
+}
+
+class Location extends Object {
+
+    Location(int id) {
+        super(id);
+    }
+}
+
+class Airport extends Location {
+
+    Airport(int id) {
+        super(id);
+    }
+}
+
+class City extends Object {
+
+    City(int id) {
+        super(id);
+    }
+}
+
+
+class LogisticsState extends PropositionalState {
+
+    LogisticsImpulsiveAgent agent;
+
+    LogisticsState(LogisticsImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate In_cityTrue(Location l, City c) {
+        duration >= 1;
+    }
+
+    predicate In_cityFalse(Location l, City c) {
+        duration >= 1;
+    }
+
+    predicate AtTrue(Thing obj, Location l) {
+        duration >= 1;
+        {
+            goal drive = new agent.Drive(t:obj, to:l, at:start);
+            fact _at_false = new AtFalse(obj:obj, l:drive.from);
+            _at_false.start <= drive.at;
+            _at_false.end >= drive.at + 1;
+        } or {
+            goal unload = new agent.Unload(p:obj, l:l, at:start);
+            fact in_false = new InFalse(p:obj, veh:unload.v);
+            in_false.start <= unload.at;
+            in_false.end >= unload.at + 1;
+        } or {
+            goal fly = new agent.Fly(a:obj, to:l, at:start);
+            fact _at_false = new AtFalse(obj:obj, l:fly.from);
+            _at_false.start <= fly.at;
+            _at_false.end >= fly.at + 1;
+        }
+    }
+
+    predicate AtFalse(Thing obj, Location l) {
+        duration >= 1;
+        {
+            goal drive = new agent.Drive(t:obj, from:l, at:start);
+            fact _at_true = new AtTrue(obj:obj, l:drive.to);
+            _at_true.start <= drive.at;
+            _at_true.end >= drive.at + 1;
+        } or {
+            goal load = new agent.Load(p:obj, l:l, at:start);
+            fact in_true = new InTrue(p:obj, veh:load.v);
+            in_true.start <= load.at;
+            in_true.end >= load.at + 1;
+        } or {
+            goal fly = new agent.Fly(a:obj, from:l, at:start);
+            fact _at_true = new AtTrue(obj:obj, l:fly.to);
+            _at_true.start <= fly.at;
+            _at_true.end >= fly.at + 1;
+        }
+    }
+
+    predicate InTrue(Package p, Vehicle veh) {
+        duration >= 1;
+        goal load = new agent.Load(v:veh, p:p, at:start);
+        fact _at_false = new AtFalse(obj:p, l:load.l);
+        _at_false.start <= load.at;
+        _at_false.end >= load.at + 1;
+    }
+
+    predicate InFalse(Package p, Vehicle veh) {
+        duration >= 1;
+        goal unload = new agent.Unload(v:veh, p:p, at:start);
+        fact _at_true = new AtTrue(obj:p, l:unload.l);
+        _at_true.start <= unload.at;
+        _at_true.end >= unload.at + 1;
+    }
+}
+
+class LogisticsImpulsiveAgent extends PropositionalImpulsiveAgent {
+
+    LogisticsState propositional_state;
+
+    LogisticsImpulsiveAgent() {
+        propositional_state = new LogisticsState(this);
+    }
+
+    predicate Drive(Truck t, Location from, Location to, City c) {
+        goal _at_true = new propositional_state.AtTrue(obj:t, l:from);
+        _at_true.start <= at - 1;
+        _at_true.end >= at;
+        goal in_city_true = new propositional_state.In_cityTrue(l:from, c:c);
+        in_city_true.start <= at - 1;
+        in_city_true.end >= at;
+        goal in_city_true = new propositional_state.In_cityTrue(l:to, c:c);
+        in_city_true.start <= at - 1;
+        in_city_true.end >= at;
+    }
+
+    predicate Fly(Airplane a, Airport from, Airport to) {
+        goal _at_true = new propositional_state.AtTrue(obj:a, l:from);
+        _at_true.start <= at - 1;
+        _at_true.end >= at;
+    }
+
+    predicate Load(Vehicle v, Package p, Location l) {
+        goal _at_true = new propositional_state.AtTrue(obj:v, l:l);
+        _at_true.start <= at - 1;
+        _at_true.end >= at;
+        goal _at_true = new propositional_state.AtTrue(obj:p, l:l);
+        _at_true.start <= at - 1;
+        _at_true.end >= at;
+    }
+
+    predicate Unload(Vehicle v, Package p, Location l) {
+        goal _at_true = new propositional_state.AtTrue(obj:v, l:l);
+        _at_true.start <= at - 1;
+        _at_true.end >= at;
+        goal in_true = new propositional_state.InTrue(p:p, veh:v);
+        in_true.start <= at - 1;
+        in_true.end >= at;
+    }
+}
+
+/**
+* Domain: Logistics
+* Problem: Logistics
+*/
+
+Airplane apn1 = new Airplane(1);
+Truck tru1 = new Truck(2);
+Truck tru2 = new Truck(3);
+Package obj11 = new Package(4);
+Package obj12 = new Package(5);
+Package obj13 = new Package(6);
+Package obj21 = new Package(7);
+Package obj22 = new Package(8);
+Package obj23 = new Package(9);
+Airport apt1 = new Airport(10);
+Airport apt2 = new Airport(11);
+Location pos1 = new Location(12);
+Location pos2 = new Location(13);
+City cit1 = new City(14);
+City cit2 = new City(15);
+
+
+LogisticsImpulsiveAgent agent = new LogisticsImpulsiveAgent();
+fact _at_true = new agent.propositional_state.AtTrue(obj:apn1, l:apt2, start:origin);
+_at_true.duration >= 1;
+fact _at_true = new agent.propositional_state.AtTrue(obj:tru1, l:pos1, start:origin);
+_at_true.duration >= 1;
+fact _at_true = new agent.propositional_state.AtTrue(obj:tru2, l:pos2, start:origin);
+_at_true.duration >= 1;
+fact _at_true = new agent.propositional_state.AtTrue(obj:obj11, l:pos1, start:origin);
+_at_true.duration >= 1;
+fact _at_true = new agent.propositional_state.AtTrue(obj:obj12, l:pos1, start:origin);
+_at_true.duration >= 1;
+fact _at_true = new agent.propositional_state.AtTrue(obj:obj13, l:pos1, start:origin);
+_at_true.duration >= 1;
+fact _at_true = new agent.propositional_state.AtTrue(obj:obj21, l:pos2, start:origin);
+_at_true.duration >= 1;
+fact _at_true = new agent.propositional_state.AtTrue(obj:obj22, l:pos2, start:origin);
+_at_true.duration >= 1;
+fact _at_true = new agent.propositional_state.AtTrue(obj:obj23, l:pos2, start:origin);
+_at_true.duration >= 1;
+fact in_city_true = new agent.propositional_state.In_cityTrue(l:apt1, c:cit1, start:origin);
+in_city_true.duration >= 1;
+fact in_city_true = new agent.propositional_state.In_cityTrue(l:apt2, c:cit2, start:origin);
+in_city_true.duration >= 1;
+fact in_city_true = new agent.propositional_state.In_cityTrue(l:pos1, c:cit1, start:origin);
+in_city_true.duration >= 1;
+fact in_city_true = new agent.propositional_state.In_cityTrue(l:pos2, c:cit2, start:origin);
+in_city_true.duration >= 1;
+goal _at_true = new agent.propositional_state.AtTrue(obj:obj11, l:apt1, end:horizon);
+goal _at_true = new agent.propositional_state.AtTrue(obj:obj13, l:apt1, end:horizon);
+goal _at_true = new agent.propositional_state.AtTrue(obj:obj21, l:pos1, end:horizon);
+goal _at_true = new agent.propositional_state.AtTrue(obj:obj23, l:pos1, end:horizon);

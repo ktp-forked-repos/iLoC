@@ -291,7 +291,7 @@ public class PDDLTranslator {
             } else {
                 CartesianProductGenerator<Constant> cartesian_product = new CartesianProductGenerator<>(function.getVariables().stream().map(var -> var.getType().getInstances().toArray(new Constant[var.getType().getInstances().size()])).toArray(Constant[][]::new));
                 for (Constant[] cs : cartesian_product) {
-                    ground_domain.addPredicate(new Predicate(function.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")) + "_"));
+                    ground_domain.addFunction(new Function(function.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")) + "_", function.getType()));
                 }
             }
         });

@@ -1,0 +1,13 @@
+ConsumableResource cr = new ConsumableResource(0, 10, 5, 0);
+
+goal prod0 = new cr.Produce(start:origin, duration:10);
+prod0.amount >= 5;
+
+goal cons0 = new cr.Consume(start:prod0.end, duration:10);
+cons0.amount >= 5;
+
+goal prod1 = new cr.Produce(start:cons0.end, duration:10);
+prod1.amount >= 5;
+
+goal cons1 = new cr.Consume(start:prod1.end, end:horizon, duration:10);
+cons1.amount >= 5;

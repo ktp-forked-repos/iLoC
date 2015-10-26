@@ -1,0 +1,8 @@
+class Visibility extends StateVariable {
+
+    predicate Visible() {
+    }
+
+    predicate NotVisible() {
+    }
+}

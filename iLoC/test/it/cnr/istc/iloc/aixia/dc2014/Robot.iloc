@@ -1,0 +1,34 @@
+class Robot extends Agent {
+
+    Navigator navigator;
+    ReusableResource antenna = new ReusableResource(1);
+    ConsumableResource memory = new ConsumableResource(0, memory_capacity);
+    Visibility visibility;
+
+    Robot(Map map, Visibility visibility) {
+        navigator = new Navigator(map);
+        this.visibility = visibility;
+    }
+
+    predicate At(Location location) {
+        goal at = new navigator.At(start:start, end:end, duration:duration, location:location);
+    }
+
+    predicate TakePicture(int id, Location location) {
+        duration == 50;
+        goal at = new navigator.At(location:location);
+        at.start <= start;
+        at.end >= end;
+        goal cons = new memory.Consume(start:start, end:end, duration:duration, amount:picture_size);
+        goal download = new Download(id:id, amount:cons.amount, duration:cons.amount/download_rate);
+        download.start >= end;
+    }
+
+    predicate Download(int id, real amount) {
+        goal antenna_use = new antenna.Use(start:start, end:end, duration:duration, amount:1);
+        goal prod = new memory.Produce(start:start, end:end, duration:duration, amount:amount);
+        goal vis = new visibility.Visible();
+        vis.start <= start;
+        vis.end >= end;
+    }
+}

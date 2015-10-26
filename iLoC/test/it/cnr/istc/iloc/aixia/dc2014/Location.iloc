@@ -1,0 +1,8 @@
+class Location {
+
+    number id;
+
+    Location(number id) {
+        this.id = id;
+    }
+}
