@@ -40,7 +40,7 @@ public class PDDLTranslator {
 
     private static final ParseTreeWalker WALKER = new ParseTreeWalker();
 
-    public static String translatePDDLInstance(File pddl_domain, File pddl_problem) throws IOException {
+    public static String translatePDDLInstance(File pddl_domain, File pddl_problem, boolean ground) throws IOException {
         // We get the requirements
         Set<String> domain_requirements = PDDLRequirements.getRequirements(pddl_domain);
         Set<String> problem_requirements = PDDLRequirements.getRequirements(pddl_problem);
@@ -256,24 +256,47 @@ public class PDDLTranslator {
          */
         problem.setGoal(term_visitor.visit(problem_context.goal().pre_GD()));
 
-        ProblemInstance ground_instance = makeGround(new ProblemInstance(domain, problem));
+        if (ground) {
+            ProblemInstance ground_instance = makeGround(new ProblemInstance(domain, problem));
 
-        STGroupFile file = new STGroupFile(PDDLTranslator.class.getResource("PDDLTemplate.stg").getPath());
-        file.registerRenderer(Domain.class, new DomainRenderer(file));
-        file.registerRenderer(Problem.class, new ProblemRenderer(file));
-        file.registerRenderer(Action.class, new ActionRenderer(file));
-        file.registerRenderer(DurativeAction.class, new DurativeActionRenderer(file));
-        file.registerRenderer(Predicate.class, new PredicateRenderer(file, ground_instance.domain));
-        file.registerRenderer(Function.class, new FunctionRenderer(file, ground_instance.domain));
-        ST translation = file.getInstanceOf("PDDL");
-        translation.add("domain", ground_instance.domain);
-        translation.add("problem", ground_instance.problem);
+            STGroupFile file = new STGroupFile(PDDLTranslator.class.getResource("PDDLTemplate.stg").getPath());
+            file.registerRenderer(Domain.class, new DomainRenderer(file));
+            file.registerRenderer(Problem.class, new ProblemRenderer(file));
+            file.registerRenderer(Action.class, new ActionRenderer(file));
+            file.registerRenderer(DurativeAction.class, new DurativeActionRenderer(file));
+            file.registerRenderer(Predicate.class, new PredicateRenderer(file, ground_instance.domain));
+            file.registerRenderer(Function.class, new FunctionRenderer(file, ground_instance.domain));
+            ST translation = file.getInstanceOf("PDDL");
+            translation.add("domain", ground_instance.domain);
+            translation.add("problem", ground_instance.problem);
 
-        return translation.render();
+            return translation.render();
+        } else {
+            STGroupFile file = new STGroupFile(PDDLTranslator.class.getResource("PDDLTemplate.stg").getPath());
+            file.registerRenderer(Domain.class, new DomainRenderer(file));
+            file.registerRenderer(Problem.class, new ProblemRenderer(file));
+            file.registerRenderer(Action.class, new ActionRenderer(file));
+            file.registerRenderer(DurativeAction.class, new DurativeActionRenderer(file));
+            file.registerRenderer(Predicate.class, new PredicateRenderer(file, domain));
+            file.registerRenderer(Function.class, new FunctionRenderer(file, domain));
+            ST translation = file.getInstanceOf("PDDL");
+            translation.add("domain", domain);
+            translation.add("problem", problem);
+
+            return translation.render();
+        }
     }
 
     private static ProblemInstance makeGround(ProblemInstance instance) {
         Domain ground_domain = new Domain(instance.domain.getName());
+
+        instance.domain.getTypes().values().stream().forEach(type -> {
+            ground_domain.addType(type);
+        });
+        instance.domain.getConstants().values().stream().forEach(c -> {
+            ground_domain.addConstant(c);
+        });
+
         instance.domain.getPredicates().values().stream().forEach(predicate -> {
             if (predicate.getVariables().isEmpty()) {
                 ground_domain.addPredicate(predicate);
@@ -320,6 +343,7 @@ public class PDDLTranslator {
                 for (Constant[] cs : cartesian_product) {
                     // We make terms ground..
                     Map<String, Term> known_terms = new HashMap<>(cs.length);
+                    known_terms.put("?duration", new ConstantTerm("duration"));
                     for (int i = 0; i < cs.length; i++) {
                         known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(cs[i].getName()));
                     }
@@ -329,6 +353,10 @@ public class PDDLTranslator {
         });
 
         Problem ground_problem = new Problem(ground_domain, instance.problem.getName());
+
+        instance.problem.getObjects().values().stream().forEach(o -> {
+            ground_problem.addObject(o);
+        });
 
         Map<String, Term> known_terms = new HashMap<>();
         instance.domain.getTypes().values().stream().flatMap(type -> type.getInstances().stream()).forEach(c -> {

@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -37,7 +36,7 @@ public class TranslatorTest {
     @Test
     public void testBlocksWorldTranslator() {
         try {
-            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("blocks/blocks-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks/blocks-problem.pddl").getPath()));
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("blocks/blocks-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks/blocks-problem.pddl").getPath()), false);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -49,7 +48,7 @@ public class TranslatorTest {
     @Test
     public void testNewBlocksWorldTranslator() {
         try {
-            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("blocks/blocks-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks/blocks-problem-new.pddl").getPath()));
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("blocks/blocks-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks/blocks-problem-new.pddl").getPath()), false);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -61,7 +60,7 @@ public class TranslatorTest {
     @Test
     public void testDepotsTranslator() {
         try {
-            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("depots/depots-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("depots/depots-problem.pddl").getPath()));
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("depots/depots-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("depots/depots-problem.pddl").getPath()), false);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -73,7 +72,7 @@ public class TranslatorTest {
     @Test
     public void testNewDepotsTranslator() {
         try {
-            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("depots/depots-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("depots/depots-problem-new.pddl").getPath()));
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("depots/depots-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("depots/depots-problem-new.pddl").getPath()), false);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -85,7 +84,7 @@ public class TranslatorTest {
     @Test
     public void testLogisticsTranslator() {
         try {
-            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("logistics/logistics-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics/logistics-problem.pddl").getPath()));
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("logistics/logistics-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics/logistics-problem.pddl").getPath()), false);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -97,7 +96,7 @@ public class TranslatorTest {
     @Test
     public void testNewLogisticsTranslator() {
         try {
-            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("logistics/logistics-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics/logistics-problem-new.pddl").getPath()));
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("logistics/logistics-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics/logistics-problem-new.pddl").getPath()), false);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -107,7 +106,7 @@ public class TranslatorTest {
     public void testTemporalCrewPlanningStripsTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/crewplanning_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/crewplanning_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/crewplanning_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/crewplanning_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -118,7 +117,7 @@ public class TranslatorTest {
     public void testTemporalElevatorsNumericTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/elevators_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/elevators_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/elevators_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/elevators_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -129,7 +128,7 @@ public class TranslatorTest {
     public void testTemporalElevatorsStripsTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/elevators_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/elevators_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/elevators_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/elevators_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -140,7 +139,7 @@ public class TranslatorTest {
     public void testTemporalModelTrainNumericTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/modeltrain_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/modeltrain_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/modeltrain_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/modeltrain_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -148,11 +147,10 @@ public class TranslatorTest {
     }
 
     @Test
-    @Ignore("Contains forall")
     public void testOpenstacksADLTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/openstacks_adl/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/openstacks_adl/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/openstacks_adl/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/openstacks_adl/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -163,7 +161,7 @@ public class TranslatorTest {
     public void testOpenstacksNumericTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/openstacks_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/openstacks_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/openstacks_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/openstacks_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -171,11 +169,10 @@ public class TranslatorTest {
     }
 
     @Test
-    @Ignore("Contains forall")
     public void testOpenstacksNumericADLTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/openstacks_numericadl/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/openstacks_numericadl/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/openstacks_numericadl/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/openstacks_numericadl/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -186,7 +183,7 @@ public class TranslatorTest {
     public void testOpenstacksStripsTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/openstacks_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/openstacks_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/openstacks_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/openstacks_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -197,7 +194,7 @@ public class TranslatorTest {
     public void testParcprinterStripsTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/parcprinter_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/parcprinter_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/parcprinter_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/parcprinter_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -208,7 +205,7 @@ public class TranslatorTest {
     public void testPegsolStripsTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/pegsol_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/pegsol_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/pegsol_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/pegsol_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -219,7 +216,7 @@ public class TranslatorTest {
     public void testSokobanStripsTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/sokoban_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/sokoban_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/sokoban_strips/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/sokoban_strips/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -230,7 +227,7 @@ public class TranslatorTest {
     public void testTransportNumericTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/transport_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/transport_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/transport_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/transport_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
@@ -241,7 +238,7 @@ public class TranslatorTest {
     public void testWoodworkingNumericTranslator() {
         try {
             for (int i = 1; i <= 30; i++) {
-                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/woodworking_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/woodworking_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()));
+                String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("temporal/woodworking_numeric/p" + new DecimalFormat("00").format(i) + "-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("temporal/woodworking_numeric/p" + new DecimalFormat("00").format(i) + ".pddl").getPath()), false);
             }
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
