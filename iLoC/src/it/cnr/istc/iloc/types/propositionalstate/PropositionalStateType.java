@@ -155,6 +155,8 @@ public class PropositionalStateType extends Type {
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(PropositionalStateType.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } else {
+            throw new UnsupportedOperationException("Lazy scheduling is not supported yet for propositional state type..");
         }
     }
 }

@@ -21,11 +21,15 @@ package it.cnr.istc.iloc.types.propositionalstate;
 import it.cnr.istc.iloc.Field;
 import it.cnr.istc.iloc.Type;
 import it.cnr.istc.iloc.api.Constants;
+import it.cnr.istc.iloc.api.FormulaState;
+import it.cnr.istc.iloc.api.IBool;
 import it.cnr.istc.iloc.api.IConstraintNetwork;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.INumber;
 import it.cnr.istc.iloc.api.IPredicate;
 import it.cnr.istc.iloc.api.ISolver;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,10 +42,12 @@ public class PropositionalAgentType extends Type {
 
     public static final String TYPE_NAME = "PropositionalAgent";
     private final Properties properties;
+    private final boolean lazy_scheduling;
 
     public PropositionalAgentType(ISolver solver, Properties properties) {
         super(solver, solver, TYPE_NAME);
         this.properties = properties;
+        this.lazy_scheduling = Boolean.parseBoolean(properties.getProperty("PropositionalAgentLazyScheduling", "false"));
     }
 
     @Override
@@ -93,5 +99,29 @@ public class PropositionalAgentType extends Type {
                 network.leq(end, horizon),
                 network.geq(duration, network.newReal("0"))
         );
+
+        if (!lazy_scheduling) {
+            List<IBool> vars = new ArrayList<>();
+            formula.getType().getEnclosingScope().getPredicates().values().stream().flatMap(predicate -> predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active)).forEach(f -> {
+                vars.add(
+                        network.or(
+                                network.lt(f.get(Constants.START), start),
+                                network.lt(start, f.get(Constants.START)),
+                                network.not(formula.getScope().eq(f.getScope()))
+                        )
+                );
+                vars.add(
+                        network.or(
+                                network.lt(f.get(Constants.END), end),
+                                network.lt(end, f.get(Constants.END)),
+                                network.not(formula.getScope().eq(f.getScope()))
+                        )
+                );
+            });
+
+            if (!vars.isEmpty()) {
+                network.assertFacts(vars.toArray(new IBool[vars.size()]));
+            }
+        }
     }
 }

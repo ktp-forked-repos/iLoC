@@ -21,11 +21,15 @@ package it.cnr.istc.iloc.types.propositionalstate;
 import it.cnr.istc.iloc.Field;
 import it.cnr.istc.iloc.Type;
 import it.cnr.istc.iloc.api.Constants;
+import it.cnr.istc.iloc.api.FormulaState;
+import it.cnr.istc.iloc.api.IBool;
 import it.cnr.istc.iloc.api.IConstraintNetwork;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.INumber;
 import it.cnr.istc.iloc.api.IPredicate;
 import it.cnr.istc.iloc.api.ISolver;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,10 +42,12 @@ public class PropositionalImpulsiveAgentType extends Type {
 
     public static final String TYPE_NAME = "PropositionalImpulsiveAgent";
     private final Properties properties;
+    private final boolean lazy_scheduling;
 
     public PropositionalImpulsiveAgentType(ISolver solver, Properties properties) {
         super(solver, solver, TYPE_NAME);
         this.properties = properties;
+        this.lazy_scheduling = Boolean.parseBoolean(properties.getProperty("PropositionalImpulsiveAgentLazyScheduling", "false"));
     }
 
     @Override
@@ -83,5 +89,22 @@ public class PropositionalImpulsiveAgentType extends Type {
                 network.geq(at, origin),
                 network.leq(at, horizon)
         );
+
+        if (!lazy_scheduling) {
+            List<IBool> vars = new ArrayList<>();
+            formula.getType().getEnclosingScope().getPredicates().values().stream().flatMap(predicate -> predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active)).forEach(f -> {
+                vars.add(
+                        network.or(
+                                network.lt(f.get(Constants.AT), at),
+                                network.lt(at, f.get(Constants.AT)),
+                                network.not(formula.getScope().eq(f.getScope()))
+                        )
+                );
+            });
+
+            if (!vars.isEmpty()) {
+                network.assertFacts(vars.toArray(new IBool[vars.size()]));
+            }
+        }
     }
 }
