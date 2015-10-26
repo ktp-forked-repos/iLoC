@@ -379,6 +379,7 @@ public class Solver implements ISolver {
     @Override
     public boolean solve() {
         bound = properties.containsKey("Bound") ? Integer.parseInt(properties.getProperty("Bound")) : predicates.size() + types.values().stream().mapToInt(type -> type.getPredicates().size()).sum();
+        staticCausalGraph.recomputeCosts();
         while (true) {
             while (!fringe.isEmpty()) {
                 Boolean reached = goTo(fringe.pollFirst());

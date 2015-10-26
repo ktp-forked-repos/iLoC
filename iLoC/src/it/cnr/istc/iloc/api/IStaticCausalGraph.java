@@ -220,6 +220,11 @@ public interface IStaticCausalGraph {
     }
 
     /**
+     * Recomputes all the currently estimated costs.
+     */
+    public void recomputeCosts();
+
+    /**
      * Adds a listener to the given static causal graph for detecting
      * addition/removal of nodes and edges.
      *

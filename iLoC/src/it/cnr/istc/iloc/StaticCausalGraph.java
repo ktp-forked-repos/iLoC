@@ -60,7 +60,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
     public void addType(IType type) {
         assert !types.contains(type);
         types.add(type);
-        clear();
         listeners.stream().forEach(listener -> {
             listener.typeAdded(type);
         });
@@ -70,7 +69,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
     public void removeType(IType type) {
         assert types.contains(type);
         types.remove(type);
-        clear();
         listeners.stream().forEach(listener -> {
             listener.typeRemoved(type);
         });
@@ -91,7 +89,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
         listeners.stream().forEach(listener -> {
             listener.nodeAdded(node);
         });
-        clear();
         return node;
     }
 
@@ -110,7 +107,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
         listeners.stream().forEach(listener -> {
             listener.nodeAdded(node);
         });
-        clear();
         return node;
     }
 
@@ -129,7 +125,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
         listeners.stream().forEach(listener -> {
             listener.nodeAdded(node);
         });
-        clear();
         return node;
     }
 
@@ -148,7 +143,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
         listeners.stream().forEach(listener -> {
             listener.nodeAdded(node);
         });
-        clear();
         return node;
     }
 
@@ -164,7 +158,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
         listeners.stream().forEach(listener -> {
             listener.nodeAdded(node);
         });
-        clear();
         return node;
     }
 
@@ -181,7 +174,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
         listeners.stream().forEach(listener -> {
             listener.nodeAdded(node);
         });
-        clear();
     }
 
     @Override
@@ -191,7 +183,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
             links.get(source).put(target, new ArrayList<>());
         }
         links.get(source).get(target).add(edge);
-        clear();
         listeners.stream().forEach(listener -> {
             listener.edgeAdded(edge);
         });
@@ -204,7 +195,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
         if (links.get(edge.getSource()).get(edge.getTarget()).isEmpty()) {
             links.get(edge.getSource()).remove(edge.getTarget());
         }
-        clear();
         listeners.stream().forEach(listener -> {
             listener.edgeRemoved(edge);
         });
@@ -237,6 +227,9 @@ class StaticCausalGraph implements IStaticCausalGraph {
     }
 
     private Set<INode> getAllMinReachableNodes(INode node, Set<INode> visited) {
+        if (!all_min_reachable_nodes.containsKey(node)) {
+            all_min_reachable_nodes.put(node, getMinReachableNodes(node, new HashSet<>(nodes.size())));
+        }
         if (!visited.contains(node)) {
             if (node instanceof IPredicateNode) {
                 visited.add(node);
@@ -270,6 +263,9 @@ class StaticCausalGraph implements IStaticCausalGraph {
     }
 
     private Set<INode> getMinReachableNodes(INode node, Set<INode> visited) {
+        if (min_reachable_nodes.containsKey(node)) {
+            return min_reachable_nodes.get(node);
+        }
         if (!visited.contains(node)) {
             if (node instanceof IPredicateNode) {
                 if (((IPredicateNode) node).getPredicate().getInstances().stream().map(instance -> (IFormula) instance).noneMatch(formula -> formula.getFormulaState() == FormulaState.Active)) {
@@ -307,6 +303,9 @@ class StaticCausalGraph implements IStaticCausalGraph {
     }
 
     private int getMinCausalDistance(INode node, Set<INode> visited) {
+        if (min_causal_distance.containsKey(node)) {
+            return min_causal_distance.get(node);
+        }
         if (!visited.contains(node)) {
             if (node instanceof IPredicateNode) {
                 if (((IPredicateNode) node).getPredicate().getInstances().stream().map(instance -> (IFormula) instance).noneMatch(formula -> formula.getFormulaState() == FormulaState.Active)) {
@@ -335,6 +334,17 @@ class StaticCausalGraph implements IStaticCausalGraph {
     }
 
     @Override
+    public void recomputeCosts() {
+        all_reachable_nodes.clear();
+        all_min_reachable_nodes.clear();
+        min_reachable_nodes.clear();
+        min_causal_distance.clear();
+        links.keySet().stream().forEach(node -> {
+            estimateCost(node);
+        });
+    }
+
+    @Override
     public void addCausalGraphListener(IStaticCausalGraphListener listener) {
         listeners.add(listener);
         types.stream().forEach(type -> {
@@ -355,11 +365,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
     @Override
     public void removeCausalGraphListener(IStaticCausalGraphListener listener) {
         listeners.remove(listener);
-    }
-
-    private void clear() {
-        all_reachable_nodes.clear();
-        all_min_reachable_nodes.clear();
     }
 
     //<editor-fold defaultstate="collapsed" desc="Nodes and edges..">
