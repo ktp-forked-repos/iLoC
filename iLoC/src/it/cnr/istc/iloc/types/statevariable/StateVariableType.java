@@ -30,16 +30,17 @@ import it.cnr.istc.iloc.api.INumber;
 import it.cnr.istc.iloc.api.IObject;
 import it.cnr.istc.iloc.api.IPredicate;
 import it.cnr.istc.iloc.api.ISolver;
+import it.cnr.istc.iloc.api.IType;
 import it.cnr.istc.iloc.utils.CombinationGenerator;
 import it.cnr.istc.iloc.utils.MathUtils;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -122,18 +123,20 @@ public class StateVariableType extends Type {
         } else {
             List<IBool> constraints = new ArrayList<>();
             IConstraintNetwork network = solver.getConstraintNetwork();
-            final Map<IObject, Collection<IFormula>> formulas = getFormulas(model);
 
-            instances.stream().map(instance -> new StateVariableTimeline(solver, model, instance, formulas.get(instance))).forEach(timeline -> {
-                timeline.values.stream().filter(value -> value.formulas.length > 1).forEach(peak -> {
-                    // we have found a peak
-                    List<IBool> or = new ArrayList<>(MathUtils.combinations(1, peak.formulas.length));
-                    for (IFormula[] c_fs : new CombinationGenerator<>(2, peak.formulas)) {
-                        or.add(network.leq(c_fs[0].get(Constants.END), c_fs[1].get(Constants.START)));
-                        or.add(network.leq(c_fs[1].get(Constants.END), c_fs[0].get(Constants.START)));
-                        or.add(network.not(c_fs[0].getScope().eq(c_fs[1].getScope())));
-                    }
-                    constraints.add(network.or(or.toArray(new IBool[or.size()])));
+            Map<IType, List<IObject>> type_instances = instances.stream().collect(Collectors.groupingBy(instance -> instance.getType()));
+            type_instances.keySet().stream().map(type -> type.getFormulas(model)).forEach(formulas -> {
+                formulas.keySet().stream().map(instance -> new StateVariableTimeline(solver, model, instance, formulas.get(instance))).forEach(timeline -> {
+                    timeline.values.stream().filter(value -> value.formulas.length > 1).forEach(peak -> {
+                        // we have found a peak
+                        List<IBool> or = new ArrayList<>(MathUtils.combinations(1, peak.formulas.length));
+                        for (IFormula[] c_fs : new CombinationGenerator<>(2, peak.formulas)) {
+                            or.add(network.leq(c_fs[0].get(Constants.END), c_fs[1].get(Constants.START)));
+                            or.add(network.leq(c_fs[1].get(Constants.END), c_fs[0].get(Constants.START)));
+                            or.add(network.not(c_fs[0].getScope().eq(c_fs[1].getScope())));
+                        }
+                        constraints.add(network.or(or.toArray(new IBool[or.size()])));
+                    });
                 });
             });
 

@@ -25,14 +25,20 @@ import it.cnr.istc.iloc.api.FormulaState;
 import it.cnr.istc.iloc.api.IBool;
 import it.cnr.istc.iloc.api.IConstraintNetwork;
 import it.cnr.istc.iloc.api.IFormula;
+import it.cnr.istc.iloc.api.IModel;
 import it.cnr.istc.iloc.api.INumber;
+import it.cnr.istc.iloc.api.IObject;
 import it.cnr.istc.iloc.api.IPredicate;
 import it.cnr.istc.iloc.api.ISolver;
+import it.cnr.istc.iloc.api.IType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -47,7 +53,7 @@ public class PropositionalAgentType extends Type {
     public PropositionalAgentType(ISolver solver, Properties properties) {
         super(solver, solver, TYPE_NAME);
         this.properties = properties;
-        this.lazy_scheduling = Boolean.parseBoolean(properties.getProperty("PropositionalAgentLazyScheduling", "false"));
+        this.lazy_scheduling = Boolean.parseBoolean(properties.getProperty("PropositionalAgentLazyScheduling", "true"));
     }
 
     @Override
@@ -122,6 +128,38 @@ public class PropositionalAgentType extends Type {
             if (!vars.isEmpty()) {
                 network.assertFacts(vars.toArray(new IBool[vars.size()]));
             }
+        }
+    }
+
+    @Override
+    public List<IBool> checkConsistency(IModel model) {
+        if (!lazy_scheduling) {
+            return Collections.emptyList();
+        } else {
+            List<IBool> constraints = new ArrayList<>();
+            IConstraintNetwork network = solver.getConstraintNetwork();
+
+            Map<IType, List<IObject>> type_instances = instances.stream().collect(Collectors.groupingBy(instance -> instance.getType()));
+            type_instances.keySet().stream().map(type -> type.getFormulas(model)).forEach(formulas -> {
+                formulas.keySet().stream().forEach(instance -> {
+                    List<IFormula> c_formulas = new ArrayList<>(formulas.get(instance));
+                    for (int i = 0; i < c_formulas.size(); i++) {
+                        for (int j = i + 1; j < c_formulas.size(); j++) {
+                            IFormula f_i = c_formulas.get(i);
+                            IFormula f_j = c_formulas.get(j);
+                            if (model.evaluate(network.and(network.lt(f_i.get(Constants.START), f_j.get(Constants.END)), network.lt(f_j.get(Constants.START), f_i.get(Constants.END))))) {
+                                constraints.add(network.or(
+                                        network.leq(f_i.get(Constants.END), f_j.get(Constants.START)),
+                                        network.leq(f_j.get(Constants.END), f_i.get(Constants.START)),
+                                        network.not(f_i.getScope().eq(f_j.getScope()))
+                                ));
+                            }
+                        }
+                    }
+                });
+            });
+
+            return constraints;
         }
     }
 }

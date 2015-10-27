@@ -118,14 +118,14 @@ public interface IObject extends IEnvironment {
             }
             assert fields.stream().map(field -> get(field.getName())).noneMatch(Objects::isNull);
             assert fields.stream().map(field -> expression.get(field.getName())).noneMatch(Objects::isNull);
-            List<IBool> c_terms = fields.stream().map(field -> get(field.getName()).eq(expression.get(field.getName()))).collect(Collectors.toList());
-            if (c_terms.isEmpty()) {
+            IBool[] c_terms = fields.stream().map(field -> get(field.getName()).eq(expression.get(field.getName()))).toArray(IBool[]::new);
+            if (c_terms.length == 0) {
                 // Objects are logically equivalent
                 return constraintNetwork.newBool("true");
-            } else if (c_terms.size() == 1) {
-                return c_terms.get(0);
+            } else if (c_terms.length == 1) {
+                return c_terms[0];
             } else {
-                return constraintNetwork.and(c_terms.toArray(new IBool[c_terms.size()]));
+                return constraintNetwork.and(c_terms);
             }
         }
     }
