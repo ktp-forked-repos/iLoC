@@ -82,9 +82,21 @@ public class TranslatorTest {
      * Test of depots domain.
      */
     @Test
-    public void testDepotsTranslator() {
+    public void testDepotsParametricTranslator() {
         try {
             String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("depots/depots-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("depots/depots-problem.pddl").getPath()), false);
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    /**
+     * Test of depots domain.
+     */
+    @Test
+    public void testDepotsGroundTranslator() {
+        try {
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("depots/depots-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("depots/depots-problem.pddl").getPath()), true);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -94,9 +106,21 @@ public class TranslatorTest {
      * Test of new depots domain.
      */
     @Test
-    public void testNewDepotsTranslator() {
+    public void testNewDepotsParametricTranslator() {
         try {
             String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("depots/depots-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("depots/depots-problem-new.pddl").getPath()), false);
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    /**
+     * Test of new depots domain.
+     */
+    @Test
+    public void testNewDepotsGroundTranslator() {
+        try {
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("depots/depots-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("depots/depots-problem-new.pddl").getPath()), true);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -106,9 +130,21 @@ public class TranslatorTest {
      * Test of logistics domain.
      */
     @Test
-    public void testLogisticsTranslator() {
+    public void testLogisticsParametricTranslator() {
         try {
             String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("logistics/logistics-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics/logistics-problem.pddl").getPath()), false);
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    /**
+     * Test of logistics domain.
+     */
+    @Test
+    public void testLogisticsGroundTranslator() {
+        try {
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("logistics/logistics-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics/logistics-problem.pddl").getPath()), true);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -118,9 +154,21 @@ public class TranslatorTest {
      * Test of new logistics domain.
      */
     @Test
-    public void testNewLogisticsTranslator() {
+    public void testNewLogisticsParametricTranslator() {
         try {
             String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("logistics/logistics-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics/logistics-problem-new.pddl").getPath()), false);
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    /**
+     * Test of new logistics domain.
+     */
+    @Test
+    public void testNewLogisticsGroundTranslator() {
+        try {
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("logistics/logistics-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics/logistics-problem-new.pddl").getPath()), true);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
