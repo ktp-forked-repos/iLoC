@@ -1,0 +1,291 @@
+/**
+* Domain: Blocks
+*/
+
+class Object {
+
+    int id;
+
+    Object(int id) {
+        this.id = id;
+    }
+}
+
+class Block extends Object {
+
+    Block(int id) {
+        super(id);
+    }
+}
+
+class On_A_A extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    On_A_A(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+        goal stack_a_a = new agent.Stack_A_A(at:start);
+        fact holding_a__false = new holding_a.False();
+        fact clear_a__false = new clear_a.False();
+        fact clear_a__true = new clear_a.True();
+        fact handempty_true = new handempty.True();
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class On_A_B extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    On_A_B(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class On_B_A extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    On_B_A(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class On_B_B extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    On_B_B(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class Ontable_A extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    Ontable_A(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class Ontable_B extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    Ontable_B(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class Clear_A extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    Clear_A(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class Clear_B extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    Clear_B(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class Holding_A extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    Holding_A(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class Holding_B extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    Holding_B(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class Handempty extends StateVariable {
+
+    BlocksImpulsiveAgent agent;
+
+    Handempty(BlocksImpulsiveAgent agent){
+        this.agent = agent;
+    }
+
+    predicate True() {
+        duration >= 1;
+    }
+
+    predicate False() {
+        duration >= 1;
+    }
+}
+
+class BlocksImpulsiveAgent extends PropositionalImpulsiveAgent {
+
+    On_A_A on_a_a;
+    On_A_B on_a_b;
+    On_B_A on_b_a;
+    On_B_B on_b_b;
+    Ontable_A ontable_a;
+    Ontable_B ontable_b;
+    Clear_A clear_a;
+    Clear_B clear_b;
+    Holding_A holding_a;
+    Holding_B holding_b;
+    Handempty handempty;
+
+    BlocksImpulsiveAgent() {
+        on_a_a = new On_A_A(this);
+        on_a_b = new On_A_B(this);
+        on_b_a = new On_B_A(this);
+        on_b_b = new On_B_B(this);
+        ontable_a = new Ontable_A(this);
+        ontable_b = new Ontable_B(this);
+        clear_a = new Clear_A(this);
+        clear_b = new Clear_B(this);
+        holding_a = new Holding_A(this);
+        holding_b = new Holding_B(this);
+        handempty = new Handempty(this);
+    }
+
+    predicate Pick_up_A() {
+    }
+
+    predicate Pick_up_B() {
+    }
+
+    predicate Put_down_A() {
+    }
+
+    predicate Put_down_B() {
+    }
+
+    predicate Stack_A_A() {
+    }
+
+    predicate Stack_A_B() {
+    }
+
+    predicate Stack_B_A() {
+    }
+
+    predicate Stack_B_B() {
+    }
+
+    predicate Unstack_A_A() {
+    }
+
+    predicate Unstack_A_B() {
+    }
+
+    predicate Unstack_B_A() {
+    }
+
+    predicate Unstack_B_B() {
+    }
+}
+
+BlocksImpulsiveAgent agent = new BlocksImpulsiveAgent();
+
+fact clear_a__true = new agent.clear_a.True(start:origin);
+clear_a__true.duration >= 1;
+fact clear_b__true = new agent.clear_b.True(start:origin);
+clear_b__true.duration >= 1;
+fact ontable_a__true = new agent.ontable_a.True(start:origin);
+ontable_a__true.duration >= 1;
+fact ontable_b__true = new agent.ontable_b.True(start:origin);
+ontable_b__true.duration >= 1;
+fact handempty_true = new agent.handempty.True(start:origin);
+handempty_true.duration >= 1;
+
+goal on_b_a__true = new agent.on_b_a.True(end:horizon);

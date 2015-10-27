@@ -1,0 +1,5 @@
+PDDL(domain, problem) ::= <<
+<domain>
+
+<problem>
+>>
