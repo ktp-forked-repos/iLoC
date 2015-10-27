@@ -32,15 +32,13 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class EqTerm implements Term {
 
+    private final Term enclosingTerm;
     private final boolean directed;
-    private final Term firstTerm, secondTerm;
+    private Term firstTerm, secondTerm;
 
-    EqTerm(boolean directed, Term firstTerm, Term secondTerm) {
-        assert firstTerm != null;
-        assert secondTerm != null;
+    EqTerm(Term enclosingTerm, boolean directed) {
+        this.enclosingTerm = enclosingTerm;
         this.directed = directed;
-        this.firstTerm = firstTerm;
-        this.secondTerm = secondTerm;
     }
 
     public boolean isDirected() {
@@ -51,18 +49,39 @@ class EqTerm implements Term {
         return firstTerm;
     }
 
+    public void setFirstTerm(Term firstTerm) {
+        assert firstTerm != null;
+        this.firstTerm = firstTerm;
+    }
+
     public Term getSecondTerm() {
         return secondTerm;
     }
 
-    @Override
-    public Term negate() {
-        return new EqTerm(!directed, firstTerm, secondTerm);
+    public void setSecondTerm(Term secondTerm) {
+        assert secondTerm != null;
+        this.secondTerm = secondTerm;
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new EqTerm(directed, firstTerm.ground(domain, known_terms), secondTerm.ground(domain, known_terms));
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
+        EqTerm eq_term = new EqTerm(enclosingTerm, !directed);
+        eq_term.setFirstTerm(firstTerm);
+        eq_term.setSecondTerm(secondTerm);
+        return eq_term;
+    }
+
+    @Override
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        EqTerm eq_term = new EqTerm(enclosingTerm, directed);
+        eq_term.setFirstTerm(firstTerm.ground(domain, eq_term, known_terms));
+        eq_term.setSecondTerm(secondTerm.ground(domain, eq_term, known_terms));
+        return eq_term;
     }
 
     @Override

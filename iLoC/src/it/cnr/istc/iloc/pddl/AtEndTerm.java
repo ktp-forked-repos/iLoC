@@ -29,25 +29,37 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class AtEndTerm implements Term {
 
-    private final Term term;
+    private final Term enclosingTerm;
+    private Term term;
 
-    AtEndTerm(Term term) {
-        assert term != null;
-        this.term = term;
+    AtEndTerm(Term enclosingTerm) {
+        this.enclosingTerm = enclosingTerm;
     }
 
     public Term getTerm() {
         return term;
     }
 
+    public void setTerm(Term term) {
+        assert term != null;
+        this.term = term;
+    }
+
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new AtEndTerm(term.ground(domain, known_terms));
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        AtEndTerm at_end_term = new AtEndTerm(enclosingTerm);
+        at_end_term.setTerm(term.ground(domain, at_end_term, known_terms));
+        return at_end_term;
     }
 
     @Override

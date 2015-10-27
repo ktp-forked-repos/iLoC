@@ -130,11 +130,26 @@ class PredicateRenderer implements AttributeRenderer {
                     }
                 }
 
-                ST action_template = file.getInstanceOf("DurativeAction");
-                action_template.add("name", Utils.lowercase(action.getName()));
-                action_template.add("action_name", Utils.capitalize(action.getName()));
-                action_template.add("assignments", action_assignments);
-                sb.append(action_template.render()).append("\n");
+                Term c_term = t;
+                while (t != null) {
+                    if (c_term instanceof AtStartTerm) {
+                        ST action_template = file.getInstanceOf("AtStartDurativeAction");
+                        action_template.add("name", Utils.lowercase(action.getName()));
+                        action_template.add("action_name", Utils.capitalize(action.getName()));
+                        action_template.add("assignments", action_assignments);
+                        sb.append(action_template.render()).append("\n");
+                        break;
+                    } else if (c_term instanceof AtEndTerm) {
+                        ST action_template = file.getInstanceOf("AtEndDurativeAction");
+                        action_template.add("name", Utils.lowercase(action.getName()));
+                        action_template.add("action_name", Utils.capitalize(action.getName()));
+                        action_template.add("assignments", action_assignments);
+                        sb.append(action_template.render()).append("\n");
+                        break;
+                    } else {
+                        c_term = c_term.getEnclosingTerm();
+                    }
+                }
 
                 sb.append(action.getEffect().toString(file, known_terms, new HashSet<>(Arrays.asList(term)), Term.Mode.Effect));
 

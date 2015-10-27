@@ -29,24 +29,37 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class OverAllTerm implements Term {
 
-    private final Term term;
+    private final Term enclosingTerm;
+    private Term term;
 
-    OverAllTerm(Term term) {
-        this.term = term;
+    OverAllTerm(Term enclosingTerm) {
+        this.enclosingTerm = enclosingTerm;
     }
 
     public Term getTerm() {
         return term;
     }
 
+    public void setTerm(Term term) {
+        assert term != null;
+        this.term = term;
+    }
+
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new OverAllTerm(term.ground(domain, known_terms));
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        OverAllTerm over_all_term = new OverAllTerm(enclosingTerm);
+        over_all_term.setTerm(term.ground(domain, over_all_term, known_terms));
+        return over_all_term;
     }
 
     @Override

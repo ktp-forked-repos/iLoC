@@ -30,9 +30,11 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class ConstantTerm implements Term {
 
+    private final Term enclosingTerm;
     private final String name;
 
-    ConstantTerm(String name) {
+    ConstantTerm(Term enclosingTerm, String name) {
+        this.enclosingTerm = enclosingTerm;
         this.name = name;
     }
 
@@ -41,13 +43,18 @@ class ConstantTerm implements Term {
     }
 
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return this;
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        return new ConstantTerm(enclosingTerm, name);
     }
 
     @Override

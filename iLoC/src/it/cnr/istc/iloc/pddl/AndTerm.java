@@ -18,6 +18,7 @@
  */
 package it.cnr.istc.iloc.pddl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +32,16 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class AndTerm implements Term {
 
-    private final List<Term> terms;
+    private final Term enclosingTerm;
+    private final List<Term> terms = new ArrayList<>();
 
-    AndTerm(List<Term> terms) {
-        this.terms = terms;
+    AndTerm(Term enclosingTerm) {
+        this.enclosingTerm = enclosingTerm;
+    }
+
+    public void addTerm(Term term) {
+        assert term != null;
+        terms.add(term);
     }
 
     public List<Term> getTerms() {
@@ -42,13 +49,22 @@ class AndTerm implements Term {
     }
 
     @Override
-    public Term negate() {
-        return new OrTerm(terms.stream().map(term -> term.negate()).collect(Collectors.toList()));
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new AndTerm(terms.stream().map(term -> term.ground(domain, known_terms)).collect(Collectors.toList()));
+    public Term negate(Term enclosingTerm) {
+        OrTerm or = new OrTerm(enclosingTerm);
+        terms.stream().map(term -> term.negate(or)).forEach(term -> or.addTerm(term));
+        return or;
+    }
+
+    @Override
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        AndTerm and = new AndTerm(enclosingTerm);
+        terms.stream().map(term -> term.ground(domain, and, known_terms)).forEach(term -> and.addTerm(term));
+        return and;
     }
 
     @Override

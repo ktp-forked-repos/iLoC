@@ -29,9 +29,11 @@ import org.stringtemplate.v4.STGroupFile;
  */
 interface Term {
 
-    Term negate();
+    Term getEnclosingTerm();
 
-    Term ground(Domain domain, Map<String, Term> known_terms);
+    Term negate(Term enclosingTerm);
+
+    Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms);
 
     List<Term> containsPredicate(boolean directed, Predicate predicate);
 

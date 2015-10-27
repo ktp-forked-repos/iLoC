@@ -18,7 +18,6 @@
  */
 package it.cnr.istc.iloc.pddl;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,36 +32,83 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class ComparisonTerm implements Term {
 
+    private final Term enclosingTerm;
     private final Comp comp;
-    private final Term firstTerm, secondTerm;
+    private Term firstTerm, secondTerm;
 
-    ComparisonTerm(Comp comp, Term firstTerm, Term secondTerm) {
+    ComparisonTerm(Term enclosingTerm, Comp comp) {
+        this.enclosingTerm = enclosingTerm;
         this.comp = comp;
+    }
+
+    public Term getFirstTerm() {
+        return firstTerm;
+    }
+
+    public void setFirstTerm(Term firstTerm) {
+        assert firstTerm != null;
         this.firstTerm = firstTerm;
+    }
+
+    public Term getSecondTerm() {
+        return secondTerm;
+    }
+
+    public void setSecondTerm(Term secondTerm) {
+        assert secondTerm != null;
         this.secondTerm = secondTerm;
     }
 
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         switch (comp) {
             case Gt:
-                return new ComparisonTerm(Comp.LEq, firstTerm, secondTerm);
+                ComparisonTerm gt_comparison_term = new ComparisonTerm(enclosingTerm, Comp.LEq);
+                gt_comparison_term.setFirstTerm(firstTerm);
+                gt_comparison_term.setSecondTerm(secondTerm);
+                return gt_comparison_term;
             case Lt:
-                return new ComparisonTerm(Comp.GEq, firstTerm, secondTerm);
+                ComparisonTerm lt_comparison_term = new ComparisonTerm(enclosingTerm, Comp.GEq);
+                lt_comparison_term.setFirstTerm(firstTerm);
+                lt_comparison_term.setSecondTerm(secondTerm);
+                return lt_comparison_term;
             case Eq:
-                return new OrTerm(Arrays.asList(new ComparisonTerm(Comp.Lt, firstTerm, secondTerm), new ComparisonTerm(Comp.Gt, firstTerm, secondTerm)));
+                OrTerm or_comparison_term = new OrTerm(enclosingTerm);
+                ComparisonTerm c_lt_comparison_term = new ComparisonTerm(enclosingTerm, Comp.GEq);
+                c_lt_comparison_term.setFirstTerm(firstTerm);
+                c_lt_comparison_term.setSecondTerm(secondTerm);
+                or_comparison_term.addTerm(c_lt_comparison_term);
+                ComparisonTerm c_gt_comparison_term = new ComparisonTerm(enclosingTerm, Comp.LEq);
+                c_gt_comparison_term.setFirstTerm(firstTerm);
+                c_gt_comparison_term.setSecondTerm(secondTerm);
+                or_comparison_term.addTerm(c_gt_comparison_term);
+                return or_comparison_term;
             case GEq:
-                return new ComparisonTerm(Comp.Lt, firstTerm, secondTerm);
+                ComparisonTerm geq_comparison_term = new ComparisonTerm(enclosingTerm, Comp.Lt);
+                geq_comparison_term.setFirstTerm(firstTerm);
+                geq_comparison_term.setSecondTerm(secondTerm);
+                return geq_comparison_term;
             case LEq:
-                return new ComparisonTerm(Comp.Gt, firstTerm, secondTerm);
+                ComparisonTerm leq_comparison_term = new ComparisonTerm(enclosingTerm, Comp.Gt);
+                leq_comparison_term.setFirstTerm(firstTerm);
+                leq_comparison_term.setSecondTerm(secondTerm);
+                return leq_comparison_term;
             default:
                 throw new AssertionError(comp.name());
         }
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        ComparisonTerm comparison_term = new ComparisonTerm(enclosingTerm, comp);
+        comparison_term.setFirstTerm(firstTerm.ground(domain, comparison_term, known_terms));
+        comparison_term.setSecondTerm(secondTerm.ground(domain, comparison_term, known_terms));
+        return comparison_term;
     }
 
     @Override

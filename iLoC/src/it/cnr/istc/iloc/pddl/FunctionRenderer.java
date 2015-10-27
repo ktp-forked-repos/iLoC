@@ -77,8 +77,10 @@ class FunctionRenderer implements AttributeRenderer {
                     known_terms.put(((VariableTerm) term.getValue()).getName(), "value");
                 } else if (term.getValue() instanceof FunctionTerm) {
                     throw new UnsupportedOperationException("Not supported yet.");
-                } else {
+                } else if (term.getValue() instanceof ConstantTerm) {
                     sb.append("value == ").append(((ConstantTerm) term.getValue()).getName()).append(";\n");
+                } else if (term.getValue() instanceof NumberTerm) {
+                    sb.append("value == ").append(((NumberTerm) term.getValue()).getValue()).append(";\n");
                 }
 
                 List<String> action_assignments = new ArrayList<>(action.getVariables().size());

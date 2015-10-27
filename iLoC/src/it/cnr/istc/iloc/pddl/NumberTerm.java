@@ -31,20 +31,31 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class NumberTerm implements Term {
 
+    private final Term enclosingTerm;
     private final BigDecimal value;
 
-    NumberTerm(BigDecimal value) {
+    NumberTerm(Term enclosingTerm, BigDecimal value) {
+        this.enclosingTerm = enclosingTerm;
         this.value = value;
     }
 
-    @Override
-    public Term negate() {
-        return new NumberTerm(value.negate());
+    public BigDecimal getValue() {
+        return value;
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
+        return new NumberTerm(enclosingTerm, value.negate());
+    }
+
+    @Override
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        return new NumberTerm(enclosingTerm, value);
     }
 
     @Override

@@ -20,6 +20,7 @@ package it.cnr.istc.iloc.pddl;
 
 import it.cnr.istc.iloc.utils.CartesianProductGenerator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,21 +35,44 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class ExistsTerm implements Term {
 
-    private final List<Variable> variables;
-    private final Term formula;
+    private final Term enclosingTerm;
+    private final List<Variable> variables = new ArrayList<>();
+    private Term formula;
 
-    ExistsTerm(List<Variable> variables, Term formula) {
-        this.variables = variables;
+    ExistsTerm(Term enclosingTerm) {
+        this.enclosingTerm = enclosingTerm;
+    }
+
+    public Term getFormula() {
+        return formula;
+    }
+
+    public void setFormula(Term formula) {
+        assert formula != null;
         this.formula = formula;
     }
 
+    public void addVariable(Variable variable) {
+        assert variable != null;
+        variables.add(variable);
+    }
+
+    public List<Variable> getVariables() {
+        return Collections.unmodifiableList(variables);
+    }
+
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

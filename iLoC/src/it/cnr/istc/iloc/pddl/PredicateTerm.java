@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.stringtemplate.v4.ST;
@@ -35,16 +34,14 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class PredicateTerm implements Term {
 
+    private final Term enclosingTerm;
     private final boolean directed;
-    private final Predicate predicate;
-    private final List<Term> arguments;
+    private Predicate predicate;
+    private final List<Term> arguments = new ArrayList<>();
 
-    PredicateTerm(boolean directed, Predicate predicate, List<Term> arguments) {
-        assert predicate != null;
-        assert arguments.stream().noneMatch(Objects::isNull);
+    PredicateTerm(Term enclosingTerm, boolean directed) {
+        this.enclosingTerm = enclosingTerm;
         this.directed = directed;
-        this.predicate = predicate;
-        this.arguments = arguments;
     }
 
     public boolean isDirected() {
@@ -55,19 +52,39 @@ class PredicateTerm implements Term {
         return predicate;
     }
 
+    public void setPredicate(Predicate predicate) {
+        assert predicate != null;
+        this.predicate = predicate;
+    }
+
+    public void addArgument(Term argument) {
+        assert argument != null;
+        arguments.add(argument);
+    }
+
     public List<Term> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
 
     @Override
-    public Term negate() {
-        return new PredicateTerm(!directed, predicate, arguments);
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        String predicate_name = predicate.getVariables().isEmpty() ? predicate.getName() : predicate.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_")) + "_";
-        return new PredicateTerm(directed, domain.getPredicate(predicate_name), Collections.emptyList());
+    public Term negate(Term enclosingTerm) {
+        PredicateTerm predicate_term = new PredicateTerm(enclosingTerm, !directed);
+        predicate_term.setPredicate(predicate);
+        arguments.stream().forEach(argument -> predicate_term.addArgument(argument));
+        return predicate_term;
+    }
+
+    @Override
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        PredicateTerm predicate_term = new PredicateTerm(enclosingTerm, directed);
+        String predicate_name = predicate.getVariables().isEmpty() ? predicate.getName() : predicate.getName() + "_" + arguments.stream().map(term -> term.ground(domain, predicate_term, known_terms).toString()).collect(Collectors.joining("_")) + "_";
+        predicate_term.setPredicate(domain.getPredicate(predicate_name));
+        return predicate_term;
     }
 
     @Override

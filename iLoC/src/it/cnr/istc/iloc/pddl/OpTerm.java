@@ -18,6 +18,7 @@
  */
 package it.cnr.istc.iloc.pddl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,22 +32,39 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class OpTerm implements Term {
 
+    private final Term enclosingTerm;
     private final Op op;
-    private final List<Term> terms;
+    private final List<Term> terms = new ArrayList<>();
 
-    OpTerm(Op op, List<Term> terms) {
+    OpTerm(Term enclosingTerm, Op op) {
+        this.enclosingTerm = enclosingTerm;
         this.op = op;
-        this.terms = terms;
+    }
+
+    public void addTerm(Term term) {
+        assert term != null;
+        terms.add(term);
+    }
+
+    public List<Term> getTerms() {
+        return Collections.unmodifiableList(terms);
     }
 
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new OpTerm(op, terms.stream().map(term -> term.ground(domain, known_terms)).collect(Collectors.toList()));
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        OpTerm op_term = new OpTerm(enclosingTerm, op);
+        terms.stream().map(term -> term.ground(domain, op_term, known_terms)).forEach(term -> op_term.addTerm(term));
+        return op_term;
     }
 
     @Override

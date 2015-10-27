@@ -34,9 +34,21 @@ public class TranslatorTest {
      * Test of blocks world domain.
      */
     @Test
-    public void testBlocksWorldTranslator() {
+    public void testBlocksWorldParametricTranslator() {
         try {
             String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("blocks/blocks-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks/blocks-problem.pddl").getPath()), false);
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    /**
+     * Test of blocks world domain.
+     */
+    @Test
+    public void testBlocksWorldGroundTranslator() {
+        try {
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("blocks/blocks-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks/blocks-problem.pddl").getPath()), true);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -46,9 +58,21 @@ public class TranslatorTest {
      * Test of new blocks world domain.
      */
     @Test
-    public void testNewBlocksWorldTranslator() {
+    public void testNewBlocksWorldParametricTranslator() {
         try {
             String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("blocks/blocks-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks/blocks-problem-new.pddl").getPath()), false);
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    /**
+     * Test of new blocks world domain.
+     */
+    @Test
+    public void testNewBlocksWorldGroundTranslator() {
+        try {
+            String translation = PDDLTranslator.translatePDDLInstance(new File(TranslatorTest.class.getResource("blocks/blocks-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks/blocks-problem-new.pddl").getPath()), true);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }

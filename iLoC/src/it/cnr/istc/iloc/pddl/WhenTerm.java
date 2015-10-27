@@ -31,22 +31,48 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class WhenTerm implements Term {
 
-    private final Term condition;
-    private final Term effect;
+    private final Term enclosingTerm;
+    private Term condition;
+    private Term effect;
 
-    WhenTerm(Term condition, Term effect) {
+    WhenTerm(Term enclosingTerm) {
+        this.enclosingTerm = enclosingTerm;
+    }
+
+    public Term getCondition() {
+        return condition;
+    }
+
+    public void setCondition(Term condition) {
+        assert condition != null;
         this.condition = condition;
+    }
+
+    public Term getEffect() {
+        return effect;
+    }
+
+    public void setEffect(Term effect) {
+        assert effect != null;
         this.effect = effect;
     }
 
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new WhenTerm(condition.ground(domain, known_terms), effect.ground(domain, known_terms));
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        WhenTerm when_term = new WhenTerm(enclosingTerm);
+        when_term.setCondition(condition.ground(domain, when_term, known_terms));
+        when_term.setEffect(effect.ground(domain, when_term, known_terms));
+        return when_term;
     }
 
     @Override

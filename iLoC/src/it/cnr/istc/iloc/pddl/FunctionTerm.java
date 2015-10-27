@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.stringtemplate.v4.ST;
@@ -35,18 +34,26 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class FunctionTerm implements Term {
 
-    private final Function function;
-    private final List<Term> arguments;
+    private final Term enclosingTerm;
+    private Function function;
+    private final List<Term> arguments = new ArrayList<>();
 
-    FunctionTerm(Function function, List<Term> arguments) {
-        assert function != null;
-        assert arguments.stream().noneMatch(Objects::isNull);
-        this.function = function;
-        this.arguments = arguments;
+    FunctionTerm(Term enclosingTerm) {
+        this.enclosingTerm = enclosingTerm;
     }
 
     public Function getFunction() {
         return function;
+    }
+
+    public void setFunction(Function function) {
+        assert function != null;
+        this.function = function;
+    }
+
+    public void addArgument(Term argument) {
+        assert argument != null;
+        arguments.add(argument);
     }
 
     public List<Term> getArguments() {
@@ -54,14 +61,21 @@ class FunctionTerm implements Term {
     }
 
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        String function_name = function.getVariables().isEmpty() ? function.getName() : function.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_")) + "_";
-        return new FunctionTerm(domain.getFunction(function_name), Collections.emptyList());
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        FunctionTerm functionTerm = new FunctionTerm(enclosingTerm);
+        String function_name = function.getVariables().isEmpty() ? function.getName() : function.getName() + "_" + arguments.stream().map(term -> term.ground(domain, functionTerm, known_terms).toString()).collect(Collectors.joining("_")) + "_";
+        functionTerm.setFunction(domain.getFunction(function_name));
+        return functionTerm;
     }
 
     @Override

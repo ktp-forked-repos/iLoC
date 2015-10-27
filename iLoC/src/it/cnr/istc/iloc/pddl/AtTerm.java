@@ -31,12 +31,13 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class AtTerm implements Term {
 
+    private final Term enclosingTerm;
     private final BigDecimal at;
-    private final PredicateTerm predicateTerm;
+    private PredicateTerm predicateTerm;
 
-    AtTerm(BigDecimal at, PredicateTerm predicateTerm) {
+    AtTerm(Term enclosingTerm, BigDecimal at) {
+        this.enclosingTerm = enclosingTerm;
         this.at = at;
-        this.predicateTerm = predicateTerm;
     }
 
     public BigDecimal getAt() {
@@ -47,14 +48,26 @@ class AtTerm implements Term {
         return predicateTerm;
     }
 
+    public void setPredicateTerm(PredicateTerm predicateTerm) {
+        assert predicateTerm != null;
+        this.predicateTerm = predicateTerm;
+    }
+
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new AtTerm(at, (PredicateTerm) predicateTerm.ground(domain, known_terms));
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        AtTerm at_term = new AtTerm(enclosingTerm, at);
+        at_term.setPredicateTerm((PredicateTerm) predicateTerm.ground(domain, at_term, known_terms));
+        return at_term;
     }
 
     @Override

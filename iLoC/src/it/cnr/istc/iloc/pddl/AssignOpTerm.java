@@ -31,16 +31,15 @@ import org.stringtemplate.v4.STGroupFile;
  */
 class AssignOpTerm implements Term {
 
+    private final Term enclosingTerm;
     private final AssignOp assignOp;
-    private final FunctionTerm functionTerm;
-    private final Term value;
+    private FunctionTerm functionTerm;
+    private Term value;
 
-    AssignOpTerm(AssignOp assignOp, FunctionTerm functionTerm, Term value) {
+    AssignOpTerm(Term enclosingTerm, AssignOp assignOp) {
         assert assignOp != null;
-        assert functionTerm != null;
+        this.enclosingTerm = enclosingTerm;
         this.assignOp = assignOp;
-        this.functionTerm = functionTerm;
-        this.value = value;
     }
 
     public AssignOp getAssignOp() {
@@ -51,18 +50,36 @@ class AssignOpTerm implements Term {
         return functionTerm;
     }
 
+    public void setFunctionTerm(FunctionTerm functionTerm) {
+        assert functionTerm != null;
+        this.functionTerm = functionTerm;
+    }
+
     public Term getValue() {
         return value;
     }
 
+    public void setValue(Term value) {
+        assert value != null;
+        this.value = value;
+    }
+
     @Override
-    public Term negate() {
+    public Term getEnclosingTerm() {
+        return enclosingTerm;
+    }
+
+    @Override
+    public Term negate(Term enclosingTerm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new AssignOpTerm(assignOp, (FunctionTerm) functionTerm.ground(domain, known_terms), value.ground(domain, known_terms));
+    public Term ground(Domain domain, Term enclosingTerm, Map<String, Term> known_terms) {
+        AssignOpTerm assign_op_term = new AssignOpTerm(enclosingTerm, assignOp);
+        assign_op_term.setFunctionTerm((FunctionTerm) functionTerm.ground(domain, assign_op_term, known_terms));
+        assign_op_term.setValue(value.ground(domain, assign_op_term, known_terms));
+        return assign_op_term;
     }
 
     @Override

@@ -328,9 +328,9 @@ public class PDDLTranslator {
                     // We make terms ground..
                     Map<String, Term> known_terms = new HashMap<>(cs.length);
                     for (int i = 0; i < cs.length; i++) {
-                        known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(cs[i].getName()));
+                        known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(null, cs[i].getName()));
                     }
-                    ground_domain.addAction(new Action(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getPrecondition().ground(ground_domain, known_terms), action.getEffect().ground(ground_domain, known_terms)));
+                    ground_domain.addAction(new Action(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getPrecondition().ground(ground_domain, null, known_terms), action.getEffect().ground(ground_domain, null, known_terms)));
                 }
             }
         });
@@ -343,11 +343,11 @@ public class PDDLTranslator {
                 for (Constant[] cs : cartesian_product) {
                     // We make terms ground..
                     Map<String, Term> known_terms = new HashMap<>(cs.length);
-                    known_terms.put("?duration", new ConstantTerm("duration"));
+                    known_terms.put("?duration", new ConstantTerm(null, "duration"));
                     for (int i = 0; i < cs.length; i++) {
-                        known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(cs[i].getName()));
+                        known_terms.put(action.getVariables().get(i).getName(), new ConstantTerm(null, cs[i].getName()));
                     }
-                    ground_domain.addDurativeAction(new DurativeAction(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getDuration().ground(ground_domain, known_terms), action.getCondition().ground(ground_domain, known_terms), action.getEffect().ground(ground_domain, known_terms)));
+                    ground_domain.addDurativeAction(new DurativeAction(action.getName() + "_" + Stream.of(cs).map(constant -> constant.getName()).collect(Collectors.joining("_")), new Variable[0], action.getDuration().ground(ground_domain, null, known_terms), action.getCondition().ground(ground_domain, null, known_terms), action.getEffect().ground(ground_domain, null, known_terms)));
                 }
             }
         });
@@ -360,12 +360,12 @@ public class PDDLTranslator {
 
         Map<String, Term> known_terms = new HashMap<>();
         instance.domain.getTypes().values().stream().flatMap(type -> type.getInstances().stream()).forEach(c -> {
-            known_terms.put(c.getName(), new ConstantTerm(c.getName()));
+            known_terms.put(c.getName(), new ConstantTerm(null, c.getName()));
         });
         instance.problem.getInitEls().stream().forEach(init_el -> {
-            ground_problem.addInitEl(init_el.ground(ground_domain, known_terms));
+            ground_problem.addInitEl(init_el.ground(ground_domain, null, known_terms));
         });
-        ground_problem.setGoal(instance.problem.getGoal().ground(ground_domain, known_terms));
+        ground_problem.setGoal(instance.problem.getGoal().ground(ground_domain, null, known_terms));
         return new ProblemInstance(ground_domain, ground_problem);
     }
 
