@@ -147,10 +147,15 @@ public class PropositionalAgentType extends Type {
                         for (int j = i + 1; j < c_formulas.size(); j++) {
                             IFormula f_i = c_formulas.get(i);
                             IFormula f_j = c_formulas.get(j);
-                            if (model.evaluate(network.and(network.lt(f_i.get(Constants.START), f_j.get(Constants.END)), network.lt(f_j.get(Constants.START), f_i.get(Constants.END))))) {
+                            if (model.evaluate(network.eq((INumber) f_i.get(Constants.START), (INumber) f_j.get(Constants.START)))) {
                                 constraints.add(network.or(
-                                        network.leq(f_i.get(Constants.END), f_j.get(Constants.START)),
-                                        network.leq(f_j.get(Constants.END), f_i.get(Constants.START)),
+                                        network.not(f_i.get(Constants.START).eq(f_j.get(Constants.START))),
+                                        network.not(f_i.getScope().eq(f_j.getScope()))
+                                ));
+                            }
+                            if (model.evaluate(network.eq((INumber) f_i.get(Constants.END), (INumber) f_j.get(Constants.END)))) {
+                                constraints.add(network.or(
+                                        network.not(f_i.get(Constants.END).eq(f_j.get(Constants.END))),
                                         network.not(f_i.getScope().eq(f_j.getScope()))
                                 ));
                             }
