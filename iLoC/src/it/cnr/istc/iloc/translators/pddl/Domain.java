@@ -38,6 +38,10 @@ public class Domain {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public Type getType(String name) {
         return types.get(name);
     }
@@ -108,5 +112,37 @@ public class Domain {
 
     public void addDurativeAction(DurativeAction durative_action) {
         durative_actions.put(durative_action.getName(), durative_action);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(define (domain ").append(name).append(")\n");
+
+        sb.append("(:types ");
+        types.values().stream().forEach(type -> {
+            sb.append(type.getName());
+            if (type.getSuperclass() != null) {
+                sb.append(" - ").append(type.getSuperclass().getName());
+            }
+        });
+        sb.append(")\n");
+
+        sb.append("(:predicates ");
+        predicates.values().stream().forEach(predicate -> {
+            sb.append(predicate);
+        });
+        sb.append(")\n");
+
+        actions.values().stream().forEach(predicate -> {
+            sb.append(predicate);
+        });
+
+        durative_actions.values().stream().forEach(predicate -> {
+            sb.append(predicate);
+        });
+
+        sb.append(")\n");
+        return sb.toString();
     }
 }

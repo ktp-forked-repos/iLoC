@@ -16,8 +16,10 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +31,8 @@ public class Problem {
     private final Domain domain;
     private final String name;
     private final Map<String, Constant> objects = new LinkedHashMap<>();
+    private final List<Term> init_els = new ArrayList<>();
+    private Term goal;
 
     public Problem(Domain domain, String name) {
         this.domain = domain;
@@ -53,5 +57,47 @@ public class Problem {
 
     public void addObject(Constant object) {
         objects.put(object.getName(), object);
+    }
+
+    public List<Term> getInitEls() {
+        return Collections.unmodifiableList(init_els);
+    }
+
+    public void addInitEl(Term init_el) {
+        init_els.add(init_el);
+    }
+
+    public Term getGoal() {
+        return goal;
+    }
+
+    public void setGoal(Term goal) {
+        this.goal = goal;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(define (problem ").append(name).append(")\n");
+
+        sb.append("(:domain ").append(domain.getName()).append(")\n");
+
+        sb.append("(:objects ");
+        objects.values().stream().forEach(object -> {
+            sb.append(object.getName());
+            sb.append(" - ").append(object.getType().getName());
+        });
+        sb.append(")\n");
+
+        sb.append("(:init ");
+        init_els.stream().forEach(init_el -> {
+            sb.append(init_el);
+        });
+        sb.append(")\n");
+
+        sb.append(goal);
+
+        sb.append(")\n");
+        return sb.toString();
     }
 }
