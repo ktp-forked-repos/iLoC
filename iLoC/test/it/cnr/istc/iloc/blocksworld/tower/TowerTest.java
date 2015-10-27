@@ -51,7 +51,7 @@ public class TowerTest {
     public void testTower() throws NoSuchFieldException, ClassNotFoundException, URISyntaxException, IOException, Exception {
         int size = 10;
 
-        int n_goals = 3;
+        int n_goals = 10;
 
         double[][] millis = new double[n_goals][size];
 
@@ -119,7 +119,7 @@ public class TowerTest {
             Properties properties = new Properties();
             ISolver solver = new Solver(properties);
 
-            solver.read(new File(TowerTest.class.getResource("tower01.iloc").getPath()));
+            solver.read(new File(TowerTest.class.getResource("tower06.iloc").getPath()));
 
             long starting_nano = System.nanoTime();
             boolean solve = solver.solve();
