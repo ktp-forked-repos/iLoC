@@ -16,7 +16,6 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,14 +29,14 @@ public class Function {
 
     private final String name;
     private final Type type;
-    private final List<Variable> variables = new ArrayList<>();
+    private final List<Variable> variables;
 
     Function(String name, Type type, Variable... variables) {
         assert Stream.of(variables).noneMatch(variable -> variable == null);
         assert type != null;
         this.name = name;
         this.type = type;
-        this.variables.addAll(Arrays.asList(variables));
+        this.variables = Arrays.asList(variables);
     }
 
     public String getName() {

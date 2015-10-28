@@ -16,36 +16,31 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.math.BigDecimal;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class OrTerm implements Term {
+public class AtTerm implements Term {
 
-    private final List<Term> terms;
+    private final BigDecimal at;
+    private final PredicateTerm predicateTerm;
 
-    OrTerm(Term... terms) {
-        assert Stream.of(terms).noneMatch(term -> term == null);
-        this.terms = Arrays.asList(terms);
-    }
-
-    public List<Term> getTerms() {
-        return Collections.unmodifiableList(terms);
+    public AtTerm(BigDecimal at, PredicateTerm predicateTerm) {
+        assert at != null;
+        assert predicateTerm != null;
+        this.at = at;
+        this.predicateTerm = predicateTerm;
     }
 
     @Override
     public Term negate() {
-        return new AndTerm(terms.stream().map(term -> term.negate()).toArray(Term[]::new));
+        throw new AssertionError("It is not possible to call negate on an at term..");
     }
 
     @Override
     public String toString() {
-        return "(or (" + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + "))";
+        return "(at " + at + " " + predicateTerm + ")";
     }
 }

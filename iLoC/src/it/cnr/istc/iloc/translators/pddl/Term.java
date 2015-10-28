@@ -16,8 +16,6 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Map;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
@@ -25,6 +23,4 @@ import java.util.Map;
 public interface Term {
 
     Term negate();
-
-    Term ground(Domain domain, Map<String, Term> known_terms);
 }

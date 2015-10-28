@@ -19,7 +19,6 @@ package it.cnr.istc.iloc.translators.pddl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,12 +55,6 @@ public class PredicateTerm implements Term {
     @Override
     public Term negate() {
         return new PredicateTerm(!directed, predicate, arguments.stream().toArray(Term[]::new));
-    }
-
-    @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        String predicate_name = predicate.getVariables().isEmpty() ? predicate.getName() : predicate.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_"));
-        return new PredicateTerm(directed, domain.getPredicate(predicate_name));
     }
 
     @Override

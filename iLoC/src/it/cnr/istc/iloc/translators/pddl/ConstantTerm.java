@@ -16,8 +16,6 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Map;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
@@ -27,6 +25,7 @@ public class ConstantTerm implements Term {
     private final Constant constant;
 
     public ConstantTerm(Constant constant) {
+        assert constant != null;
         this.constant = constant;
     }
 
@@ -37,11 +36,6 @@ public class ConstantTerm implements Term {
     @Override
     public Term negate() {
         throw new AssertionError("It is not possible to call negate on a constant..");
-    }
-
-    @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new ConstantTerm(constant);
     }
 
     @Override

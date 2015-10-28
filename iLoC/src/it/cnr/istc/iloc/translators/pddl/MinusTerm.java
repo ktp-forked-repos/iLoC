@@ -16,36 +16,25 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class OrTerm implements Term {
+public class MinusTerm implements Term {
 
-    private final List<Term> terms;
+    private final Term term;
 
-    OrTerm(Term... terms) {
-        assert Stream.of(terms).noneMatch(term -> term == null);
-        this.terms = Arrays.asList(terms);
-    }
-
-    public List<Term> getTerms() {
-        return Collections.unmodifiableList(terms);
+    public MinusTerm(Term term) {
+        this.term = term;
     }
 
     @Override
     public Term negate() {
-        return new AndTerm(terms.stream().map(term -> term.negate()).toArray(Term[]::new));
+        return new MinusTerm(term.negate());
     }
 
     @Override
     public String toString() {
-        return "(or (" + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + "))";
+        return "(- " + term + ")";
     }
 }

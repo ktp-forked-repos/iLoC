@@ -16,8 +16,6 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Map;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
@@ -27,17 +25,13 @@ public class OverAllTerm implements Term {
     private final Term term;
 
     public OverAllTerm(Term term) {
+        assert term != null;
         this.term = term;
     }
 
     @Override
     public Term negate() {
         throw new AssertionError("It is not possible to call negate on an over all term..");
-    }
-
-    @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new OverAllTerm(term.ground(domain, known_terms));
     }
 
     @Override

@@ -16,8 +16,6 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Map;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
@@ -27,17 +25,13 @@ public class AtStartTerm implements Term {
     private final Term term;
 
     public AtStartTerm(Term term) {
+        assert term != null;
         this.term = term;
     }
 
     @Override
     public Term negate() {
         throw new AssertionError("It is not possible to call negate on an at start term..");
-    }
-
-    @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new AtStartTerm(term.ground(domain, known_terms));
     }
 
     @Override

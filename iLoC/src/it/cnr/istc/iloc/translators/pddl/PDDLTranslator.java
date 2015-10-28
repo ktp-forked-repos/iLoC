@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -177,8 +178,6 @@ public class PDDLTranslator {
             }, domain_context.functions_def());
         }
 
-        TermVisitor term_visitor = new TermVisitor(domain_parser, domain, problem);
-
         /**
          * We define the structures.
          */
@@ -196,6 +195,8 @@ public class PDDLTranslator {
                             variables = typedListVariable.variables.toArray(new Variable[typedListVariable.variables.size()]);
                         }
                         Action action = new Action(Utils.capitalize(ctx.action_symbol().name().getText()), variables);
+
+                        TermVisitor term_visitor = new TermVisitor(domain_parser, domain, problem, Stream.of(variables).collect(Collectors.toMap(Variable::getName, variable -> variable)));
                         if (ctx.action_def_body().emptyOr_pre_GD() != null) {
                             action.setPrecondition(term_visitor.visit(ctx.action_def_body().emptyOr_pre_GD()));
                         }
@@ -218,6 +219,7 @@ public class PDDLTranslator {
                             variables = typedListVariable.variables.toArray(new Variable[typedListVariable.variables.size()]);
                         }
                         DurativeAction action = new DurativeAction(Utils.capitalize(ctx.da_symbol().name().getText()), variables);
+                        TermVisitor term_visitor = new TermVisitor(domain_parser, domain, problem, Stream.of(variables).collect(Collectors.toMap(Variable::getName, variable -> variable)));
                         if (ctx.da_def_body().duration_constraint() != null) {
                             action.setDuration(term_visitor.visit(ctx.da_def_body().duration_constraint()));
                         }

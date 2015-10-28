@@ -18,7 +18,6 @@ package it.cnr.istc.iloc.translators.pddl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,12 +40,6 @@ public class FunctionTerm implements Term {
     @Override
     public Term negate() {
         throw new AssertionError("It is not possible to call negate on a function..");
-    }
-
-    @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        String function_name = function.getVariables().isEmpty() ? function.getName() : function.getName() + "_" + arguments.stream().map(term -> term.ground(domain, known_terms).toString()).collect(Collectors.joining("_"));
-        return new FunctionTerm(domain.getFunction(function_name));
     }
 
     @Override

@@ -19,7 +19,6 @@ package it.cnr.istc.iloc.translators.pddl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,11 +42,6 @@ public class AndTerm implements Term {
     @Override
     public Term negate() {
         return new OrTerm(terms.stream().map(term -> term.negate()).toArray(Term[]::new));
-    }
-
-    @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new AndTerm(terms.stream().map(term -> term.ground(domain, known_terms)).toArray(Term[]::new));
     }
 
     @Override

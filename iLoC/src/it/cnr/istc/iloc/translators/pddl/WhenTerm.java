@@ -16,36 +16,29 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class OrTerm implements Term {
+public class WhenTerm implements Term {
 
-    private final List<Term> terms;
+    private final Term condition;
+    private final Term effect;
 
-    OrTerm(Term... terms) {
-        assert Stream.of(terms).noneMatch(term -> term == null);
-        this.terms = Arrays.asList(terms);
-    }
-
-    public List<Term> getTerms() {
-        return Collections.unmodifiableList(terms);
+    public WhenTerm(Term condition, Term effect) {
+        assert condition != null;
+        assert effect != null;
+        this.condition = condition;
+        this.effect = effect;
     }
 
     @Override
     public Term negate() {
-        return new AndTerm(terms.stream().map(term -> term.negate()).toArray(Term[]::new));
+        throw new AssertionError("It is not possible to call negate on a conditiona effect..");
     }
 
     @Override
     public String toString() {
-        return "(or (" + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + "))";
+        return "(when " + condition + " " + effect + ")";
     }
 }

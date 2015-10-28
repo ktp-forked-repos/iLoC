@@ -16,7 +16,6 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.stream.Stream;
 public class DurativeAction {
 
     private final String name;
-    private final List<Variable> variables = new ArrayList<>();
+    private final List<Variable> variables;
     private Term duration;
     private Term condition;
     private Term effect;
@@ -38,7 +37,7 @@ public class DurativeAction {
     DurativeAction(String name, Variable... variables) {
         assert Stream.of(variables).noneMatch(variable -> variable == null);
         this.name = name;
-        this.variables.addAll(Arrays.asList(variables));
+        this.variables = Arrays.asList(variables);
     }
 
     public String getName() {

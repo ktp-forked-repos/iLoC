@@ -16,36 +16,34 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class OrTerm implements Term {
+public class EqTerm implements Term {
 
-    private final List<Term> terms;
+    private final boolean directed;
+    private final Term firstTerm, secondTerm;
 
-    OrTerm(Term... terms) {
-        assert Stream.of(terms).noneMatch(term -> term == null);
-        this.terms = Arrays.asList(terms);
-    }
-
-    public List<Term> getTerms() {
-        return Collections.unmodifiableList(terms);
+    public EqTerm(boolean directed, Term firstTerm, Term secondTerm) {
+        assert firstTerm != null;
+        assert secondTerm != null;
+        this.directed = directed;
+        this.firstTerm = firstTerm;
+        this.secondTerm = secondTerm;
     }
 
     @Override
     public Term negate() {
-        return new AndTerm(terms.stream().map(term -> term.negate()).toArray(Term[]::new));
+        return new EqTerm(!directed, firstTerm, secondTerm);
     }
 
     @Override
     public String toString() {
-        return "(or (" + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + "))";
+        if (directed) {
+            return "(= " + firstTerm + " " + secondTerm + ")";
+        } else {
+            return "(not (= " + firstTerm + " " + secondTerm + "))";
+        }
     }
 }

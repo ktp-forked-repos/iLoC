@@ -16,8 +16,6 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Map;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
@@ -27,17 +25,13 @@ public class AtEndTerm implements Term {
     private final Term term;
 
     public AtEndTerm(Term term) {
+        assert term != null;
         this.term = term;
     }
 
     @Override
     public Term negate() {
         throw new AssertionError("It is not possible to call negate on an at end term..");
-    }
-
-    @Override
-    public Term ground(Domain domain, Map<String, Term> known_terms) {
-        return new AtEndTerm(term.ground(domain, known_terms));
     }
 
     @Override

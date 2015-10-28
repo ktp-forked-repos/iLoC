@@ -16,20 +16,27 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import java.math.BigDecimal;
+import java.util.Map;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
 public class TermVisitor extends PDDLBaseVisitor<Term> {
 
+    private static final ParseTreeWalker WALKER = new ParseTreeWalker();
     private final PDDLParser parser;
     private final Domain domain;
     private final Problem problem;
+    private final Map<String, Variable> variables;
 
-    TermVisitor(PDDLParser parser, Domain domain, Problem problem) {
+    TermVisitor(PDDLParser parser, Domain domain, Problem problem, Map<String, Variable> variables) {
         this.parser = parser;
         this.domain = domain;
         this.problem = problem;
+        this.variables = variables;
     }
 
     @Override
@@ -64,7 +71,9 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitPre_GD_forall(PDDLParser.Pre_GD_forallContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TypedListVariableListener typedListVariable = new TypedListVariableListener(domain);
+        WALKER.walk(typedListVariable, ctx.typed_list_variable());
+        return new ForAllTerm(typedListVariable.variables.stream().toArray(Variable[]::new), visit(ctx.pre_GD()));
     }
 
     @Override
@@ -109,12 +118,16 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitGd_exists(PDDLParser.Gd_existsContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TypedListVariableListener typedListVariable = new TypedListVariableListener(domain);
+        WALKER.walk(typedListVariable, ctx.typed_list_variable());
+        return new ExistsTerm(typedListVariable.variables.stream().toArray(Variable[]::new), visit(ctx.gD()));
     }
 
     @Override
     public Term visitGd_forall(PDDLParser.Gd_forallContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TypedListVariableListener typedListVariable = new TypedListVariableListener(domain);
+        WALKER.walk(typedListVariable, ctx.typed_list_variable());
+        return new ForAllTerm(typedListVariable.variables.stream().toArray(Variable[]::new), visit(ctx.gD()));
     }
 
     @Override
@@ -124,7 +137,20 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitF_comp(PDDLParser.F_compContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (ctx.binary_comp().getText()) {
+            case ">":
+                return new ComparisonTerm(ComparisonTerm.Comp.Gt, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
+            case "<":
+                return new ComparisonTerm(ComparisonTerm.Comp.Lt, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
+            case "=":
+                return new ComparisonTerm(ComparisonTerm.Comp.Eq, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
+            case ">=":
+                return new ComparisonTerm(ComparisonTerm.Comp.GEq, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
+            case "<=":
+                return new ComparisonTerm(ComparisonTerm.Comp.LEq, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
+            default:
+                throw new AssertionError(ctx.binary_comp().getText());
+        }
     }
 
     @Override
@@ -149,12 +175,19 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitAtomic_formula_term_predicate(PDDLParser.Atomic_formula_term_predicateContext ctx) {
-        return new PredicateTerm(true, domain.getPredicate(Utils.capitalize(ctx.predicate().name().getText())), ctx.term().stream().map(t -> visit(t)).toArray(Term[]::new));
+        Predicate predicate = domain.getPredicate(Utils.capitalize(ctx.predicate().name().getText()));
+        for (int i = 0; i < ctx.term().size(); i++) {
+            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                Variable variable = new Variable(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), predicate.getVariables().get(i).getType());
+                variables.put(variable.getName(), variable);
+            }
+        }
+        return new PredicateTerm(true, predicate, ctx.term().stream().map(t -> visit(t)).toArray(Term[]::new));
     }
 
     @Override
     public Term visitAtomic_formula_term_eq(PDDLParser.Atomic_formula_term_eqContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new EqTerm(true, visit(ctx.term(0)), visit(ctx.term(1)));
     }
 
     @Override
@@ -164,17 +197,17 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitAtomic_formula_name_eq(PDDLParser.Atomic_formula_name_eqContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new EqTerm(true, visit(ctx.name(0)), visit(ctx.name(1)));
     }
 
     @Override
     public Term visitTerm_name(PDDLParser.Term_nameContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new ConstantTerm(domain.getConstants().containsKey(Utils.lowercase(ctx.name().getText())) ? domain.getConstant(Utils.lowercase(ctx.name().getText())) : problem.getObject(Utils.lowercase(ctx.name().getText())));
     }
 
     @Override
     public Term visitTerm_variable(PDDLParser.Term_variableContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new VariableTerm(variables.get("?" + Utils.lowercase(ctx.variable().name().getText())));
     }
 
     @Override
@@ -184,22 +217,47 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitFunction_term(PDDLParser.Function_termContext ctx) {
-        return new FunctionTerm(domain.getFunction(Utils.capitalize(ctx.function_symbol().name().getText())), ctx.term().stream().map(t -> visit(t)).toArray(Term[]::new));
+        Function function = domain.getFunction(Utils.capitalize(ctx.function_symbol().name().getText()));
+        for (int i = 0; i < ctx.term().size(); i++) {
+            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                Variable variable = new Variable(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), function.getVariables().get(i).getType());
+                variables.put(variable.getName(), variable);
+            }
+        }
+        return new FunctionTerm(function, ctx.term().stream().map(t -> visit(t)).toArray(Term[]::new));
     }
 
     @Override
     public Term visitF_exp_number(PDDLParser.F_exp_numberContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new NumberTerm(new BigDecimal(ctx.NUMBER().getText()));
     }
 
     @Override
     public Term visitF_exp_binary_op(PDDLParser.F_exp_binary_opContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (ctx.binary_op().getText()) {
+            case "-":
+                return new OpTerm(OpTerm.Op.Sub, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
+            case "/":
+                return new OpTerm(OpTerm.Op.Div, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
+            case "+":
+                return new OpTerm(OpTerm.Op.Add, ctx.f_exp().stream().map(f_exp -> visit(f_exp)).toArray(Term[]::new));
+            case "*":
+                return new OpTerm(OpTerm.Op.Mul, ctx.f_exp().stream().map(f_exp -> visit(f_exp)).toArray(Term[]::new));
+            default:
+                throw new AssertionError(ctx.binary_op().getText());
+        }
     }
 
     @Override
     public Term visitF_exp_multi_op(PDDLParser.F_exp_multi_opContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (ctx.multi_op().getText()) {
+            case "+":
+                return new OpTerm(OpTerm.Op.Add, ctx.f_exp().stream().map(f_exp -> visit(f_exp)).toArray(Term[]::new));
+            case "*":
+                return new OpTerm(OpTerm.Op.Mul, ctx.f_exp().stream().map(f_exp -> visit(f_exp)).toArray(Term[]::new));
+            default:
+                throw new AssertionError(ctx.multi_op().getText());
+        }
     }
 
     @Override
@@ -214,12 +272,19 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitF_head_function_symbol_terms(PDDLParser.F_head_function_symbol_termsContext ctx) {
-        return new FunctionTerm(domain.getFunction(Utils.capitalize(ctx.function_symbol().name().getText())), ctx.term().stream().map(t -> visit(t)).toArray(Term[]::new));
+        Function function = domain.getFunction(Utils.capitalize(ctx.function_symbol().name().getText()));
+        for (int i = 0; i < ctx.term().size(); i++) {
+            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                Variable variable = new Variable(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), function.getVariables().get(i).getType());
+                variables.put(variable.getName(), variable);
+            }
+        }
+        return new FunctionTerm(function, ctx.term().stream().map(t -> visit(t)).toArray(Term[]::new));
     }
 
     @Override
     public Term visitF_head_function_symbol(PDDLParser.F_head_function_symbolContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new FunctionTerm(domain.getFunction(Utils.capitalize(ctx.function_symbol().name().getText())));
     }
 
     @Override
@@ -234,12 +299,14 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitC_effect_forall(PDDLParser.C_effect_forallContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TypedListVariableListener typedListVariable = new TypedListVariableListener(domain);
+        WALKER.walk(typedListVariable, ctx.typed_list_variable());
+        return new ForAllTerm(typedListVariable.variables.stream().toArray(Variable[]::new), visit(ctx.effect()));
     }
 
     @Override
     public Term visitC_effect_when(PDDLParser.C_effect_whenContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new WhenTerm(visit(ctx.gD()), visit(ctx.cond_effect()));
     }
 
     @Override
@@ -259,17 +326,30 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitP_effect_assign_op_f_head_f_exp(PDDLParser.P_effect_assign_op_f_head_f_expContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (ctx.assign_op().getText()) {
+            case "assign":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.Assign, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp()));
+            case "scale-up":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.ScaleUp, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp()));
+            case "scale-down":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.ScaleDown, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp()));
+            case "increase":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.Increase, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp()));
+            case "decrease":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.Decrease, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp()));
+            default:
+                throw new AssertionError(ctx.assign_op().getText());
+        }
     }
 
     @Override
     public Term visitP_effect_assign_term(PDDLParser.P_effect_assign_termContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new AssignOpTerm(AssignOpTerm.AssignOp.Assign, (FunctionTerm) visit(ctx.function_term()), visit(ctx.term()));
     }
 
     @Override
     public Term visitP_effect_assign_undefined(PDDLParser.P_effect_assign_undefinedContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new AssignOpTerm(AssignOpTerm.AssignOp.Assign, (FunctionTerm) visit(ctx.function_term()), null);
     }
 
     @Override
@@ -294,7 +374,9 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitDa_GD_forall(PDDLParser.Da_GD_forallContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TypedListVariableListener typedListVariable = new TypedListVariableListener(domain);
+        WALKER.walk(typedListVariable, ctx.typed_list_variable());
+        return new ForAllTerm(typedListVariable.variables.stream().toArray(Variable[]::new), visit(ctx.da_GD()));
     }
 
     @Override
@@ -341,7 +423,16 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitSimple_duration_constraint_d_op(PDDLParser.Simple_duration_constraint_d_opContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (ctx.d_op().getText()) {
+            case "=":
+                return new ComparisonTerm(ComparisonTerm.Comp.Eq, new VariableTerm(variables.get("?duration")), visit(ctx.d_value()));
+            case ">=":
+                return new ComparisonTerm(ComparisonTerm.Comp.GEq, new VariableTerm(variables.get("?duration")), visit(ctx.d_value()));
+            case "<=":
+                return new ComparisonTerm(ComparisonTerm.Comp.LEq, new VariableTerm(variables.get("?duration")), visit(ctx.d_value()));
+            default:
+                throw new AssertionError(ctx.d_op().getText());
+        }
     }
 
     @Override
@@ -371,12 +462,14 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitDa_effect_forall(PDDLParser.Da_effect_forallContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TypedListVariableListener typedListVariable = new TypedListVariableListener(domain);
+        WALKER.walk(typedListVariable, ctx.typed_list_variable());
+        return new ForAllTerm(typedListVariable.variables.stream().toArray(Variable[]::new), visit(ctx.da_effect()));
     }
 
     @Override
     public Term visitDa_effect_when(PDDLParser.Da_effect_whenContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new WhenTerm(visit(ctx.da_GD()), visit(ctx.timed_effect()));
     }
 
     @Override
@@ -410,17 +503,48 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitF_assign_da(PDDLParser.F_assign_daContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (ctx.assign_op().getText()) {
+            case "assign":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.Assign, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp_da()));
+            case "scale-up":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.ScaleUp, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp_da()));
+            case "scale-down":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.ScaleDown, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp_da()));
+            case "increase":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.Increase, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp_da()));
+            case "decrease":
+                return new AssignOpTerm(AssignOpTerm.AssignOp.Decrease, (FunctionTerm) visit(ctx.f_head()), visit(ctx.f_exp_da()));
+            default:
+                throw new AssertionError(ctx.assign_op().getText());
+        }
     }
 
     @Override
     public Term visitF_exp_da_binary(PDDLParser.F_exp_da_binaryContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet: " + ctx.toStringTree(parser));
+        switch (ctx.binary_op().getText()) {
+            case "-":
+                return new OpTerm(OpTerm.Op.Sub, visit(ctx.f_exp_da(0)), visit(ctx.f_exp_da(1)));
+            case "/":
+                return new OpTerm(OpTerm.Op.Div, visit(ctx.f_exp_da(0)), visit(ctx.f_exp_da(1)));
+            case "+":
+                return new OpTerm(OpTerm.Op.Add, ctx.f_exp_da().stream().map(f_exp_da -> visit(f_exp_da)).toArray(Term[]::new));
+            case "*":
+                return new OpTerm(OpTerm.Op.Mul, ctx.f_exp_da().stream().map(f_exp_da -> visit(f_exp_da)).toArray(Term[]::new));
+            default:
+                throw new AssertionError(ctx.binary_op().getText());
+        }
     }
 
     @Override
     public Term visitF_exp_da_multi(PDDLParser.F_exp_da_multiContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet: " + ctx.toStringTree(parser));
+        switch (ctx.multi_op().getText()) {
+            case "+":
+                return new OpTerm(OpTerm.Op.Add, ctx.f_exp_da().stream().map(f_exp_da -> visit(f_exp_da)).toArray(Term[]::new));
+            case "*":
+                return new OpTerm(OpTerm.Op.Mul, ctx.f_exp_da().stream().map(f_exp_da -> visit(f_exp_da)).toArray(Term[]::new));
+            default:
+                throw new AssertionError(ctx.multi_op().getText());
+        }
     }
 
     @Override
@@ -455,22 +579,22 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitInit_el_at(PDDLParser.Init_el_atContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new AtTerm(new BigDecimal(ctx.NUMBER().getText()), (PredicateTerm) visit(ctx.literal_name()));
     }
 
     @Override
     public Term visitInit_el_eq_number(PDDLParser.Init_el_eq_numberContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new EqTerm(true, visit(ctx.basic_function_term()), new NumberTerm(new BigDecimal(ctx.NUMBER().getText())));
     }
 
     @Override
     public Term visitInit_el_eq_name(PDDLParser.Init_el_eq_nameContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new EqTerm(true, visit(ctx.basic_function_term()), new ConstantTerm(domain.getConstants().containsKey(Utils.lowercase(ctx.name().getText())) ? domain.getConstant(Utils.lowercase(ctx.name().getText())) : problem.getObject(Utils.lowercase(ctx.name().getText()))));
     }
 
     @Override
     public Term visitBasic_function_term_function_symbol(PDDLParser.Basic_function_term_function_symbolContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new FunctionTerm(domain.getFunction(Utils.capitalize(ctx.function_symbol().name().getText())));
     }
 
     @Override
