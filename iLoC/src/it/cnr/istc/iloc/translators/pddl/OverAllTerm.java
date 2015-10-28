@@ -22,9 +22,26 @@ import java.util.Map;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public interface Term {
+public class OverAllTerm implements Term {
 
-    Term negate();
+    private final Term term;
 
-    Term ground(Domain domain, Map<String, Term> known_terms);
+    public OverAllTerm(Term term) {
+        this.term = term;
+    }
+
+    @Override
+    public Term negate() {
+        throw new AssertionError("It is not possible to call negate on an over all term..");
+    }
+
+    @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        return new OverAllTerm(term.ground(domain, known_terms));
+    }
+
+    @Override
+    public String toString() {
+        return "(over all " + term + ')';
+    }
 }

@@ -22,9 +22,30 @@ import java.util.Map;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public interface Term {
+public class ConstantTerm implements Term {
 
-    Term negate();
+    private final Constant constant;
 
-    Term ground(Domain domain, Map<String, Term> known_terms);
+    public ConstantTerm(Constant constant) {
+        this.constant = constant;
+    }
+
+    public Constant getConstant() {
+        return constant;
+    }
+
+    @Override
+    public Term negate() {
+        throw new AssertionError("It is not possible to call negate on a constant..");
+    }
+
+    @Override
+    public Term ground(Domain domain, Map<String, Term> known_terms) {
+        return new ConstantTerm(constant);
+    }
+
+    @Override
+    public String toString() {
+        return constant.getName();
+    }
 }
