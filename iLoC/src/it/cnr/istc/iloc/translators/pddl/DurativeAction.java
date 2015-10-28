@@ -78,7 +78,7 @@ public class DurativeAction {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("(").append(name).append("(").append(variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" "))).append(")\n");
+        sb.append("(durative-action ").append(name).append("( ").append(variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" "))).append(")\n");
         if (duration != null) {
             sb.append("(:duration ").append(duration.toString()).append(")\n");
         }

@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -82,20 +83,11 @@ public class Problem {
 
         sb.append("(:domain ").append(domain.getName()).append(")\n");
 
-        sb.append("(:objects ");
-        objects.values().stream().forEach(object -> {
-            sb.append(object.getName());
-            sb.append(" - ").append(object.getType().getName());
-        });
-        sb.append(")\n");
+        sb.append("(:objects ").append(objects.values().stream().map(object -> object.getName() + " - " + object.getType().getName()).collect(Collectors.joining(" "))).append(")\n");
 
-        sb.append("(:init ");
-        init_els.stream().forEach(init_el -> {
-            sb.append(init_el);
-        });
-        sb.append(")\n");
+        sb.append("(:init ").append(init_els.stream().map(init_el -> init_el.toString()).collect(Collectors.joining(" "))).append(")\n");
 
-        sb.append(goal);
+        sb.append("(:goal ").append(goal).append(")\n");
 
         sb.append(")\n");
         return sb.toString();

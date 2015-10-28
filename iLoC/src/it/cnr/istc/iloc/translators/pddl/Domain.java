@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -128,18 +129,24 @@ public class Domain {
         });
         sb.append(")\n");
 
-        sb.append("(:predicates ");
-        predicates.values().stream().forEach(predicate -> {
-            sb.append(predicate);
-        });
-        sb.append(")\n");
+        if (!constants.isEmpty()) {
+            sb.append("(:constants ").append(constants.values().stream().map(constant -> constant.getName() + " " + constant.getType().getName()).collect(Collectors.joining(" "))).append(")\n");
+        }
 
-        actions.values().stream().forEach(predicate -> {
-            sb.append(predicate);
+        if (!predicates.isEmpty()) {
+            sb.append("(:predicates ").append(predicates.values().stream().map(predicate -> predicate.toString()).collect(Collectors.joining(" "))).append(")\n");
+        }
+
+        if (!functions.isEmpty()) {
+            sb.append("(:functions ").append(functions.values().stream().map(function -> function.toString()).collect(Collectors.joining(" "))).append(")\n");
+        }
+
+        actions.values().stream().forEach(action -> {
+            sb.append(action).append("\n");
         });
 
-        durative_actions.values().stream().forEach(predicate -> {
-            sb.append(predicate);
+        durative_actions.values().stream().forEach(action -> {
+            sb.append(action).append("\n");
         });
 
         sb.append(")\n");

@@ -46,6 +46,6 @@ public class OrTerm implements Term {
 
     @Override
     public String toString() {
-        return "(or (" + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + "))";
+        return "(or " + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + ")";
     }
 }

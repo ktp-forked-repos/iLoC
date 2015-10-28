@@ -68,7 +68,7 @@ public class Action {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("(").append(name).append("(").append(variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" "))).append(")\n");
+        sb.append("(action ").append(name).append(" (").append(variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" "))).append(")\n");
         if (precondition != null) {
             sb.append("(:precondition ").append(precondition.toString()).append(")\n");
         }

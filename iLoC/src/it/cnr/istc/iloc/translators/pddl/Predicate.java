@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -46,12 +47,6 @@ public class Predicate {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("(").append(name).append("\n");
-        variables.stream().forEach(variable -> {
-            sb.append("  ").append(variable.getName()).append(" - ").append(variable.getType().getName()).append("\n");
-        });
-        sb.append(")");
-        return sb.toString();
+        return "(" + name + " " + variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" ")) + ")";
     }
 }

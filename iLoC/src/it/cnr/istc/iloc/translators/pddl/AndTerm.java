@@ -46,6 +46,6 @@ public class AndTerm implements Term {
 
     @Override
     public String toString() {
-        return "(and (" + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + "))";
+        return "(and " + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + ")";
     }
 }

@@ -18,6 +18,7 @@ package it.cnr.istc.iloc.translators.pddl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -256,6 +257,19 @@ public class PDDLTranslator {
                 }
             }, problem_context.object_declaration());
         }
+
+        TermVisitor term_visitor = new TermVisitor(domain_parser, domain, problem, Collections.emptyMap());
+        /**
+         * We define the initial state
+         */
+        problem_context.init().init_el().stream().forEach(init_el -> {
+            problem.addInitEl(term_visitor.visit(init_el));
+        });
+
+        /**
+         * We define the goal
+         */
+        problem.setGoal(term_visitor.visit(problem_context.goal().pre_GD()));
 
         STGroupFile file = new STGroupFile(PDDLTranslator.class.getResource("PDDLTemplate.stg").getPath());
 
