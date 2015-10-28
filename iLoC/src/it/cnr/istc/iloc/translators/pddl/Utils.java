@@ -19,6 +19,15 @@
 package it.cnr.istc.iloc.translators.pddl;
 
 import it.cnr.istc.iloc.api.Constants;
+import it.cnr.istc.iloc.translators.pddl.core.AndTerm;
+import it.cnr.istc.iloc.translators.pddl.core.AssignOpTerm;
+import it.cnr.istc.iloc.translators.pddl.core.ConstantTerm;
+import it.cnr.istc.iloc.translators.pddl.core.Function;
+import it.cnr.istc.iloc.translators.pddl.core.FunctionTerm;
+import it.cnr.istc.iloc.translators.pddl.core.Predicate;
+import it.cnr.istc.iloc.translators.pddl.core.PredicateTerm;
+import it.cnr.istc.iloc.translators.pddl.core.Term;
+import it.cnr.istc.iloc.translators.pddl.core.VariableTerm;
 
 /**
  *
@@ -56,6 +65,42 @@ class Utils {
             c_str = "_" + c_str;
         }
         return c_str;
+    }
+
+    static boolean containsPredicate(Term term, Predicate predicate) {
+        if (term instanceof PredicateTerm) {
+            return ((PredicateTerm) term).getPredicate() == predicate;
+        } else if (term instanceof FunctionTerm) {
+            return false;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsPredicate(t, predicate));
+        } else if (term instanceof AssignOpTerm) {
+            return false;
+        } else if (term instanceof VariableTerm) {
+            return false;
+        } else if (term instanceof ConstantTerm) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
+    }
+
+    static boolean containsFunction(Term term, Function function) {
+        if (term instanceof FunctionTerm) {
+            return ((FunctionTerm) term).getFunction() == function;
+        } else if (term instanceof PredicateTerm) {
+            return false;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsFunction(t, function));
+        } else if (term instanceof AssignOpTerm) {
+            return containsFunction(((AssignOpTerm) term).getFunctionTerm(), function) || containsFunction(((AssignOpTerm) term).getValue(), function);
+        } else if (term instanceof VariableTerm) {
+            return false;
+        } else if (term instanceof ConstantTerm) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
     }
 
     private Utils() {

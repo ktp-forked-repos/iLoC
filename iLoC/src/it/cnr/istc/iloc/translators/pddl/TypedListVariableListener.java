@@ -18,6 +18,10 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import it.cnr.istc.iloc.translators.pddl.core.Domain;
+import it.cnr.istc.iloc.translators.pddl.core.EitherType;
+import it.cnr.istc.iloc.translators.pddl.core.Type;
+import it.cnr.istc.iloc.translators.pddl.core.Variable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

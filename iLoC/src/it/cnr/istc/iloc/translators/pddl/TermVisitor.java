@@ -16,6 +16,30 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import it.cnr.istc.iloc.translators.pddl.core.AndTerm;
+import it.cnr.istc.iloc.translators.pddl.core.AssignOpTerm;
+import it.cnr.istc.iloc.translators.pddl.core.AtEndTerm;
+import it.cnr.istc.iloc.translators.pddl.core.AtStartTerm;
+import it.cnr.istc.iloc.translators.pddl.core.AtTerm;
+import it.cnr.istc.iloc.translators.pddl.core.ComparisonTerm;
+import it.cnr.istc.iloc.translators.pddl.core.ConstantTerm;
+import it.cnr.istc.iloc.translators.pddl.core.Domain;
+import it.cnr.istc.iloc.translators.pddl.core.EqTerm;
+import it.cnr.istc.iloc.translators.pddl.core.ExistsTerm;
+import it.cnr.istc.iloc.translators.pddl.core.ForAllTerm;
+import it.cnr.istc.iloc.translators.pddl.core.Function;
+import it.cnr.istc.iloc.translators.pddl.core.FunctionTerm;
+import it.cnr.istc.iloc.translators.pddl.core.NumberTerm;
+import it.cnr.istc.iloc.translators.pddl.core.OpTerm;
+import it.cnr.istc.iloc.translators.pddl.core.OrTerm;
+import it.cnr.istc.iloc.translators.pddl.core.OverAllTerm;
+import it.cnr.istc.iloc.translators.pddl.core.Predicate;
+import it.cnr.istc.iloc.translators.pddl.core.PredicateTerm;
+import it.cnr.istc.iloc.translators.pddl.core.Problem;
+import it.cnr.istc.iloc.translators.pddl.core.Term;
+import it.cnr.istc.iloc.translators.pddl.core.Variable;
+import it.cnr.istc.iloc.translators.pddl.core.VariableTerm;
+import it.cnr.istc.iloc.translators.pddl.core.WhenTerm;
 import java.math.BigDecimal;
 import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -177,8 +201,8 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
     public Term visitAtomic_formula_term_predicate(PDDLParser.Atomic_formula_term_predicateContext ctx) {
         Predicate predicate = domain.getPredicate(Utils.capitalize(ctx.predicate().name().getText()));
         for (int i = 0; i < ctx.term().size(); i++) {
-            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
-                Variable variable = new Variable(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), predicate.getVariables().get(i).getType());
+            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                Variable variable = new Variable("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), predicate.getVariables().get(i).getType());
                 variables.put(variable.getName(), variable);
             }
         }
@@ -219,8 +243,8 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
     public Term visitFunction_term(PDDLParser.Function_termContext ctx) {
         Function function = domain.getFunction(Utils.capitalize(ctx.function_symbol().name().getText()));
         for (int i = 0; i < ctx.term().size(); i++) {
-            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
-                Variable variable = new Variable(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), function.getVariables().get(i).getType());
+            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                Variable variable = new Variable("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), function.getVariables().get(i).getType());
                 variables.put(variable.getName(), variable);
             }
         }
@@ -274,8 +298,8 @@ public class TermVisitor extends PDDLBaseVisitor<Term> {
     public Term visitF_head_function_symbol_terms(PDDLParser.F_head_function_symbol_termsContext ctx) {
         Function function = domain.getFunction(Utils.capitalize(ctx.function_symbol().name().getText()));
         for (int i = 0; i < ctx.term().size(); i++) {
-            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
-                Variable variable = new Variable(((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), function.getVariables().get(i).getType());
+            if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables.containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                Variable variable = new Variable("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(), function.getVariables().get(i).getType());
                 variables.put(variable.getName(), variable);
             }
         }

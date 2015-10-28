@@ -16,6 +16,15 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import it.cnr.istc.iloc.translators.pddl.core.Action;
+import it.cnr.istc.iloc.translators.pddl.core.Domain;
+import it.cnr.istc.iloc.translators.pddl.core.DurativeAction;
+import it.cnr.istc.iloc.translators.pddl.core.EitherType;
+import it.cnr.istc.iloc.translators.pddl.core.Function;
+import it.cnr.istc.iloc.translators.pddl.core.Predicate;
+import it.cnr.istc.iloc.translators.pddl.core.Problem;
+import it.cnr.istc.iloc.translators.pddl.core.Type;
+import it.cnr.istc.iloc.translators.pddl.core.Variable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -271,15 +280,19 @@ public class PDDLTranslator {
          */
         problem.setGoal(term_visitor.visit(problem_context.goal().pre_GD()));
 
-        STGroupFile file = new STGroupFile(PDDLTranslator.class.getResource("PDDLTemplate.stg").getPath());
-
-        ST translation = file.getInstanceOf("PDDL");
-        translation.add("domain", domain);
-        translation.add("problem", problem);
-
-        return translation.render();
+        return translatePDDLInstance(domain, problem);
     }
 
-    private PDDLTranslator() {
+    public static String translatePDDLInstance(Domain domain, Problem problem) {
+        Grounder grounder = new Grounder(domain, problem);
+        STGroupFile file = new STGroupFile(PDDLTranslator.class.getResource("PDDLTemplate.stg").getPath());
+
+        file.registerRenderer(StateVariable.class, new StateVariableRenderer(file, grounder));
+        file.registerRenderer(GroundAction.class, new ActionRenderer(file, grounder));
+
+        ST translation = file.getInstanceOf("PDDL");
+        translation.add("grounder", grounder);
+
+        return translation.render();
     }
 }

@@ -1,5 +1,9 @@
-PDDL(domain, problem) ::= <<
-<domain>
+PDDL(grounder) ::= <<
+<grounder.domain>
 
-<problem>
+<grounder.problem>
+
+<grounder.stateVariables : {sv |
+<sv>
+}>
 >>
