@@ -1,0 +1,72 @@
+Translation(translator) ::= <<
+
+<translator.agent.stateVariables.values : {state_variable |
+<StateVariable(translator, state_variable)>}; separator="\n">
+
+<Agent(translator, translator.agent)>
+>>
+
+
+
+StateVariable(translator, state_variable) ::= <<
+class <state_variable.name> extends StateVariable {
+
+    <translator.agent.name> agent;
+
+    <state_variable.name>(<translator.agent.name> agent) {
+        this.agent = agent;
+    \}
+<state_variable.values.values : {value |
+
+    <StateVariablePredicate(translator, value)>}>
+\}>>
+
+
+
+StateVariablePredicate(translator, value) ::= <<
+predicate <value.name>() {
+\}
+>>
+
+
+
+And(and) ::= <<
+<and.envs : {env |
+<env>
+}>
+>>
+
+
+
+Or(or) ::= <<
+{
+<or.envs : {env |
+    <env>
+}; separator="} or {\n">
+\}
+>>
+
+
+
+Agent(translator, agent) ::= <<
+class <agent.name> extends PropositionalImpulsiveAgent {
+
+<translator.agent.stateVariables.values : {state_variable |
+    <state_variable.name> <state_variable.name; format ="lower">;}>
+
+    <agent.name>() {
+<translator.agent.stateVariables.values : {state_variable |
+        <state_variable.name; format ="lower"> = new <state_variable.name>(this);}>
+    \}
+<agent.actions.values : {action |
+
+    <Action(translator, action)>}>
+\}
+>>
+
+
+
+Action(translator, action) ::= <<
+predicate <action.name>() {
+\}
+>>

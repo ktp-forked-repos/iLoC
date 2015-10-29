@@ -16,36 +16,36 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Locale;
+import org.stringtemplate.v4.AttributeRenderer;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroupFile;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class StateVariable {
+public class EnvRenderer implements AttributeRenderer {
 
-    private final String name;
-    private final Map<String, StateVariableValue> values = new LinkedHashMap<>();
+    private final STGroupFile file;
 
-    public StateVariable(String name) {
-        this.name = name;
+    public EnvRenderer(STGroupFile file) {
+        this.file = file;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void addValue(StateVariableValue value) {
-        values.put(value.getName(), value);
-    }
-
-    public StateVariableValue getValue(String name) {
-        return values.get(name);
-    }
-
-    public Map<String, StateVariableValue> getValues() {
-        return Collections.unmodifiableMap(values);
+    @Override
+    public String toString(Object o, String string, Locale locale) {
+        Env env = (Env) o;
+        if (env instanceof AND) {
+            ST translation = file.getInstanceOf("And");
+            translation.add("and", env);
+            return translation.render();
+        } else if (env instanceof OR) {
+            assert ((OR) env).getEnvs().size() > 1;
+            ST translation = file.getInstanceOf("Or");
+            translation.add("or", env);
+            return translation.render();
+        }
+        return env.toString();
     }
 }

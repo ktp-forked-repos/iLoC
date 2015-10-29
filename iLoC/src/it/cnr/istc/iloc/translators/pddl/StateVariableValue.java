@@ -20,12 +20,14 @@ package it.cnr.istc.iloc.translators.pddl;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class StateVariableValue implements GD {
+public class StateVariableValue implements Env {
 
     private final StateVariable stateVariable;
     private final String name;
+    private Action action;
+    private DurativeAction durativeAction;
 
-    StateVariableValue(StateVariable state_variable, String name) {
+    public StateVariableValue(StateVariable state_variable, String name) {
         this.stateVariable = state_variable;
         this.name = name;
     }
@@ -38,13 +40,29 @@ class StateVariableValue implements GD {
         return name;
     }
 
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    public DurativeAction getDurativeAction() {
+        return durativeAction;
+    }
+
+    public void setDurativeAction(DurativeAction durativeAction) {
+        this.durativeAction = durativeAction;
+    }
+
     @Override
-    public GD getEnclosingDG() {
+    public Env getEnclosingEnv() {
         throw new AssertionError();
     }
 
     @Override
-    public void addGD(GD gd) {
+    public void addEnv(Env gd) {
         throw new AssertionError();
     }
 }

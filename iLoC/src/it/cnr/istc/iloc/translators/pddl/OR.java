@@ -24,26 +24,26 @@ import java.util.List;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class OR implements GD {
+public class OR implements Env {
 
-    private final GD enclosingGD;
-    private final List<GD> gds = new ArrayList<>();
+    private final Env enclosingGD;
+    private final List<Env> envs = new ArrayList<>();
 
-    OR(GD enclosingGD) {
+    public OR(Env enclosingGD) {
         this.enclosingGD = enclosingGD;
     }
 
     @Override
-    public GD getEnclosingDG() {
+    public Env getEnclosingEnv() {
         return enclosingGD;
     }
 
     @Override
-    public void addGD(GD gd) {
-        gds.add(gd);
+    public void addEnv(Env gd) {
+        envs.add(gd);
     }
 
-    public List<GD> getGDs() {
-        return Collections.unmodifiableList(gds);
+    public List<Env> getEnvs() {
+        return Collections.unmodifiableList(envs);
     }
 }

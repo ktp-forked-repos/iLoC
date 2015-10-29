@@ -18,8 +18,6 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import it.cnr.istc.iloc.translators.pddl.parser.PDDLInstance;
-import it.cnr.istc.iloc.translators.pddl.parser.Parser;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Assert;
@@ -37,8 +35,9 @@ public class TranslatorTest {
     @Test
     public void testBlocksWorldTranslator() {
         try {
-            PDDLInstance instance = Parser.parse(new File(TranslatorTest.class.getResource("blocks-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks-problem.pddl").getPath()));
-            String translation = PDDLTranslator.translatePDDLInstance(instance.getDomain(), instance.getProblem());
+            PDDLTranslator translator = new PDDLTranslator(new File(TranslatorTest.class.getResource("blocks-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks-problem.pddl").getPath()));
+            String translation = translator.translate();
+            System.out.println(translation);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -50,8 +49,9 @@ public class TranslatorTest {
     @Test
     public void testNewBlocksWorldTranslator() {
         try {
-            PDDLInstance instance = Parser.parse(new File(TranslatorTest.class.getResource("blocks-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks-problem-new.pddl").getPath()));
-            String translation = PDDLTranslator.translatePDDLInstance(instance.getDomain(), instance.getProblem());
+            PDDLTranslator translator = new PDDLTranslator(new File(TranslatorTest.class.getResource("blocks-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks-problem-new.pddl").getPath()));
+            String translation = translator.translate();
+            System.out.println(translation);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }

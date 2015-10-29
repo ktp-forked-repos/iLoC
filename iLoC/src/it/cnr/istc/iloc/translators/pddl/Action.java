@@ -20,9 +20,25 @@ package it.cnr.istc.iloc.translators.pddl;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-interface GD {
+public class Action {
 
-    GD getEnclosingDG();
+    private final String name;
+    private final Env precondition = new AND(null);
+    private final Env effect = new AND(null);
 
-    void addGD(GD gd);
+    public Action(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Env getPrecondition() {
+        return precondition;
+    }
+
+    public Env getEffect() {
+        return effect;
+    }
 }

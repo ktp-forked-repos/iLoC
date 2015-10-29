@@ -16,20 +16,18 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class StateVariable {
+public class DurativeAction {
 
     private final String name;
-    private final Map<String, StateVariableValue> values = new LinkedHashMap<>();
+    private final Env duration = new AND(null);
+    private final Env condition = new AND(null);
+    private final Env effect = new AND(null);
 
-    public StateVariable(String name) {
+    public DurativeAction(String name) {
         this.name = name;
     }
 
@@ -37,15 +35,15 @@ public class StateVariable {
         return name;
     }
 
-    public void addValue(StateVariableValue value) {
-        values.put(value.getName(), value);
+    public Env getDuration() {
+        return duration;
     }
 
-    public StateVariableValue getValue(String name) {
-        return values.get(name);
+    public Env getCondition() {
+        return condition;
     }
 
-    public Map<String, StateVariableValue> getValues() {
-        return Collections.unmodifiableMap(values);
+    public Env getEffect() {
+        return effect;
     }
 }

@@ -20,25 +20,9 @@ package it.cnr.istc.iloc.translators.pddl;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class GroundAction {
+public interface Env {
 
-    private final String name;
-    private final AND precondition = new AND(null);
-    private final AND effect = new AND(null);
+    public Env getEnclosingEnv();
 
-    GroundAction(String name) {
-        this.name = name;
-    }
-
-    String getName() {
-        return name;
-    }
-
-    AND getPrecondition() {
-        return precondition;
-    }
-
-    AND getEffect() {
-        return effect;
-    }
+    public void addEnv(Env env);
 }
