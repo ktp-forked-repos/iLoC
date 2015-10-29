@@ -101,7 +101,7 @@ public class StateVariableType extends Type {
         if (!lazy_scheduling) {
             List<IBool> vars = new ArrayList<>();
             formula.getType().getEnclosingScope().getPredicates().values().stream().flatMap(predicate -> predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active)).forEach(f -> {
-                // We already know these formulas cannot overlap..
+                // We filter out those formulas we already know they cannot overlap..
                 if (start != f.get(Constants.END) && end != f.get(Constants.START)) {
                     vars.add(
                             network.or(
