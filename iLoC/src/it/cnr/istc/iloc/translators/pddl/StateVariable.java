@@ -24,12 +24,12 @@ import java.util.Map;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class StateVariable {
+class StateVariable {
 
     private final String name;
     private final Map<String, StateVariableValue> values = new LinkedHashMap<>();
 
-    public StateVariable(String name) {
+    StateVariable(String name) {
         this.name = name;
     }
 

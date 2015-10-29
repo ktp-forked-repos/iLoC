@@ -56,7 +56,7 @@ class <agent.name> extends PropositionalImpulsiveAgent {
 
     <agent.name>() {
 <translator.agent.stateVariables.values : {state_variable |
-        <state_variable.name; format ="lower"> = new <state_variable.name>(this);}>
+        this.<state_variable.name; format ="lower"> = new <state_variable.name>(this);}>
     \}
 <agent.actions.values : {action |
 
@@ -68,5 +68,6 @@ class <agent.name> extends PropositionalImpulsiveAgent {
 
 Action(translator, action) ::= <<
 predicate <action.name>() {
+    <action.precondition>
 \}
 >>

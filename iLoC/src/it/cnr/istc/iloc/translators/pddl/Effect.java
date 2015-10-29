@@ -20,30 +20,25 @@ package it.cnr.istc.iloc.translators.pddl;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class DurativeAction {
+class Effect implements Env {
 
-    private final String name;
-    private final Env duration = new AND(null);
-    private final Env condition = new AND(null);
-    private final Env effect = new AND(null);
+    private final StateVariableValue value;
 
-    DurativeAction(String name) {
-        this.name = name;
+    Effect(StateVariableValue value) {
+        this.value = value;
     }
 
-    public String getName() {
-        return name;
+    public StateVariableValue getValue() {
+        return value;
     }
 
-    public Env getDuration() {
-        return duration;
+    @Override
+    public Env getEnclosingEnv() {
+        throw new AssertionError();
     }
 
-    public Env getCondition() {
-        return condition;
-    }
-
-    public Env getEffect() {
-        return effect;
+    @Override
+    public void addEnv(Env gd) {
+        throw new AssertionError();
     }
 }

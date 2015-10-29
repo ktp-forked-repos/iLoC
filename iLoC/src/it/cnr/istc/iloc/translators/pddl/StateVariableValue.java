@@ -16,18 +16,22 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class StateVariableValue implements Env {
+class StateVariableValue {
 
     private final StateVariable stateVariable;
     private final String name;
-    private Action action;
-    private DurativeAction durativeAction;
+    private final Collection<Action> actions = new ArrayList<>();
+    private final Collection<DurativeAction> durativeActions = new ArrayList<>();
 
-    public StateVariableValue(StateVariable state_variable, String name) {
+    StateVariableValue(StateVariable state_variable, String name) {
         this.stateVariable = state_variable;
         this.name = name;
     }
@@ -40,29 +44,19 @@ public class StateVariableValue implements Env {
         return name;
     }
 
-    public Action getAction() {
-        return action;
+    public void addAction(Action action) {
+        actions.add(action);
     }
 
-    public void setAction(Action action) {
-        this.action = action;
+    public Collection<Action> getActions() {
+        return Collections.unmodifiableCollection(actions);
     }
 
-    public DurativeAction getDurativeAction() {
-        return durativeAction;
+    public void addDurativeAction(DurativeAction action) {
+        durativeActions.add(action);
     }
 
-    public void setDurativeAction(DurativeAction durativeAction) {
-        this.durativeAction = durativeAction;
-    }
-
-    @Override
-    public Env getEnclosingEnv() {
-        throw new AssertionError();
-    }
-
-    @Override
-    public void addEnv(Env gd) {
-        throw new AssertionError();
+    public Collection<DurativeAction> getDurativeActions() {
+        return Collections.unmodifiableCollection(durativeActions);
     }
 }

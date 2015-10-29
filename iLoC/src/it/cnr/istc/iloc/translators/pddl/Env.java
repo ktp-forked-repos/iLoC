@@ -20,9 +20,9 @@ package it.cnr.istc.iloc.translators.pddl;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public interface Env {
+interface Env {
 
-    public Env getEnclosingEnv();
+    Env getEnclosingEnv();
 
-    public void addEnv(Env env);
+    void addEnv(Env env);
 }

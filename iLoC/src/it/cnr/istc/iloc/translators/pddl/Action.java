@@ -20,13 +20,13 @@ package it.cnr.istc.iloc.translators.pddl;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class Action {
+class Action {
 
     private final String name;
     private final Env precondition = new AND(null);
     private final Env effect = new AND(null);
 
-    public Action(String name) {
+    Action(String name) {
         this.name = name;
     }
 

@@ -25,11 +25,11 @@ import org.stringtemplate.v4.STGroupFile;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class EnvRenderer implements AttributeRenderer {
+class EnvRenderer implements AttributeRenderer {
 
     private final STGroupFile file;
 
-    public EnvRenderer(STGroupFile file) {
+    EnvRenderer(STGroupFile file) {
         this.file = file;
     }
 
@@ -45,6 +45,8 @@ public class EnvRenderer implements AttributeRenderer {
             ST translation = file.getInstanceOf("Or");
             translation.add("or", env);
             return translation.render();
+        } else if (env instanceof Precondition) {
+            throw new UnsupportedOperationException(env.getClass().getName());
         }
         return env.toString();
     }

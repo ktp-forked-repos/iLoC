@@ -24,14 +24,14 @@ import java.util.Map;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class Agent {
+class Agent {
 
     private final String name;
     private final Map<String, StateVariable> state_variables = new LinkedHashMap<>();
     private final Map<String, Action> actions = new LinkedHashMap<>();
     private final Map<String, DurativeAction> durative_actions = new LinkedHashMap<>();
 
-    public Agent(String name) {
+    Agent(String name) {
         this.name = name;
     }
 
