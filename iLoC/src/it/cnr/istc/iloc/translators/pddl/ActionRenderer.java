@@ -16,7 +16,10 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.STGroupFile;
 
@@ -37,6 +40,29 @@ class ActionRenderer implements AttributeRenderer {
     @Override
     public String toString(Object o, String string, Locale locale) {
         GroundAction action = (GroundAction) o;
-        return action.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("predicate ").append(action.getName()).append("() {\n");
+        Map<Class<? extends GD>, List<GD>> gds = action.getPrecondition().getGDs().stream().collect(Collectors.groupingBy(gd -> gd.getClass()));
+        gds.entrySet().stream().forEach(entry -> {
+            if (entry.getKey() == AND.class) {
+            } else if (entry.getKey() == AND.class) {
+            } else if (entry.getKey() == AND.class) {
+            } else {
+                throw new UnsupportedOperationException(entry.getKey().getName());
+            }
+        });
+        action.getPrecondition().getGDs().stream().filter(gd -> gd instanceof StateVariableValue).map(gd -> (StateVariableValue) gd).forEach(value -> {
+            String goal_name = Utils.lowercase(value.getStateVariable().getName()) + "_" + Utils.lowercase(value.getName());
+            sb.append("    goal ").append(goal_name).append(" = new ").append(Utils.lowercase(value.getStateVariable().getName())).append(".").append(value.getName()).append("(");
+            if (Utils.containsStateVariable(action.getPrecondition(), value.getStateVariable())) {
+                sb.append("end:start);\n");
+            } else {
+                sb.append(");\n");
+                sb.append("    ").append(goal_name).append(".start <= at - 1;\n");
+                sb.append("    ").append(goal_name).append(".end >= at;\n");
+            }
+        });
+        sb.append("}\n");
+        return sb.toString();
     }
 }

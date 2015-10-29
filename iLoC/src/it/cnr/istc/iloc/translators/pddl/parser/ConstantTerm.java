@@ -14,38 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+package it.cnr.istc.iloc.translators.pddl.parser;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class StateVariable {
+public class ConstantTerm implements Term {
 
-    private final String name;
-    private final Map<String, StateVariableValue> values = new HashMap<>();
+    private final Constant constant;
 
-    StateVariable(String name) {
-        this.name = name;
+    public ConstantTerm(Constant constant) {
+        assert constant != null;
+        this.constant = constant;
     }
 
-    public String getName() {
-        return name;
+    public Constant getConstant() {
+        return constant;
     }
 
-    void addValue(StateVariableValue value) {
-        values.put(value.getName(), value);
+    @Override
+    public Term negate() {
+        throw new AssertionError("It is not possible to call negate on a constant..");
     }
 
-    StateVariableValue getValue(String name) {
-        return values.get(name);
-    }
-
-    Collection<StateVariableValue> getValues() {
-        return values.values();
+    @Override
+    public String toString() {
+        return constant.getName();
     }
 }

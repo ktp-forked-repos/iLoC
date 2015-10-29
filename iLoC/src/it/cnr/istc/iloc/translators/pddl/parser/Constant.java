@@ -14,38 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+package it.cnr.istc.iloc.translators.pddl.parser;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class StateVariable {
+public class Constant {
 
     private final String name;
-    private final Map<String, StateVariableValue> values = new HashMap<>();
+    private final Type type;
 
-    StateVariable(String name) {
+    Constant(String name, Type type) {
+        assert type != null;
         this.name = name;
+        this.type = type;
     }
 
     public String getName() {
         return name;
     }
 
-    void addValue(StateVariableValue value) {
-        values.put(value.getName(), value);
+    public Type getType() {
+        return type;
     }
 
-    StateVariableValue getValue(String name) {
-        return values.get(name);
-    }
-
-    Collection<StateVariableValue> getValues() {
-        return values.values();
+    @Override
+    public String toString() {
+        return type.getName() + " " + name;
     }
 }

@@ -16,20 +16,20 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import it.cnr.istc.iloc.translators.pddl.core.AndTerm;
-import it.cnr.istc.iloc.translators.pddl.core.AssignOpTerm;
-import it.cnr.istc.iloc.translators.pddl.core.Constant;
-import it.cnr.istc.iloc.translators.pddl.core.ConstantTerm;
-import it.cnr.istc.iloc.translators.pddl.core.Domain;
-import it.cnr.istc.iloc.translators.pddl.core.EqTerm;
-import it.cnr.istc.iloc.translators.pddl.core.Function;
-import it.cnr.istc.iloc.translators.pddl.core.FunctionTerm;
-import it.cnr.istc.iloc.translators.pddl.core.OrTerm;
-import it.cnr.istc.iloc.translators.pddl.core.Predicate;
-import it.cnr.istc.iloc.translators.pddl.core.PredicateTerm;
-import it.cnr.istc.iloc.translators.pddl.core.Problem;
-import it.cnr.istc.iloc.translators.pddl.core.Term;
-import it.cnr.istc.iloc.translators.pddl.core.VariableTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.AndTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.AssignOpTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.Constant;
+import it.cnr.istc.iloc.translators.pddl.parser.ConstantTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.Domain;
+import it.cnr.istc.iloc.translators.pddl.parser.EqTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.Function;
+import it.cnr.istc.iloc.translators.pddl.parser.FunctionTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.OrTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.Predicate;
+import it.cnr.istc.iloc.translators.pddl.parser.PredicateTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.Problem;
+import it.cnr.istc.iloc.translators.pddl.parser.Term;
+import it.cnr.istc.iloc.translators.pddl.parser.VariableTerm;
 import it.cnr.istc.iloc.utils.CartesianProductGenerator;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ class Grounder {
     private final Set<Predicate> static_predicates;
     private final Set<Function> static_functions;
     private final Map<String, Constant> assignments = new HashMap<>();
-    private final Map<String, StateVariable> state_variables = new LinkedHashMap<>();
+    private final Map<String, StateVariable> stateVariables = new LinkedHashMap<>();
     private final Map<String, GroundAction> actions = new LinkedHashMap<>();
     private GD gd = null;
 
@@ -89,7 +89,7 @@ class Grounder {
     }
 
     public List<StateVariable> getStateVariables() {
-        return new ArrayList<>(state_variables.values());
+        return new ArrayList<>(stateVariables.values());
     }
 
     public List<GroundAction> getActions() {
@@ -103,21 +103,21 @@ class Grounder {
             return ((ConstantTerm) term).getConstant().getName();
         } else if (term instanceof PredicateTerm) {
             String predicate_name = ((PredicateTerm) term).getArguments().isEmpty() ? ((PredicateTerm) term).getPredicate().getName() : ((PredicateTerm) term).getPredicate().getName() + "_" + ((PredicateTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
-            if (!state_variables.containsKey(predicate_name)) {
+            if (!stateVariables.containsKey(predicate_name)) {
                 StateVariable new_state_variable = new StateVariable(predicate_name);
                 new_state_variable.addValue(new StateVariableValue(new_state_variable, "True"));
                 new_state_variable.addValue(new StateVariableValue(new_state_variable, "False"));
-                state_variables.put(predicate_name, new_state_variable);
+                stateVariables.put(predicate_name, new_state_variable);
             }
             return predicate_name;
         } else if (term instanceof FunctionTerm) {
             String function_name = ((FunctionTerm) term).getArguments().isEmpty() ? ((FunctionTerm) term).getFunction().getName() : ((FunctionTerm) term).getFunction().getName() + "_" + ((FunctionTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
-            if (!state_variables.containsKey(function_name)) {
+            if (!stateVariables.containsKey(function_name)) {
                 StateVariable new_state_variable = new StateVariable(function_name);
                 ((FunctionTerm) term).getFunction().getType().getInstances().stream().forEach(c -> {
                     new_state_variable.addValue(new StateVariableValue(new_state_variable, c.getName()));
                 });
-                state_variables.put(function_name, new_state_variable);
+                stateVariables.put(function_name, new_state_variable);
             }
             return function_name;
         } else {
@@ -129,9 +129,9 @@ class Grounder {
         if (term instanceof PredicateTerm) {
             String predicate_name = ground(term);
             if (((PredicateTerm) term).isDirected()) {
-                gd.addGD(state_variables.get(predicate_name).getValue("True"));
+                gd.addGD(stateVariables.get(predicate_name).getValue("True"));
             } else {
-                gd.addGD(state_variables.get(predicate_name).getValue("False"));
+                gd.addGD(stateVariables.get(predicate_name).getValue("False"));
             }
         } else if (term instanceof AndTerm) {
             ((AndTerm) term).getTerms().stream().forEach(t -> visitPreconditionTerm(action, t));
@@ -143,7 +143,7 @@ class Grounder {
             if (((EqTerm) term).isDirected()) {
                 if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm && (((EqTerm) term).getSecondTerm() instanceof ConstantTerm || ((EqTerm) term).getSecondTerm() instanceof VariableTerm)) {
                     String function_name = ground(((EqTerm) term).getFirstTerm());
-                    gd.addGD(state_variables.get(function_name).getValue(ground(((EqTerm) term).getSecondTerm())));
+                    gd.addGD(stateVariables.get(function_name).getValue(ground(((EqTerm) term).getSecondTerm())));
                 } else {
                     throw new UnsupportedOperationException(((EqTerm) term).getFirstTerm().getClass().getName() + " = " + ((EqTerm) term).getSecondTerm().getClass().getName());
                 }
@@ -159,15 +159,15 @@ class Grounder {
         if (term instanceof PredicateTerm) {
             String predicate_name = ground(term);
             if (((PredicateTerm) term).isDirected()) {
-                gd.addGD(state_variables.get(predicate_name).getValue("True"));
+                gd.addGD(stateVariables.get(predicate_name).getValue("True"));
             } else {
-                gd.addGD(state_variables.get(predicate_name).getValue("False"));
+                gd.addGD(stateVariables.get(predicate_name).getValue("False"));
             }
         } else if (term instanceof AndTerm) {
             ((AndTerm) term).getTerms().stream().forEach(t -> visitEffectTerm(action, t));
         } else if (term instanceof AssignOpTerm) {
             String function_name = ground(((AssignOpTerm) term).getFunctionTerm());
-            gd.addGD(state_variables.get(function_name).getValue(ground(((AssignOpTerm) term).getValue())));
+            gd.addGD(stateVariables.get(function_name).getValue(ground(((AssignOpTerm) term).getValue())));
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
         }

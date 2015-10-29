@@ -17,6 +17,7 @@
 package it.cnr.istc.iloc.translators.pddl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,7 +27,7 @@ import java.util.List;
 class OR implements GD {
 
     private final GD enclosingGD;
-    private final List<GD> terms = new ArrayList<>();
+    private final List<GD> gds = new ArrayList<>();
 
     OR(GD enclosingGD) {
         this.enclosingGD = enclosingGD;
@@ -39,6 +40,10 @@ class OR implements GD {
 
     @Override
     public void addGD(GD gd) {
-        terms.add(gd);
+        gds.add(gd);
+    }
+
+    public List<GD> getGDs() {
+        return Collections.unmodifiableList(gds);
     }
 }

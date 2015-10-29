@@ -14,38 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+package it.cnr.istc.iloc.translators.pddl.parser;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class StateVariable {
+public class MinusTerm implements Term {
 
-    private final String name;
-    private final Map<String, StateVariableValue> values = new HashMap<>();
+    private final Term term;
 
-    StateVariable(String name) {
-        this.name = name;
+    public MinusTerm(Term term) {
+        this.term = term;
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public Term negate() {
+        return new MinusTerm(term.negate());
     }
 
-    void addValue(StateVariableValue value) {
-        values.put(value.getName(), value);
-    }
-
-    StateVariableValue getValue(String name) {
-        return values.get(name);
-    }
-
-    Collection<StateVariableValue> getValues() {
-        return values.values();
+    @Override
+    public String toString() {
+        return "(- " + term + ")";
     }
 }

@@ -14,37 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl;
+package it.cnr.istc.iloc.translators.pddl.parser;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class StateVariableValue implements GD {
+public class ExistsTerm implements Term {
 
-    private final StateVariable stateVariable;
-    private final String name;
+    private final List<Variable> variables;
+    private final Term formula;
 
-    StateVariableValue(StateVariable state_variable, String name) {
-        this.stateVariable = state_variable;
-        this.name = name;
-    }
-
-    public StateVariable getStateVariable() {
-        return stateVariable;
-    }
-
-    public String getName() {
-        return name;
+    public ExistsTerm(Variable[] variables, Term formula) {
+        assert Stream.of(variables).noneMatch(variable -> variable == null);
+        assert formula != null;
+        this.variables = Arrays.asList(variables);
+        this.formula = formula;
     }
 
     @Override
-    public GD getEnclosingDG() {
-        throw new AssertionError();
+    public Term negate() {
+        return new ForAllTerm(variables.stream().toArray(Variable[]::new), formula.negate());
     }
 
     @Override
-    public void addGD(GD gd) {
-        throw new AssertionError();
+    public String toString() {
+        return "(exists " + variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" ")) + " " + formula + ")";
     }
 }

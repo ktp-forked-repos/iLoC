@@ -16,7 +16,9 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.STGroupFile;
 
@@ -38,13 +40,23 @@ class StateVariableRenderer implements AttributeRenderer {
     public String toString(Object o, String string, Locale locale) {
         StateVariable variable = (StateVariable) o;
         StringBuilder sb = new StringBuilder();
-        sb.append("class ").append(variable.getName()).append(" extends StateVariable {\n");
+        sb.append("class ").append(variable.getName()).append(" extends StateVariable {\n\n");
+        sb.append("    ").append(grounder.getDomain().getName()).append("Agent agent;\n\n");
+        sb.append("    ").append(variable.getName()).append("(").append(grounder.getDomain().getName()).append("Agent agent) {\n");
+        sb.append("        this.agent = agent;\n");
+        sb.append("    }\n");
         variable.getValues().stream().forEach(value -> {
             sb.append("\n");
             sb.append("    predicate ").append(value.getName()).append("() {\n");
+            List<GroundAction> actions = findActions(value);
             sb.append("    }\n");
         });
         sb.append("}\n");
         return sb.toString();
+    }
+
+    private List<GroundAction> findActions(StateVariableValue value) {
+        return grounder.getActions().stream()
+                .filter(action -> action.getEffect().getGDs().stream().filter(gd -> gd == value).findAny().isPresent()).collect(Collectors.toList());
     }
 }

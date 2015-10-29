@@ -14,38 +14,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl;
+package it.cnr.istc.iloc.translators.pddl.parser;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class StateVariable {
+public class Predicate {
 
     private final String name;
-    private final Map<String, StateVariableValue> values = new HashMap<>();
+    private final List<Variable> variables;
 
-    StateVariable(String name) {
+    public Predicate(String name, Variable... variables) {
+        assert Stream.of(variables).noneMatch(variable -> variable == null);
         this.name = name;
+        this.variables = Arrays.asList(variables);
     }
 
     public String getName() {
         return name;
     }
 
-    void addValue(StateVariableValue value) {
-        values.put(value.getName(), value);
+    public List<Variable> getVariables() {
+        return Collections.unmodifiableList(variables);
     }
 
-    StateVariableValue getValue(String name) {
-        return values.get(name);
-    }
-
-    Collection<StateVariableValue> getValues() {
-        return values.values();
+    @Override
+    public String toString() {
+        return "(" + name + " " + variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" ")) + ")";
     }
 }

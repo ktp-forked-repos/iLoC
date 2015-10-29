@@ -14,38 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+package it.cnr.istc.iloc.translators.pddl.parser;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class StateVariable {
+public class PDDLInstance {
 
-    private final String name;
-    private final Map<String, StateVariableValue> values = new HashMap<>();
+    private final Domain domain;
+    private final Problem problem;
 
-    StateVariable(String name) {
-        this.name = name;
+    public PDDLInstance(Domain domain, Problem problem) {
+        this.domain = domain;
+        this.problem = problem;
     }
 
-    public String getName() {
-        return name;
+    public Domain getDomain() {
+        return domain;
     }
 
-    void addValue(StateVariableValue value) {
-        values.put(value.getName(), value);
+    public Problem getProblem() {
+        return problem;
     }
 
-    StateVariableValue getValue(String name) {
-        return values.get(name);
-    }
-
-    Collection<StateVariableValue> getValues() {
-        return values.values();
+    @Override
+    public String toString() {
+        return domain.toString() + "\n\n" + problem.toString();
     }
 }

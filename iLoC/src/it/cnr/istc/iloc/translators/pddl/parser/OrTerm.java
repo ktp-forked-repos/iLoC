@@ -14,38 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl;
+package it.cnr.istc.iloc.translators.pddl.parser;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class StateVariable {
+public class OrTerm implements Term {
 
-    private final String name;
-    private final Map<String, StateVariableValue> values = new HashMap<>();
+    private final List<Term> terms;
 
-    StateVariable(String name) {
-        this.name = name;
+    public OrTerm(Term... terms) {
+        assert Stream.of(terms).noneMatch(term -> term == null);
+        this.terms = Arrays.asList(terms);
     }
 
-    public String getName() {
-        return name;
+    public List<Term> getTerms() {
+        return Collections.unmodifiableList(terms);
     }
 
-    void addValue(StateVariableValue value) {
-        values.put(value.getName(), value);
+    @Override
+    public Term negate() {
+        return new AndTerm(terms.stream().map(term -> term.negate()).toArray(Term[]::new));
     }
 
-    StateVariableValue getValue(String name) {
-        return values.get(name);
-    }
-
-    Collection<StateVariableValue> getValues() {
-        return values.values();
+    @Override
+    public String toString() {
+        return "(or " + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + ")";
     }
 }

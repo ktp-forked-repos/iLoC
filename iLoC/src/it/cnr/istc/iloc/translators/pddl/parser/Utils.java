@@ -16,18 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package it.cnr.istc.iloc.translators.pddl;
+package it.cnr.istc.iloc.translators.pddl.parser;
 
 import it.cnr.istc.iloc.api.Constants;
-import it.cnr.istc.iloc.translators.pddl.parser.AndTerm;
-import it.cnr.istc.iloc.translators.pddl.parser.AssignOpTerm;
-import it.cnr.istc.iloc.translators.pddl.parser.ConstantTerm;
-import it.cnr.istc.iloc.translators.pddl.parser.Function;
-import it.cnr.istc.iloc.translators.pddl.parser.FunctionTerm;
-import it.cnr.istc.iloc.translators.pddl.parser.Predicate;
-import it.cnr.istc.iloc.translators.pddl.parser.PredicateTerm;
-import it.cnr.istc.iloc.translators.pddl.parser.Term;
-import it.cnr.istc.iloc.translators.pddl.parser.VariableTerm;
 
 /**
  *
@@ -65,54 +56,6 @@ class Utils {
             c_str = "_" + c_str;
         }
         return c_str;
-    }
-
-    static boolean containsPredicate(Term term, Predicate predicate) {
-        if (term instanceof PredicateTerm) {
-            return ((PredicateTerm) term).getPredicate() == predicate;
-        } else if (term instanceof FunctionTerm) {
-            return false;
-        } else if (term instanceof AndTerm) {
-            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsPredicate(t, predicate));
-        } else if (term instanceof AssignOpTerm) {
-            return false;
-        } else if (term instanceof VariableTerm) {
-            return false;
-        } else if (term instanceof ConstantTerm) {
-            return false;
-        } else {
-            throw new UnsupportedOperationException(term.getClass().getName());
-        }
-    }
-
-    static boolean containsFunction(Term term, Function function) {
-        if (term instanceof FunctionTerm) {
-            return ((FunctionTerm) term).getFunction() == function;
-        } else if (term instanceof PredicateTerm) {
-            return false;
-        } else if (term instanceof AndTerm) {
-            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsFunction(t, function));
-        } else if (term instanceof AssignOpTerm) {
-            return containsFunction(((AssignOpTerm) term).getFunctionTerm(), function) || containsFunction(((AssignOpTerm) term).getValue(), function);
-        } else if (term instanceof VariableTerm) {
-            return false;
-        } else if (term instanceof ConstantTerm) {
-            return false;
-        } else {
-            throw new UnsupportedOperationException(term.getClass().getName());
-        }
-    }
-
-    static boolean containsStateVariable(GD gd, StateVariable sv) {
-        if (gd instanceof StateVariableValue) {
-            return ((StateVariableValue) gd).getStateVariable() == sv;
-        } else if (gd instanceof AND) {
-            return ((AND) gd).getGDs().stream().anyMatch(g -> containsStateVariable(g, sv));
-        } else if (gd instanceof OR) {
-            return ((OR) gd).getGDs().stream().allMatch(g -> containsStateVariable(g, sv));
-        } else {
-            throw new UnsupportedOperationException(gd.getClass().getName());
-        }
     }
 
     private Utils() {
