@@ -51,7 +51,7 @@ class EnvRenderer implements AttributeRenderer {
             if (effectContainsStateVariable(precondition.getAction().getEffect(), precondition.getValue().getStateVariable())) {
                 sb.append("goal ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(" = new ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append(".").append(precondition.getValue().getName()).append("(end:at);");
             } else {
-                sb.append("goal ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(" = ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append(".").append(precondition.getValue().getName()).append("();\n");
+                sb.append("goal ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(" = new ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append(".").append(precondition.getValue().getName()).append("();\n");
                 sb.append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(".start <= at - 1;\n");
                 sb.append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(".end >= at;");
             }
@@ -60,17 +60,18 @@ class EnvRenderer implements AttributeRenderer {
             Effect effect = (Effect) env;
             StringBuilder sb = new StringBuilder();
             sb.append("fact ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append("_").append(effect.getValue().getName().toLowerCase()).append(" = new ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append(".").append(effect.getValue().getName()).append("(start:at);");
+            sb.append(effect.getValue().getStateVariable().getName().toLowerCase()).append("_").append(effect.getValue().getName().toLowerCase()).append(".duration >= 1;\n");
             return sb.toString();
         } else if (env instanceof InitEl) {
             InitEl init_el = (InitEl) env;
             StringBuilder sb = new StringBuilder();
-            sb.append("fact ").append(init_el.getValue().getStateVariable().getName().toLowerCase()).append("_").append(init_el.getValue().getName().toLowerCase()).append(" = ").append(init_el.getValue().getStateVariable().getName().toLowerCase()).append(".").append(init_el.getValue().getName()).append("(start:origin);\n");
+            sb.append("fact ").append(init_el.getValue().getStateVariable().getName().toLowerCase()).append("_").append(init_el.getValue().getName().toLowerCase()).append(" = new agent.").append(init_el.getValue().getStateVariable().getName().toLowerCase()).append(".").append(init_el.getValue().getName()).append("(start:origin);\n");
             sb.append(init_el.getValue().getStateVariable().getName().toLowerCase()).append("_").append(init_el.getValue().getName().toLowerCase()).append(".duration >= 1;");
             return sb.toString();
         } else if (env instanceof Goal) {
             Goal goal = (Goal) env;
             StringBuilder sb = new StringBuilder();
-            sb.append("goal ").append(goal.getValue().getStateVariable().getName().toLowerCase()).append("_").append(goal.getValue().getName().toLowerCase()).append(" = ").append(goal.getValue().getStateVariable().getName().toLowerCase()).append(".").append(goal.getValue().getName()).append("(end:horizon);");
+            sb.append("goal ").append(goal.getValue().getStateVariable().getName().toLowerCase()).append("_").append(goal.getValue().getName().toLowerCase()).append(" = new agent.").append(goal.getValue().getStateVariable().getName().toLowerCase()).append(".").append(goal.getValue().getName()).append("(end:horizon);");
             return sb.toString();
         } else {
             throw new UnsupportedOperationException(env.getClass().getName());

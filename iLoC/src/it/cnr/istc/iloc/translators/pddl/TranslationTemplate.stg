@@ -5,6 +5,8 @@ Translation(translator) ::= <<
 
 <Agent(translator, translator.agent)>
 
+<translator.agent.name> agent = new <translator.agent.name>();
+
 <translator.init>
 
 <translator.goal>
@@ -29,6 +31,7 @@ class <state_variable.name> extends StateVariable {
 
 StateVariablePredicate(translator, value) ::= <<
 predicate <value.name>() {
+    duration >= 1;
     <value>
 \}
 >>
