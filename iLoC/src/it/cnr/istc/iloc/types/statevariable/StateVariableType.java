@@ -103,13 +103,26 @@ public class StateVariableType extends Type {
             formula.getType().getEnclosingScope().getPredicates().values().stream().flatMap(predicate -> predicate.getInstances().stream().map(f -> (IFormula) f).filter(f -> f != formula && f.getFormulaState() == FormulaState.Active)).forEach(f -> {
                 // We filter out those formulas we already know they cannot overlap..
                 if (start != f.get(Constants.END) && end != f.get(Constants.START)) {
-                    vars.add(
-                            network.or(
-                                    network.leq(f.get(Constants.END), start),
-                                    network.leq(end, f.get(Constants.START)),
-                                    network.not(formula.getScope().eq(f.getScope()))
-                            )
-                    );
+                    if (formula.getType() == f.getType()) {
+                        // Either the two formulas have the same parameters or they must be temporally ordered or they have a different scope
+                        vars.add(
+                                network.or(
+                                        network.and(formula.getType().getFields().values().stream().filter(field -> !field.isSynthetic() && !(field.getName().equals(Constants.START) || field.getName().equals(Constants.END))).map(field -> formula.get(field.getName()).eq(f.get(field.getName()))).toArray(IBool[]::new)),
+                                        network.leq(f.get(Constants.END), start),
+                                        network.leq(end, f.get(Constants.START)),
+                                        network.not(formula.getScope().eq(f.getScope()))
+                                )
+                        );
+                    } else {
+                        // Either the two formulas are temporally ordered or they have a different scope
+                        vars.add(
+                                network.or(
+                                        network.leq(f.get(Constants.END), start),
+                                        network.leq(end, f.get(Constants.START)),
+                                        network.not(formula.getScope().eq(f.getScope()))
+                                )
+                        );
+                    }
                 }
             });
 
@@ -134,11 +147,23 @@ public class StateVariableType extends Type {
                         // we have found a peak
                         List<IBool> or = new ArrayList<>(MathUtils.combinations(1, peak.formulas.length));
                         for (IFormula[] c_fs : new CombinationGenerator<>(2, peak.formulas)) {
-                            or.add(network.leq(c_fs[0].get(Constants.END), c_fs[1].get(Constants.START)));
-                            or.add(network.leq(c_fs[1].get(Constants.END), c_fs[0].get(Constants.START)));
-                            or.add(network.not(c_fs[0].getScope().eq(c_fs[1].getScope())));
+                            if (c_fs[0].getType() != c_fs[1].getType()) {
+                                // Since the predicate is different, either the two formulas are temporally ordered or they have a different scope
+                                or.add(network.leq(c_fs[0].get(Constants.END), c_fs[1].get(Constants.START)));
+                                or.add(network.leq(c_fs[1].get(Constants.END), c_fs[0].get(Constants.START)));
+                                or.add(network.not(c_fs[0].getScope().eq(c_fs[1].getScope())));
+                            } else if (!model.evaluate(network.and(c_fs[0].getType().getFields().values().stream().filter(field -> !field.isSynthetic() && !(field.getName().equals(Constants.START) || field.getName().equals(Constants.END))).map(field -> c_fs[0].get(field.getName()).eq(c_fs[1].get(field.getName()))).toArray(IBool[]::new)))) {
+                                // The predicate of the two formulas is the same but parameter assignments are different therefore..
+                                // ..either the two formulas have the same parameters or they must be temporally ordered or they have a different scope
+                                or.add(network.and(c_fs[0].getType().getFields().values().stream().filter(field -> !field.isSynthetic() && !(field.getName().equals(Constants.START) || field.getName().equals(Constants.END))).map(field -> c_fs[0].get(field.getName()).eq(c_fs[1].get(field.getName()))).toArray(IBool[]::new)));
+                                or.add(network.leq(c_fs[0].get(Constants.END), c_fs[1].get(Constants.START)));
+                                or.add(network.leq(c_fs[1].get(Constants.END), c_fs[0].get(Constants.START)));
+                                or.add(network.not(c_fs[0].getScope().eq(c_fs[1].getScope())));
+                            }
                         }
-                        constraints.add(network.or(or.toArray(new IBool[or.size()])));
+                        if (!or.isEmpty()) {
+                            constraints.add(network.or(or.toArray(new IBool[or.size()])));
+                        }
                     });
                 });
             });
