@@ -24,12 +24,12 @@ import java.util.List;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class And_ implements Env {
+class Or implements Env {
 
     private final Env enclosingGD;
     private final List<Env> envs = new ArrayList<>();
 
-    And_(Env enclosingGD) {
+    Or(Env enclosingGD) {
         this.enclosingGD = enclosingGD;
     }
 

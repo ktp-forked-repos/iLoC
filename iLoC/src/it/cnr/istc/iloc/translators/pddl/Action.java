@@ -23,8 +23,8 @@ package it.cnr.istc.iloc.translators.pddl;
 class Action {
 
     private final String name;
-    private final Env precondition = new And_(null);
-    private final Env effect = new And_(null);
+    private final Env precondition = new And(null);
+    private final Env effect = new And(null);
 
     Action(String name) {
         this.name = name;

@@ -36,12 +36,12 @@ class EnvRenderer implements AttributeRenderer {
     @Override
     public String toString(Object o, String string, Locale locale) {
         Env env = (Env) o;
-        if (env instanceof And_) {
+        if (env instanceof And) {
             ST translation = file.getInstanceOf("And");
             translation.add("and", env);
             return translation.render();
-        } else if (env instanceof Or_) {
-            assert ((Or_) env).getEnvs().size() > 1;
+        } else if (env instanceof Or) {
+            assert ((Or) env).getEnvs().size() > 1;
             ST translation = file.getInstanceOf("Or");
             translation.add("or", env);
             return translation.render();
@@ -66,8 +66,8 @@ class EnvRenderer implements AttributeRenderer {
     }
 
     private static boolean effectContainsStateVariable(Env env, StateVariable state_variable) {
-        if (env instanceof And_) {
-            return ((And_) env).getEnvs().stream().anyMatch(e -> effectContainsStateVariable(e, state_variable));
+        if (env instanceof And) {
+            return ((And) env).getEnvs().stream().anyMatch(e -> effectContainsStateVariable(e, state_variable));
         } else if (env instanceof Effect) {
             return ((Effect) env).getValue().getStateVariable() == state_variable;
         } else {

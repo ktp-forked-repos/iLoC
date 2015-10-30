@@ -23,9 +23,9 @@ package it.cnr.istc.iloc.translators.pddl;
 class DurativeAction {
 
     private final String name;
-    private final Env duration = new And_(null);
-    private final Env condition = new And_(null);
-    private final Env effect = new And_(null);
+    private final Env duration = new And(null);
+    private final Env condition = new And(null);
+    private final Env effect = new And(null);
 
     DurativeAction(String name) {
         this.name = name;
