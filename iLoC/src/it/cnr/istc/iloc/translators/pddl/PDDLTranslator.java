@@ -24,6 +24,7 @@ import it.cnr.istc.iloc.translators.pddl.parser.Domain;
 import it.cnr.istc.iloc.translators.pddl.parser.EqTerm;
 import it.cnr.istc.iloc.translators.pddl.parser.Function;
 import it.cnr.istc.iloc.translators.pddl.parser.FunctionTerm;
+import it.cnr.istc.iloc.translators.pddl.parser.NumberTerm;
 import it.cnr.istc.iloc.translators.pddl.parser.OrTerm;
 import it.cnr.istc.iloc.translators.pddl.parser.PDDLInstance;
 import it.cnr.istc.iloc.translators.pddl.parser.Parser;
@@ -107,6 +108,7 @@ public class PDDLTranslator {
     private Agent agent;
     private Set<Predicate> static_predicates;
     private Set<Function> static_functions;
+    private final Map<String, String> static_assignments = new HashMap<>();
     private final Map<String, Constant> assignments = new HashMap<>();
     private Env env;
     private And init = new And(null);
@@ -182,6 +184,14 @@ public class PDDLTranslator {
             }
         });
 
+        // we set the initial state for instantiating static predicates..
+        assignments.clear();
+        assignments.putAll(domain.getConstants());
+        assignments.putAll(problem.getObjects());
+        problem.getInitEls().forEach(init_el -> {
+            visitInitEl(init_el);
+        });
+
         domain.getActions().values().forEach(action -> {
             CartesianProductGenerator<Constant> cartesian_product = new CartesianProductGenerator<>(action.getVariables().stream().map(var -> var.getType().getInstances().toArray(new Constant[var.getType().getInstances().size()])).toArray(Constant[][]::new));
             for (Constant[] cs : cartesian_product) {
@@ -216,13 +226,6 @@ public class PDDLTranslator {
             }
         });
 
-        assignments.clear();
-        assignments.putAll(domain.getConstants());
-        assignments.putAll(problem.getObjects());
-        problem.getInitEls().forEach(init_el -> {
-            visitInitEl(init_el);
-        });
-
         visitGoal(problem.getGoal());
 
         ST translation = GROUP_FILE.getInstanceOf("Translation");
@@ -237,16 +240,27 @@ public class PDDLTranslator {
         } else if (term instanceof ConstantTerm) {
             return ((ConstantTerm) term).getConstant().getName();
         } else if (term instanceof PredicateTerm) {
+            String predicate_name = ((PredicateTerm) term).getArguments().isEmpty() ? ((PredicateTerm) term).getPredicate().getName() : ((PredicateTerm) term).getPredicate().getName() + "_" + ((PredicateTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
             if (static_predicates.contains(((PredicateTerm) term).getPredicate())) {
-                throw new UnsupportedOperationException(term.getClass().getName());
+                // We have a static predicate..
+                if (static_assignments.containsKey(predicate_name)) {
+                    // The static predicate is true in the initial state..
+                    return "True";
+                } else {
+                    // The static predicate is false in the initial state..
+                    return "False";
+                }
             } else {
-                return ((PredicateTerm) term).getArguments().isEmpty() ? ((PredicateTerm) term).getPredicate().getName() : ((PredicateTerm) term).getPredicate().getName() + "_" + ((PredicateTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
+                return predicate_name;
             }
         } else if (term instanceof FunctionTerm) {
+            String function_name = ((FunctionTerm) term).getArguments().isEmpty() ? ((FunctionTerm) term).getFunction().getName() : ((FunctionTerm) term).getFunction().getName() + "_" + ((FunctionTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
             if (static_functions.contains(((FunctionTerm) term).getFunction())) {
-                throw new UnsupportedOperationException(term.getClass().getName());
+                // We have a static function..
+                assert static_assignments.containsKey(function_name);
+                return static_assignments.get(function_name);
             } else {
-                return ((FunctionTerm) term).getArguments().isEmpty() ? ((FunctionTerm) term).getFunction().getName() : ((FunctionTerm) term).getFunction().getName() + "_" + ((FunctionTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
+                return function_name;
             }
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
@@ -256,10 +270,18 @@ public class PDDLTranslator {
     private void visitPrecondition(Action action, Term term) {
         if (term instanceof PredicateTerm) {
             String predicate_name = ground(term);
-            if (((PredicateTerm) term).isDirected()) {
-                env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("True")));
+            if (static_predicates.contains(((PredicateTerm) term).getPredicate())) {
+                if (predicate_name.equals("False")) {
+                    // We have a precondition which is never true..
+                    // We can simplify the disjunction or even remove the avtion..
+                    throw new UnsupportedOperationException("Not supported yet..");
+                }
             } else {
-                env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("False")));
+                if (((PredicateTerm) term).isDirected()) {
+                    env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("True")));
+                } else {
+                    env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("False")));
+                }
             }
         } else if (term instanceof EqTerm) {
             if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm) {
@@ -327,16 +349,38 @@ public class PDDLTranslator {
 
     private void visitInitEl(Term term) {
         if (term instanceof PredicateTerm) {
-            String predicate_name = ground(term);
-            if (((PredicateTerm) term).isDirected()) {
-                init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("True")));
+            String predicate_name = ((PredicateTerm) term).getArguments().isEmpty() ? ((PredicateTerm) term).getPredicate().getName() : ((PredicateTerm) term).getPredicate().getName() + "_" + ((PredicateTerm) term).getArguments().stream().map(a -> ((ConstantTerm) a).getConstant().getName()).collect(Collectors.joining("_"));
+            if (static_predicates.contains(((PredicateTerm) term).getPredicate())) {
+                // We are instantiating a static predicate..
+                if (((PredicateTerm) term).isDirected()) {
+                    static_assignments.put(predicate_name, "True");
+                } else {
+                    static_assignments.put(predicate_name, "False");
+                }
             } else {
-                init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("False")));
+                if (((PredicateTerm) term).isDirected()) {
+                    init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("True")));
+                } else {
+                    init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("False")));
+                }
             }
         } else if (term instanceof EqTerm) {
             if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm) {
-                String function_name = ground(((EqTerm) term).getFirstTerm());
-                init.addEnv(new InitEl(agent.getStateVariable(function_name).getValue(ground(((EqTerm) term).getSecondTerm()))));
+                String function_name = ((FunctionTerm) term).getArguments().isEmpty() ? ((FunctionTerm) term).getFunction().getName() : ((FunctionTerm) term).getFunction().getName() + "_" + ((FunctionTerm) term).getArguments().stream().map(a -> ((ConstantTerm) a).getConstant().getName()).collect(Collectors.joining("_"));
+                if (static_functions.contains(((FunctionTerm) ((EqTerm) term).getFirstTerm()).getFunction())) {
+                    // We are instantiating a static function..
+                    if (((EqTerm) term).getSecondTerm() instanceof ConstantTerm) {
+                        static_assignments.put(function_name, ((ConstantTerm) ((EqTerm) term).getSecondTerm()).getConstant().getName());
+                    } else {
+                        static_assignments.put(function_name, ((NumberTerm) ((EqTerm) term).getSecondTerm()).getValue().toString());
+                    }
+                } else {
+                    if (((EqTerm) term).getSecondTerm() instanceof ConstantTerm) {
+                        init.addEnv(new InitEl(agent.getStateVariable(function_name).getValue(((ConstantTerm) ((EqTerm) term).getSecondTerm()).getConstant().getName())));
+                    } else {
+                        init.addEnv(new InitEl(agent.getStateVariable(function_name).getValue(((NumberTerm) ((EqTerm) term).getSecondTerm()).getValue().toString())));
+                    }
+                }
             } else {
                 throw new UnsupportedOperationException(term.getClass().getName());
             }

@@ -44,7 +44,9 @@ class TypedListVariableListener extends PDDLBaseListener {
             type = ctx.type().primitive_type(0).name() == null ? Type.OBJECT : domain.getType(Utils.capitalize(ctx.type().primitive_type(0).name().getText()));
         } else {
             type = new EitherType(ctx.type().primitive_type().stream().map(primitive_type -> primitive_type.name() == null ? Type.OBJECT : domain.getType(Utils.capitalize(primitive_type.name().getText()))).collect(Collectors.toList()));
-            domain.addType(type);
+            if (!domain.getTypes().containsKey(type.getName())) {
+                domain.addType(type);
+            }
         }
 
         assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText();

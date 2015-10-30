@@ -121,14 +121,7 @@ public class Domain {
         StringBuilder sb = new StringBuilder();
         sb.append("(define (domain ").append(name).append(")\n");
 
-        sb.append("(:types ");
-        types.values().stream().forEach(type -> {
-            sb.append(type.getName());
-            if (type.getSuperclass() != null) {
-                sb.append(" - ").append(type.getSuperclass().getName());
-            }
-        });
-        sb.append(")\n");
+        sb.append("(:types ").append(types.values().stream().map(type -> type.getName() + (type.getSuperclass() != null ? " - " + type.getSuperclass().getName() : "")).collect(Collectors.joining(" "))).append(")\n");
 
         if (!constants.isEmpty()) {
             sb.append("(:constants ").append(constants.values().stream().map(constant -> constant.getName() + " " + constant.getType().getName()).collect(Collectors.joining(" "))).append(")\n");

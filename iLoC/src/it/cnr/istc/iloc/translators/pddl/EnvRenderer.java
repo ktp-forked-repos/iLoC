@@ -59,8 +59,8 @@ class EnvRenderer implements AttributeRenderer {
         } else if (env instanceof Effect) {
             Effect effect = (Effect) env;
             StringBuilder sb = new StringBuilder();
-            sb.append("fact ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append("_").append(effect.getValue().getName().toLowerCase()).append(" = new ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append(".").append(effect.getValue().getName()).append("(start:at);");
-            sb.append(effect.getValue().getStateVariable().getName().toLowerCase()).append("_").append(effect.getValue().getName().toLowerCase()).append(".duration >= 1;\n");
+            sb.append("fact ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append("_").append(effect.getValue().getName().toLowerCase()).append(" = new ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append(".").append(effect.getValue().getName()).append("(start:at);\n");
+            sb.append(effect.getValue().getStateVariable().getName().toLowerCase()).append("_").append(effect.getValue().getName().toLowerCase()).append(".duration >= 1;");
             return sb.toString();
         } else if (env instanceof InitEl) {
             InitEl init_el = (InitEl) env;

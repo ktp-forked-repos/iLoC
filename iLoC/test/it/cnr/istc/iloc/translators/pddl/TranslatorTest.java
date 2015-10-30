@@ -52,4 +52,28 @@ public class TranslatorTest {
             Assert.fail(ex.getMessage());
         }
     }
+
+    /**
+     * Test of blocks world domain.
+     */
+    @Test
+    public void testLogisticsWorldTranslator() {
+        try {
+            String translation = PDDLTranslator.translate(new File(TranslatorTest.class.getResource("logistics-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics-problem.pddl").getPath()));
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    /**
+     * Test of new blocks world domain.
+     */
+    @Test
+    public void testNewLogisticsWorldTranslator() {
+        try {
+            String translation = PDDLTranslator.translate(new File(TranslatorTest.class.getResource("logistics-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics-problem-new.pddl").getPath()));
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
 }

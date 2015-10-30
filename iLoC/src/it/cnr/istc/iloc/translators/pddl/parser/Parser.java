@@ -65,7 +65,21 @@ public class Parser {
 
         if (domain_context.types_def() != null) {
             /**
-             * We define all the types of the domain.
+             * We define all the types of the domain..
+             */
+            WALKER.walk(new PDDLBaseListener() {
+
+                @Override
+                public void enterTyped_list_name(PDDLParser.Typed_list_nameContext ctx) {
+                    ctx.name().stream().forEach(type_name -> {
+                        Type type = new Type(Utils.capitalize(type_name.getText()));
+                        domain.addType(type);
+                    });
+                }
+            }, domain_context.types_def());
+
+            /**
+             * We set the superclasses (i.e., we manage type inheritance)..
              */
             WALKER.walk(new PDDLBaseListener() {
 
@@ -76,17 +90,12 @@ public class Parser {
                         c_superclass = Type.OBJECT;
                     } else if (ctx.type().primitive_type().size() == 1) {
                         c_superclass = ctx.type().primitive_type(0).name() == null ? Type.OBJECT : domain.getType(Utils.capitalize(ctx.type().primitive_type(0).name().getText()));
-                        if (c_superclass == null) {
-                            c_superclass = new Type(Utils.capitalize(ctx.type().primitive_type(0).name().getText()));
-                            domain.addType(c_superclass);
-                        }
                     } else {
-                        c_superclass = new EitherType(ctx.type().primitive_type().stream().map(primitive_type -> primitive_type.name() == null ? Type.OBJECT : domain.getType(Utils.capitalize(primitive_type.name().getText()))).collect(Collectors.toList()));
-                        domain.addType(c_superclass);
+                        throw new AssertionError("multiple inheritance..");
                     }
                     final Type superclass = c_superclass;
                     ctx.name().stream().forEach(type_name -> {
-                        Type type = new Type(Utils.capitalize(type_name.getText()));
+                        Type type = domain.getType(Utils.capitalize(type_name.getText()));
                         type.setSuperclass(superclass);
                         domain.addType(type);
                     });
@@ -109,7 +118,9 @@ public class Parser {
                         type = ctx.type().primitive_type(0).name() == null ? Type.OBJECT : domain.getType(Utils.capitalize(ctx.type().primitive_type(0).name().getText()));
                     } else {
                         type = new EitherType(ctx.type().primitive_type().stream().map(primitive_type -> primitive_type.name() == null ? Type.OBJECT : domain.getType(Utils.capitalize(primitive_type.name().getText()))).collect(Collectors.toList()));
-                        domain.addType(type);
+                        if (!domain.getTypes().containsKey(type.getName())) {
+                            domain.addType(type);
+                        }
                     }
 
                     assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText();
