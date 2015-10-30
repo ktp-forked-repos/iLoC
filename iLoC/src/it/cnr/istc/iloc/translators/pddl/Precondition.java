@@ -22,10 +22,16 @@ package it.cnr.istc.iloc.translators.pddl;
  */
 class Precondition implements Env {
 
+    private final Action action;
     private final StateVariableValue value;
 
-    Precondition(StateVariableValue value) {
+    Precondition(Action action, StateVariableValue value) {
+        this.action = action;
         this.value = value;
+    }
+
+    public Action getAction() {
+        return action;
     }
 
     public StateVariableValue getValue() {

@@ -22,10 +22,16 @@ package it.cnr.istc.iloc.translators.pddl;
  */
 class Effect implements Env {
 
+    private final Action action;
     private final StateVariableValue value;
 
-    Effect(StateVariableValue value) {
+    Effect(Action action, StateVariableValue value) {
+        this.action = action;
         this.value = value;
+    }
+
+    public Action getAction() {
+        return action;
     }
 
     public StateVariableValue getValue() {

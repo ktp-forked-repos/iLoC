@@ -29,7 +29,8 @@ class StateVariableValue {
     private final StateVariable stateVariable;
     private final String name;
     private final Collection<Action> actions = new ArrayList<>();
-    private final Collection<DurativeAction> durativeActions = new ArrayList<>();
+    private final Collection<DurativeAction> atStartdurativeActions = new ArrayList<>();
+    private final Collection<DurativeAction> atEnddurativeActions = new ArrayList<>();
 
     StateVariableValue(StateVariable state_variable, String name) {
         this.stateVariable = state_variable;
@@ -52,11 +53,19 @@ class StateVariableValue {
         return Collections.unmodifiableCollection(actions);
     }
 
-    public void addDurativeAction(DurativeAction action) {
-        durativeActions.add(action);
+    public void addAtStartDurativeAction(DurativeAction action) {
+        atStartdurativeActions.add(action);
     }
 
-    public Collection<DurativeAction> getDurativeActions() {
-        return Collections.unmodifiableCollection(durativeActions);
+    public Collection<DurativeAction> getAtStartDurativeActions() {
+        return Collections.unmodifiableCollection(atStartdurativeActions);
+    }
+
+    public void addAtEndDurativeAction(DurativeAction action) {
+        atEnddurativeActions.add(action);
+    }
+
+    public Collection<DurativeAction> getAtEndDurativeActions() {
+        return Collections.unmodifiableCollection(atEnddurativeActions);
     }
 }

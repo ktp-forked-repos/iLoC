@@ -36,18 +36,42 @@ class EnvRenderer implements AttributeRenderer {
     @Override
     public String toString(Object o, String string, Locale locale) {
         Env env = (Env) o;
-        if (env instanceof AND) {
+        if (env instanceof And) {
             ST translation = file.getInstanceOf("And");
             translation.add("and", env);
             return translation.render();
-        } else if (env instanceof OR) {
-            assert ((OR) env).getEnvs().size() > 1;
+        } else if (env instanceof Or) {
+            assert ((Or) env).getEnvs().size() > 1;
             ST translation = file.getInstanceOf("Or");
             translation.add("or", env);
             return translation.render();
         } else if (env instanceof Precondition) {
-            throw new UnsupportedOperationException(env.getClass().getName());
+            Precondition precondition = (Precondition) env;
+            StringBuilder sb = new StringBuilder();
+            if (effectContainsStateVariable(precondition.getAction().getEffect(), precondition.getValue().getStateVariable())) {
+                sb.append("goal ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(" = new ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append(".").append(precondition.getValue().getName()).append("(end:at);");
+            } else {
+                sb.append("goal ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(" = ").append(precondition.getValue().getStateVariable().getName().toLowerCase()).append(".").append(precondition.getValue().getName()).append("();\n");
+                sb.append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(".start <= at - 1;\n");
+                sb.append(precondition.getValue().getStateVariable().getName().toLowerCase()).append("_").append(precondition.getValue().getName().toLowerCase()).append(".end >= at;");
+            }
+            return sb.toString();
+        } else if (env instanceof Effect) {
+            Effect effect = (Effect) env;
+            StringBuilder sb = new StringBuilder();
+            sb.append("fact ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append("_").append(effect.getValue().getName().toLowerCase()).append(" = new ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append(".").append(effect.getValue().getName()).append("(start:at);");
+            return sb.toString();
         }
         return env.toString();
+    }
+
+    private static boolean effectContainsStateVariable(Env env, StateVariable state_variable) {
+        if (env instanceof And) {
+            return ((And) env).getEnvs().stream().anyMatch(e -> effectContainsStateVariable(e, state_variable));
+        } else if (env instanceof Effect) {
+            return ((Effect) env).getValue().getStateVariable() == state_variable;
+        } else {
+            throw new UnsupportedOperationException(env.getClass().getName());
+        }
     }
 }

@@ -55,6 +55,7 @@ public class PDDLTranslator {
     static {
         GROUP_FILE.registerRenderer(String.class, new StringRenderer());
         GROUP_FILE.registerRenderer(Env.class, new EnvRenderer(GROUP_FILE));
+        GROUP_FILE.registerRenderer(StateVariableValue.class, new StateVariableValueRenderer(GROUP_FILE));
     }
     private final Domain domain;
     private final Problem problem;
@@ -142,7 +143,7 @@ public class PDDLTranslator {
                 Action a = new Action(action.getName() + "_" + Stream.of(cs).map(c -> c.getName()).collect(Collectors.joining("_")));
                 agent.addAction(a);
                 env = a.getPrecondition();
-                visitPrecondition(action, action.getPrecondition());
+                visitPrecondition(a, action.getPrecondition());
                 env = a.getEffect();
                 visitEffect(a, action.getEffect());
             }
@@ -177,8 +178,14 @@ public class PDDLTranslator {
             return assignments.get(((VariableTerm) term).getVariable().getName()).getName();
         } else if (term instanceof ConstantTerm) {
             return ((ConstantTerm) term).getConstant().getName();
+        } else if (term instanceof PredicateTerm) {
+            if (static_predicates.contains(((PredicateTerm) term).getPredicate())) {
+                throw new UnsupportedOperationException(term.getClass().getName());
+            } else {
+                return ((PredicateTerm) term).getArguments().isEmpty() ? ((PredicateTerm) term).getPredicate().getName() : ((PredicateTerm) term).getPredicate().getName() + "_" + ((PredicateTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
+            }
         } else if (term instanceof FunctionTerm) {
-            if (static_functions.contains(((FunctionTerm) term))) {
+            if (static_functions.contains(((FunctionTerm) term).getFunction())) {
                 throw new UnsupportedOperationException(term.getClass().getName());
             } else {
                 return ((FunctionTerm) term).getArguments().isEmpty() ? ((FunctionTerm) term).getFunction().getName() : ((FunctionTerm) term).getFunction().getName() + "_" + ((FunctionTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
@@ -188,29 +195,29 @@ public class PDDLTranslator {
         }
     }
 
-    private void visitPrecondition(it.cnr.istc.iloc.translators.pddl.parser.Action action, Term term) {
+    private void visitPrecondition(Action action, Term term) {
         if (term instanceof PredicateTerm) {
-            String predicate_name = ((PredicateTerm) term).getArguments().isEmpty() ? ((PredicateTerm) term).getPredicate().getName() : ((PredicateTerm) term).getPredicate().getName() + "_" + ((PredicateTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
+            String predicate_name = ground(term);
             if (((PredicateTerm) term).isDirected()) {
-                env.addEnv(new Precondition(agent.getStateVariable(predicate_name).getValue("True")));
+                env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("True")));
             } else {
-                env.addEnv(new Precondition(agent.getStateVariable(predicate_name).getValue("False")));
+                env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("False")));
             }
         } else if (term instanceof EqTerm) {
             if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm) {
                 String function_name = ground(((EqTerm) term).getFirstTerm());
-                env.addEnv(new Precondition(agent.getStateVariable(function_name).getValue(ground(((EqTerm) term).getSecondTerm()))));
+                env.addEnv(new Precondition(action, agent.getStateVariable(function_name).getValue(ground(((EqTerm) term).getSecondTerm()))));
             } else {
                 throw new UnsupportedOperationException(term.getClass().getName());
             }
         } else if (term instanceof AndTerm) {
-            AND and = new AND(env);
+            And and = new And(env);
             env.addEnv(and);
             env = and;
             ((AndTerm) term).getTerms().stream().forEach(t -> visitPrecondition(action, t));
             env = and.getEnclosingEnv();
         } else if (term instanceof OrTerm) {
-            OR or = new OR(env);
+            Or or = new Or(env);
             env.addEnv(or);
             env = or;
             ((OrTerm) term).getTerms().stream().forEach(t -> visitPrecondition(action, t));
@@ -222,17 +229,23 @@ public class PDDLTranslator {
 
     private void visitEffect(Action action, Term term) {
         if (term instanceof PredicateTerm) {
-            String predicate_name = ((PredicateTerm) term).getArguments().isEmpty() ? ((PredicateTerm) term).getPredicate().getName() : ((PredicateTerm) term).getPredicate().getName() + "_" + ((PredicateTerm) term).getArguments().stream().map(a -> ground(a)).collect(Collectors.joining("_"));
+            String predicate_name = ground(term);
             if (((PredicateTerm) term).isDirected()) {
-                env.addEnv(new Effect(agent.getStateVariable(predicate_name).getValue("True")));
+                StateVariableValue value = agent.getStateVariable(predicate_name).getValue("True");
+                value.addAction(action);
+                env.addEnv(new Effect(action, value));
             } else {
-                env.addEnv(new Effect(agent.getStateVariable(predicate_name).getValue("False")));
+                StateVariableValue value = agent.getStateVariable(predicate_name).getValue("False");
+                value.addAction(action);
+                env.addEnv(new Effect(action, value));
             }
         } else if (term instanceof AssignOpTerm) {
             String function_name = ground(((AssignOpTerm) term).getFunctionTerm());
-            env.addEnv(new Effect(agent.getStateVariable(function_name).getValue(ground(((AssignOpTerm) term).getValue()))));
+            StateVariableValue value = agent.getStateVariable(function_name).getValue(ground(((AssignOpTerm) term).getValue()));
+            value.addAction(action);
+            env.addEnv(new Effect(action, value));
         } else if (term instanceof AndTerm) {
-            AND and = new AND(env);
+            And and = new And(env);
             env.addEnv(and);
             env = and;
             ((AndTerm) term).getTerms().stream().forEach(t -> visitEffect(action, t));
