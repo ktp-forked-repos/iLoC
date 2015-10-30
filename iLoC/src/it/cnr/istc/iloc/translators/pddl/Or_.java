@@ -16,29 +16,34 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class Action {
+class Or_ implements Env {
 
-    private final String name;
-    private final Env precondition = new And_(null);
-    private final Env effect = new And_(null);
+    private final Env enclosingGD;
+    private final List<Env> envs = new ArrayList<>();
 
-    Action(String name) {
-        this.name = name;
+    Or_(Env enclosingGD) {
+        this.enclosingGD = enclosingGD;
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public Env getEnclosingEnv() {
+        return enclosingGD;
     }
 
-    public Env getPrecondition() {
-        return precondition;
+    @Override
+    public void addEnv(Env gd) {
+        envs.add(gd);
     }
 
-    public Env getEffect() {
-        return effect;
+    public List<Env> getEnvs() {
+        return Collections.unmodifiableList(envs);
     }
 }

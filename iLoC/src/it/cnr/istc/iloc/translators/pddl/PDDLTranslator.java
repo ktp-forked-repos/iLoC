@@ -211,13 +211,13 @@ public class PDDLTranslator {
                 throw new UnsupportedOperationException(term.getClass().getName());
             }
         } else if (term instanceof AndTerm) {
-            And and = new And(env);
+            And_ and = new And_(env);
             env.addEnv(and);
             env = and;
             ((AndTerm) term).getTerms().stream().forEach(t -> visitPrecondition(action, t));
             env = and.getEnclosingEnv();
         } else if (term instanceof OrTerm) {
-            Or or = new Or(env);
+            Or_ or = new Or_(env);
             env.addEnv(or);
             env = or;
             ((OrTerm) term).getTerms().stream().forEach(t -> visitPrecondition(action, t));
@@ -245,7 +245,7 @@ public class PDDLTranslator {
             value.addAction(action);
             env.addEnv(new Effect(action, value));
         } else if (term instanceof AndTerm) {
-            And and = new And(env);
+            And_ and = new And_(env);
             env.addEnv(and);
             env = and;
             ((AndTerm) term).getTerms().stream().forEach(t -> visitEffect(action, t));
