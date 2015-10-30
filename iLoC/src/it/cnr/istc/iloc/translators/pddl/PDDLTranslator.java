@@ -57,6 +57,51 @@ public class PDDLTranslator {
         GROUP_FILE.registerRenderer(Env.class, new EnvRenderer(GROUP_FILE));
         GROUP_FILE.registerRenderer(StateVariableValue.class, new StateVariableValueRenderer(GROUP_FILE));
     }
+
+    public static String translate(Domain domain, Problem problem) {
+        return new PDDLTranslator(domain, problem).translate();
+    }
+
+    public static String translate(File pddl_domain, File pddl_problem) throws IOException {
+        PDDLInstance instance = Parser.parse(pddl_domain, pddl_problem);
+        return new PDDLTranslator(instance.getDomain(), instance.getProblem()).translate();
+    }
+
+    static boolean containsPredicate(Term term, Predicate predicate) {
+        if (term instanceof PredicateTerm) {
+            return ((PredicateTerm) term).getPredicate() == predicate;
+        } else if (term instanceof FunctionTerm) {
+            return false;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsPredicate(t, predicate));
+        } else if (term instanceof AssignOpTerm) {
+            return false;
+        } else if (term instanceof VariableTerm) {
+            return false;
+        } else if (term instanceof ConstantTerm) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
+    }
+
+    static boolean containsFunction(Term term, Function function) {
+        if (term instanceof PredicateTerm) {
+            return false;
+        } else if (term instanceof FunctionTerm) {
+            return ((FunctionTerm) term).getFunction() == function;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsFunction(t, function));
+        } else if (term instanceof AssignOpTerm) {
+            return containsFunction(((AssignOpTerm) term).getFunctionTerm(), function) || containsFunction(((AssignOpTerm) term).getValue(), function);
+        } else if (term instanceof VariableTerm) {
+            return false;
+        } else if (term instanceof ConstantTerm) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
+    }
     private final Domain domain;
     private final Problem problem;
     private Agent agent;
@@ -64,16 +109,12 @@ public class PDDLTranslator {
     private Set<Function> static_functions;
     private final Map<String, Constant> assignments = new HashMap<>();
     private Env env;
+    private And init = new And(null);
+    private Env goal = new And(null);
 
-    public PDDLTranslator(Domain domain, Problem problem) {
+    private PDDLTranslator(Domain domain, Problem problem) {
         this.domain = domain;
         this.problem = problem;
-    }
-
-    public PDDLTranslator(File pddl_domain, File pddl_problem) throws IOException {
-        PDDLInstance instance = Parser.parse(pddl_domain, pddl_problem);
-        this.domain = instance.getDomain();
-        this.problem = instance.getProblem();
     }
 
     public Domain getDomain() {
@@ -86,6 +127,14 @@ public class PDDLTranslator {
 
     public Agent getAgent() {
         return agent;
+    }
+
+    public And getInit() {
+        return init;
+    }
+
+    public Env getGoal() {
+        return goal;
     }
 
     public String translate() {
@@ -166,6 +215,15 @@ public class PDDLTranslator {
                 visitEffect(da, action.getEffect());
             }
         });
+
+        assignments.clear();
+        assignments.putAll(domain.getConstants());
+        assignments.putAll(problem.getObjects());
+        problem.getInitEls().forEach(init_el -> {
+            visitInitEl(init_el);
+        });
+
+        visitGoal(problem.getGoal());
 
         ST translation = GROUP_FILE.getInstanceOf("Translation");
         translation.add("translator", this);
@@ -267,37 +325,53 @@ public class PDDLTranslator {
         throw new UnsupportedOperationException("Not supported yet..");
     }
 
-    static boolean containsPredicate(Term term, Predicate predicate) {
+    private void visitInitEl(Term term) {
         if (term instanceof PredicateTerm) {
-            return ((PredicateTerm) term).getPredicate() == predicate;
-        } else if (term instanceof FunctionTerm) {
-            return false;
-        } else if (term instanceof AndTerm) {
-            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsPredicate(t, predicate));
-        } else if (term instanceof AssignOpTerm) {
-            return false;
-        } else if (term instanceof VariableTerm) {
-            return false;
-        } else if (term instanceof ConstantTerm) {
-            return false;
+            String predicate_name = ground(term);
+            if (((PredicateTerm) term).isDirected()) {
+                init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("True")));
+            } else {
+                init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("False")));
+            }
+        } else if (term instanceof EqTerm) {
+            if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm) {
+                String function_name = ground(((EqTerm) term).getFirstTerm());
+                init.addEnv(new InitEl(agent.getStateVariable(function_name).getValue(ground(((EqTerm) term).getSecondTerm()))));
+            } else {
+                throw new UnsupportedOperationException(term.getClass().getName());
+            }
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
         }
     }
 
-    static boolean containsFunction(Term term, Function function) {
+    private void visitGoal(Term term) {
         if (term instanceof PredicateTerm) {
-            return false;
-        } else if (term instanceof FunctionTerm) {
-            return ((FunctionTerm) term).getFunction() == function;
+            String predicate_name = ground(term);
+            if (((PredicateTerm) term).isDirected()) {
+                goal.addEnv(new Goal(agent.getStateVariable(predicate_name).getValue("True")));
+            } else {
+                goal.addEnv(new Goal(agent.getStateVariable(predicate_name).getValue("False")));
+            }
+        } else if (term instanceof EqTerm) {
+            if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm) {
+                String function_name = ground(((EqTerm) term).getFirstTerm());
+                goal.addEnv(new Goal(agent.getStateVariable(function_name).getValue(ground(((EqTerm) term).getSecondTerm()))));
+            } else {
+                throw new UnsupportedOperationException(term.getClass().getName());
+            }
         } else if (term instanceof AndTerm) {
-            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsFunction(t, function));
-        } else if (term instanceof AssignOpTerm) {
-            return containsFunction(((AssignOpTerm) term).getFunctionTerm(), function) || containsFunction(((AssignOpTerm) term).getValue(), function);
-        } else if (term instanceof VariableTerm) {
-            return false;
-        } else if (term instanceof ConstantTerm) {
-            return false;
+            And and = new And(goal);
+            goal.addEnv(and);
+            goal = and;
+            ((AndTerm) term).getTerms().stream().forEach(t -> visitGoal(t));
+            goal = and.getEnclosingEnv();
+        } else if (term instanceof OrTerm) {
+            Or or = new Or(goal);
+            goal.addEnv(or);
+            goal = or;
+            ((OrTerm) term).getTerms().stream().forEach(t -> visitGoal(t));
+            goal = goal.getEnclosingEnv();
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
         }

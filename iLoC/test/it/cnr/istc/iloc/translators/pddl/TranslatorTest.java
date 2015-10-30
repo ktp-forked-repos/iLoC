@@ -35,8 +35,7 @@ public class TranslatorTest {
     @Test
     public void testBlocksWorldTranslator() {
         try {
-            PDDLTranslator translator = new PDDLTranslator(new File(TranslatorTest.class.getResource("blocks-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks-problem.pddl").getPath()));
-            String translation = translator.translate();
+            String translation = PDDLTranslator.translate(new File(TranslatorTest.class.getResource("blocks-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks-problem.pddl").getPath()));
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -48,8 +47,7 @@ public class TranslatorTest {
     @Test
     public void testNewBlocksWorldTranslator() {
         try {
-            PDDLTranslator translator = new PDDLTranslator(new File(TranslatorTest.class.getResource("blocks-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks-problem-new.pddl").getPath()));
-            String translation = translator.translate();
+            String translation = PDDLTranslator.translate(new File(TranslatorTest.class.getResource("blocks-domain-new.pddl").getPath()), new File(TranslatorTest.class.getResource("blocks-problem-new.pddl").getPath()));
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }

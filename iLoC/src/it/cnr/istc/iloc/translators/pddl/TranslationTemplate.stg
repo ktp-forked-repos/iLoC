@@ -4,6 +4,10 @@ Translation(translator) ::= <<
 <StateVariable(translator, state_variable)>}; separator="\n">
 
 <Agent(translator, translator.agent)>
+
+<translator.init>
+
+<translator.goal>
 >>
 
 

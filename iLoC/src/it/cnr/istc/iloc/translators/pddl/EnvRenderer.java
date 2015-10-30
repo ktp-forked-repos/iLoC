@@ -61,8 +61,20 @@ class EnvRenderer implements AttributeRenderer {
             StringBuilder sb = new StringBuilder();
             sb.append("fact ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append("_").append(effect.getValue().getName().toLowerCase()).append(" = new ").append(effect.getValue().getStateVariable().getName().toLowerCase()).append(".").append(effect.getValue().getName()).append("(start:at);");
             return sb.toString();
+        } else if (env instanceof InitEl) {
+            InitEl init_el = (InitEl) env;
+            StringBuilder sb = new StringBuilder();
+            sb.append("fact ").append(init_el.getValue().getStateVariable().getName().toLowerCase()).append("_").append(init_el.getValue().getName().toLowerCase()).append(" = ").append(init_el.getValue().getStateVariable().getName().toLowerCase()).append(".").append(init_el.getValue().getName()).append("(start:origin);\n");
+            sb.append(init_el.getValue().getStateVariable().getName().toLowerCase()).append("_").append(init_el.getValue().getName().toLowerCase()).append(".duration >= 1;");
+            return sb.toString();
+        } else if (env instanceof Goal) {
+            Goal goal = (Goal) env;
+            StringBuilder sb = new StringBuilder();
+            sb.append("goal ").append(goal.getValue().getStateVariable().getName().toLowerCase()).append("_").append(goal.getValue().getName().toLowerCase()).append(" = ").append(goal.getValue().getStateVariable().getName().toLowerCase()).append(".").append(goal.getValue().getName()).append("(end:horizon);");
+            return sb.toString();
+        } else {
+            throw new UnsupportedOperationException(env.getClass().getName());
         }
-        return env.toString();
     }
 
     private static boolean effectContainsStateVariable(Env env, StateVariable state_variable) {
