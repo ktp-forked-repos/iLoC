@@ -20,8 +20,11 @@ import it.cnr.istc.iloc.utils.CombinationGenerator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -127,17 +130,35 @@ public class Domain {
         return functions.values().stream().filter(function -> actions.values().stream().noneMatch(action -> containsFunction(action.getEffect(), function)) && durative_actions.values().stream().noneMatch(action -> containsFunction(action.getEffect(), function))).collect(Collectors.toSet());
     }
 
-    public Collection<Mutex> getMutexes() {
-        Collection<Mutex> mutexes = new ArrayList<>();
-        // We compute the initial candidates..
+    public Collection<Invariant> getInvariants() {
+        Collection<Invariant> accepted_invariants = new ArrayList<>();
+        Collection<Invariant> c_invariants = new ArrayList<>();
+
+        // We compute the initial invariant candidates..
         predicates.values().forEach(predicate -> {
-            for (int i = 1; i < predicate.getVariables().size(); i++) {
+            for (int i = 1; i <= predicate.getVariables().size(); i++) {
                 for (Variable[] vs : new CombinationGenerator<>(i, predicate.getVariables().stream().toArray(Variable[]::new))) {
-                    mutexes.add(new Mutex(vs, new Predicate[]{predicate}));
+                    c_invariants.add(new Invariant(vs, new Predicate[]{predicate}, new HashMap<>()));
                 }
             }
         });
-        return mutexes;
+
+        // We check for threats..
+        // We remove too heavy candidates..
+        c_invariants.removeIf(mutex -> actions.values().stream().anyMatch(action -> countAddPredicates(action.getEffect(), new HashSet<>(mutex.getPredicates())) > 1));
+        c_invariants.forEach(mutex -> {
+            HashSet<Predicate> ps = new HashSet<>(mutex.getPredicates());
+            actions.values().forEach(action -> {
+                if (countAddPredicates(action.getEffect(), ps) == countDelPredicates(action.getEffect(), ps)) {
+                    // The invariant candidate is an actual invariant..
+                    accepted_invariants.add(mutex);
+                } else {
+                    // We have found an invariant candidate which is threatened..
+                    System.out.println("wait..");
+                }
+            });
+        });
+        return c_invariants;
     }
 
     @Override
@@ -202,6 +223,42 @@ public class Domain {
             return false;
         } else if (term instanceof ConstantTerm) {
             return false;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
+    }
+
+    static int countAddPredicates(Term term, Set<Predicate> predicates) {
+        if (term instanceof PredicateTerm) {
+            return predicates.contains(((PredicateTerm) term).getPredicate()) && ((PredicateTerm) term).isDirected() ? 1 : 0;
+        } else if (term instanceof FunctionTerm) {
+            return 0;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().mapToInt(t -> countAddPredicates(t, predicates)).sum();
+        } else if (term instanceof AssignOpTerm) {
+            return 0;
+        } else if (term instanceof VariableTerm) {
+            return 0;
+        } else if (term instanceof ConstantTerm) {
+            return 0;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
+    }
+
+    static int countDelPredicates(Term term, Set<Predicate> predicates) {
+        if (term instanceof PredicateTerm) {
+            return predicates.contains(((PredicateTerm) term).getPredicate()) && !((PredicateTerm) term).isDirected() ? 1 : 0;
+        } else if (term instanceof FunctionTerm) {
+            return 0;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().mapToInt(t -> countAddPredicates(t, predicates)).sum();
+        } else if (term instanceof AssignOpTerm) {
+            return 0;
+        } else if (term instanceof VariableTerm) {
+            return 0;
+        } else if (term instanceof ConstantTerm) {
+            return 0;
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
         }

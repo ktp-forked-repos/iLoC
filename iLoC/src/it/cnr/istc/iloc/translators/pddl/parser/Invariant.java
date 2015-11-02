@@ -17,23 +17,41 @@
 package it.cnr.istc.iloc.translators.pddl.parser;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class Mutex {
+public class Invariant {
 
     private final List<Variable> variables;
     private final List<Predicate> predicates;
+    private final Map<String, String> assignments;
 
-    public Mutex(Variable[] variables, Predicate[] predicates) {
+    public Invariant(Variable[] variables, Predicate[] predicates, Map<String, String> assignments) {
         assert Stream.of(variables).noneMatch(Objects::isNull);
         assert Stream.of(predicates).noneMatch(Objects::isNull);
         this.variables = Arrays.asList(variables);
         this.predicates = Arrays.asList(predicates);
+        this.assignments = assignments;
+    }
+
+    public List<Variable> getVariables() {
+        return Collections.unmodifiableList(variables);
+    }
+
+    public List<Predicate> getPredicates() {
+        return Collections.unmodifiableList(predicates);
+    }
+
+    @Override
+    public String toString() {
+        return "∀" + variables.stream().map(v -> v.getName()).collect(Collectors.joining(", ")) + " " + predicates.stream().map(p -> p.toString()).collect(Collectors.joining(" + ")) + "↓";
     }
 }
