@@ -22,7 +22,39 @@ package it.cnr.istc.iloc.translators.pddl;
  */
 interface Env {
 
+    /**
+     * Returns the enclosing environment of this environment.
+     *
+     * @return the enclosing environment of this environment.
+     */
     Env getEnclosingEnv();
 
+    /**
+     * Adds an environment to this environment. This method is typically used
+     * for adding environments to conjunctions and disjunctions.
+     *
+     * @param env the environment to add to this environment.
+     */
     void addEnv(Env env);
+
+    /**
+     * Checks whether this environment is consistent or not.
+     *
+     * @return {@code true} if this environment is consistent.
+     */
+    boolean isConsistent();
+
+    /**
+     * Sets the consistency of this environment. This methid is typically called
+     * when a static predicate is found.
+     *
+     * @param consistent the consistency of the environment.
+     */
+    void setConsistent(boolean consistent);
+
+    /**
+     * Simplifies this environment, removing all the enclosed environments which
+     * are inconsistent.
+     */
+    void simplify();
 }

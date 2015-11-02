@@ -29,8 +29,8 @@ class StateVariableValue {
     private final StateVariable stateVariable;
     private final String name;
     private final Collection<Action> actions = new ArrayList<>();
-    private final Collection<DurativeAction> atStartdurativeActions = new ArrayList<>();
-    private final Collection<DurativeAction> atEnddurativeActions = new ArrayList<>();
+    private final Collection<DurativeAction> atStartDurativeActions = new ArrayList<>();
+    private final Collection<DurativeAction> atEndDurativeActions = new ArrayList<>();
 
     StateVariableValue(StateVariable state_variable, String name) {
         this.stateVariable = state_variable;
@@ -54,18 +54,26 @@ class StateVariableValue {
     }
 
     public void addAtStartDurativeAction(DurativeAction action) {
-        atStartdurativeActions.add(action);
+        atStartDurativeActions.add(action);
     }
 
     public Collection<DurativeAction> getAtStartDurativeActions() {
-        return Collections.unmodifiableCollection(atStartdurativeActions);
+        return Collections.unmodifiableCollection(atStartDurativeActions);
     }
 
     public void addAtEndDurativeAction(DurativeAction action) {
-        atEnddurativeActions.add(action);
+        atEndDurativeActions.add(action);
     }
 
     public Collection<DurativeAction> getAtEndDurativeActions() {
-        return Collections.unmodifiableCollection(atEnddurativeActions);
+        return Collections.unmodifiableCollection(atEndDurativeActions);
+    }
+
+    public int getSize() {
+        return actions.size() + atStartDurativeActions.size() + atEndDurativeActions.size();
+    }
+
+    public boolean isLeaf() {
+        return getSize() == 0;
     }
 }

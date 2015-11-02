@@ -200,11 +200,14 @@ public class PDDLTranslator {
                     assignments.put(action.getVariables().get(i).getName(), cs[i]);
                 }
                 Action a = new Action(action.getName() + "_" + Stream.of(cs).map(c -> c.getName()).collect(Collectors.joining("_")));
-                agent.addAction(a);
                 env = a.getPrecondition();
                 visitPrecondition(a, action.getPrecondition());
                 env = a.getEffect();
                 visitEffect(a, action.getEffect());
+                a.getPrecondition().simplify();
+                if (a.getPrecondition().isConsistent()) {
+                    agent.addAction(a);
+                }
             }
         });
 
@@ -273,8 +276,8 @@ public class PDDLTranslator {
             if (static_predicates.contains(((PredicateTerm) term).getPredicate())) {
                 if (predicate_name.equals("False")) {
                     // We have a precondition which is never true..
-                    // We can simplify the disjunction or even remove the avtion..
-                    throw new UnsupportedOperationException("Not supported yet..");
+                    // We can simplify the disjunction or even remove the action..
+                    env.setConsistent(false);
                 }
             } else {
                 if (((PredicateTerm) term).isDirected()) {
@@ -366,12 +369,14 @@ public class PDDLTranslator {
             }
         } else if (term instanceof EqTerm) {
             if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm) {
-                String function_name = ((FunctionTerm) term).getArguments().isEmpty() ? ((FunctionTerm) term).getFunction().getName() : ((FunctionTerm) term).getFunction().getName() + "_" + ((FunctionTerm) term).getArguments().stream().map(a -> ((ConstantTerm) a).getConstant().getName()).collect(Collectors.joining("_"));
+                String function_name = ((FunctionTerm) ((EqTerm) term).getFirstTerm()).getArguments().isEmpty() ? ((FunctionTerm) ((EqTerm) term).getFirstTerm()).getFunction().getName() : ((FunctionTerm) ((EqTerm) term).getFirstTerm()).getFunction().getName() + "_" + ((FunctionTerm) ((EqTerm) term).getFirstTerm()).getArguments().stream().map(a -> ((ConstantTerm) a).getConstant().getName()).collect(Collectors.joining("_"));
                 if (static_functions.contains(((FunctionTerm) ((EqTerm) term).getFirstTerm()).getFunction())) {
                     // We are instantiating a static function..
                     if (((EqTerm) term).getSecondTerm() instanceof ConstantTerm) {
+                        // We are instantiating a static multi-valued function..
                         static_assignments.put(function_name, ((ConstantTerm) ((EqTerm) term).getSecondTerm()).getConstant().getName());
                     } else {
+                        // We are instantiating a static numeric function..
                         static_assignments.put(function_name, ((NumberTerm) ((EqTerm) term).getSecondTerm()).getValue().toString());
                     }
                 } else {

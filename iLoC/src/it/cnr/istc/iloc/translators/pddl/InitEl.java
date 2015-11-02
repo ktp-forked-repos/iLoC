@@ -41,4 +41,18 @@ class InitEl implements Env {
     public void addEnv(Env gd) {
         throw new AssertionError();
     }
+
+    @Override
+    public boolean isConsistent() {
+        return true;
+    }
+
+    @Override
+    public void setConsistent(boolean inconsistent) {
+        throw new AssertionError();
+    }
+
+    @Override
+    public void simplify() {
+    }
 }

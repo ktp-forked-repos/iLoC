@@ -32,7 +32,9 @@ class <state_variable.name> extends StateVariable {
 StateVariablePredicate(translator, value) ::= <<
 predicate <value.name>() {
     duration >= 1;
+<if(!value.leaf)>
     <value>
+<endif>
 \}
 >>
 

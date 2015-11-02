@@ -28,6 +28,7 @@ class Or implements Env {
 
     private final Env enclosingGD;
     private final List<Env> envs = new ArrayList<>();
+    private boolean consistent = true;
 
     Or(Env enclosingGD) {
         this.enclosingGD = enclosingGD;
@@ -45,5 +46,22 @@ class Or implements Env {
 
     public List<Env> getEnvs() {
         return Collections.unmodifiableList(envs);
+    }
+
+    @Override
+    public boolean isConsistent() {
+        return consistent;
+    }
+
+    @Override
+    public void setConsistent(boolean consistent) {
+        this.consistent = consistent;
+    }
+
+    @Override
+    public void simplify() {
+        envs.stream().forEach(env -> env.simplify());
+        envs.removeIf(env -> !env.isConsistent());
+        this.consistent = !envs.isEmpty();
     }
 }

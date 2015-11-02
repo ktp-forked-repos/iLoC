@@ -28,6 +28,7 @@ class And implements Env {
 
     private final Env enclosingGD;
     private final List<Env> envs = new ArrayList<>();
+    private boolean consistent = true;
 
     And(Env enclosingGD) {
         this.enclosingGD = enclosingGD;
@@ -45,5 +46,25 @@ class And implements Env {
 
     public List<Env> getEnvs() {
         return Collections.unmodifiableList(envs);
+    }
+
+    @Override
+    public boolean isConsistent() {
+        return consistent;
+    }
+
+    @Override
+    public void setConsistent(boolean consistent) {
+        this.consistent = consistent;
+    }
+
+    @Override
+    public void simplify() {
+        if (envs.stream().allMatch(env -> env.isConsistent())) {
+            envs.stream().forEach(env -> env.simplify());
+            this.consistent = envs.stream().allMatch(env -> env.isConsistent());
+        } else {
+            this.consistent = false;
+        }
     }
 }

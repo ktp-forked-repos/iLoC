@@ -38,10 +38,7 @@ class StateVariableValueRenderer implements AttributeRenderer {
     @Override
     public String toString(Object o, String string, Locale locale) {
         StateVariableValue value = (StateVariableValue) o;
-        int size = 0;
-        size += value.getActions().size();
-        size += value.getAtStartDurativeActions().size();
-        size += value.getAtEndDurativeActions().size();
+        int size = value.getSize();
         assert size > 0;
         if (size == 1) {
             if (!value.getActions().isEmpty()) {
