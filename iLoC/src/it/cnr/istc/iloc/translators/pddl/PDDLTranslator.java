@@ -202,10 +202,10 @@ public class PDDLTranslator {
                 Action a = new Action(action.getName() + "_" + Stream.of(cs).map(c -> c.getName()).collect(Collectors.joining("_")));
                 env = a.getPrecondition();
                 visitPrecondition(a, action.getPrecondition());
-                env = a.getEffect();
-                visitEffect(a, action.getEffect());
                 a.getPrecondition().simplify();
                 if (a.getPrecondition().isConsistent()) {
+                    env = a.getEffect();
+                    visitEffect(a, action.getEffect());
                     agent.addAction(a);
                 }
             }
@@ -219,14 +219,26 @@ public class PDDLTranslator {
                     assignments.put(action.getVariables().get(i).getName(), cs[i]);
                 }
                 DurativeAction da = new DurativeAction(action.getName() + "_" + Stream.of(cs).map(c -> c.getName()).collect(Collectors.joining("_")));
-                agent.addDurativeAction(da);
-                env = da.getDuration();
-                visitDuration(da, action.getDuration());
                 env = da.getCondition();
                 visitCondition(da, action.getCondition());
-                env = da.getEffect();
-                visitEffect(da, action.getEffect());
+                da.getCondition().simplify();
+                if (da.getCondition().isConsistent()) {
+                    env = da.getDuration();
+                    visitDuration(da, action.getDuration());
+                    env = da.getEffect();
+                    visitEffect(da, action.getEffect());
+                    agent.addDurativeAction(da);
+                }
             }
+        });
+
+        agent.getStateVariables().values().forEach(sv -> {
+            sv.getValues().values().forEach(v -> {
+                if (v.isLeaf()) {
+                    // Since this effect can never be achieved, it should be pruned away..
+                    throw new UnsupportedOperationException("Simplify!!");
+                }
+            });
         });
 
         visitGoal(problem.getGoal());
@@ -274,7 +286,11 @@ public class PDDLTranslator {
         if (term instanceof PredicateTerm) {
             String predicate_name = ground(term);
             if (static_predicates.contains(((PredicateTerm) term).getPredicate())) {
-                if (predicate_name.equals("False")) {
+                if (((PredicateTerm) term).isDirected() && predicate_name.equals("False")) {
+                    // We have a precondition which is never true..
+                    // We can simplify the disjunction or even remove the action..
+                    env.setConsistent(false);
+                } else if (!((PredicateTerm) term).isDirected() && predicate_name.equals("True")) {
                     // We have a precondition which is never true..
                     // We can simplify the disjunction or even remove the action..
                     env.setConsistent(false);
