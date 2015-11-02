@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl.parser;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -116,6 +117,14 @@ public class Domain {
         durative_actions.put(durative_action.getName(), durative_action);
     }
 
+    public Set<Predicate> getStaticPredicates() {
+        return predicates.values().stream().filter(predicate -> actions.values().stream().noneMatch(action -> containsPredicate(action.getEffect(), predicate)) && durative_actions.values().stream().noneMatch(action -> containsPredicate(action.getEffect(), predicate))).collect(Collectors.toSet());
+    }
+
+    public Set<Function> getStaticFunctions() {
+        return functions.values().stream().filter(function -> actions.values().stream().noneMatch(action -> containsFunction(action.getEffect(), function)) && durative_actions.values().stream().noneMatch(action -> containsFunction(action.getEffect(), function))).collect(Collectors.toSet());
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -145,5 +154,41 @@ public class Domain {
 
         sb.append(")\n");
         return sb.toString();
+    }
+
+    static boolean containsPredicate(Term term, Predicate predicate) {
+        if (term instanceof PredicateTerm) {
+            return ((PredicateTerm) term).getPredicate() == predicate;
+        } else if (term instanceof FunctionTerm) {
+            return false;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsPredicate(t, predicate));
+        } else if (term instanceof AssignOpTerm) {
+            return false;
+        } else if (term instanceof VariableTerm) {
+            return false;
+        } else if (term instanceof ConstantTerm) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
+    }
+
+    static boolean containsFunction(Term term, Function function) {
+        if (term instanceof PredicateTerm) {
+            return false;
+        } else if (term instanceof FunctionTerm) {
+            return ((FunctionTerm) term).getFunction() == function;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsFunction(t, function));
+        } else if (term instanceof AssignOpTerm) {
+            return containsFunction(((AssignOpTerm) term).getFunctionTerm(), function) || containsFunction(((AssignOpTerm) term).getValue(), function);
+        } else if (term instanceof VariableTerm) {
+            return false;
+        } else if (term instanceof ConstantTerm) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
     }
 }
