@@ -36,7 +36,9 @@ import it.cnr.istc.iloc.translators.pddl.parser.VariableTerm;
 import it.cnr.istc.iloc.utils.CartesianProductGenerator;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,6 +68,26 @@ public class PDDLTranslator {
     public static String translate(File pddl_domain, File pddl_problem) throws IOException {
         PDDLInstance instance = Parser.parse(pddl_domain, pddl_problem);
         return new PDDLTranslator(instance.getDomain(), instance.getProblem()).translate();
+    }
+
+    static boolean containsNegativePreconditions(Term term) {
+        if (term instanceof PredicateTerm) {
+            return !((PredicateTerm) term).isDirected();
+        } else if (term instanceof FunctionTerm) {
+            return false;
+        } else if (term instanceof AndTerm) {
+            return ((AndTerm) term).getTerms().stream().anyMatch(t -> containsNegativePreconditions(t));
+        } else if (term instanceof OrTerm) {
+            return ((OrTerm) term).getTerms().stream().anyMatch(t -> containsNegativePreconditions(t));
+        } else if (term instanceof AssignOpTerm) {
+            return false;
+        } else if (term instanceof VariableTerm) {
+            return false;
+        } else if (term instanceof ConstantTerm) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException(term.getClass().getName());
+        }
     }
 
     static boolean containsPredicate(Term term, Predicate predicate) {
@@ -232,14 +254,55 @@ public class PDDLTranslator {
             }
         });
 
-        agent.getStateVariables().values().forEach(sv -> {
-            sv.getValues().values().forEach(v -> {
-                if (v.isLeaf()) {
-                    // Since this effect can never be achieved, it should be pruned away..
-                    throw new UnsupportedOperationException("Simplify!!");
+        while (true) {
+            List<StateVariableValue> v_to_remove = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream().filter(v -> v.isLeaf())).collect(Collectors.toList());
+            if (v_to_remove.isEmpty()) {
+                break;
+            }
+
+            v_to_remove.stream().forEach(v -> {
+                v.getStateVariable().removeValue(v);
+                if (v.getStateVariable().getValues().isEmpty()) {
+                    agent.removeStateVariable(v.getStateVariable());
                 }
             });
-        });
+
+            List<Action> a_to_remove = new ArrayList<>();
+            agent.getActions().values().forEach(action -> {
+                v_to_remove.stream().forEach(v -> {
+                    removeValue(action.getPrecondition(), v);
+                });
+                action.getPrecondition().simplify();
+                if (!action.getPrecondition().isConsistent()) {
+                    a_to_remove.add(action);
+                }
+            });
+            a_to_remove.stream().forEach(a -> {
+                agent.removeAction(a);
+            });
+
+            List<DurativeAction> da_to_remove = new ArrayList<>();
+            agent.getDurativeActions().values().forEach(durative_action -> {
+                v_to_remove.stream().forEach(v -> {
+                    removeValue(durative_action.getCondition(), v);
+                });
+                durative_action.getCondition().simplify();
+                if (!durative_action.getCondition().isConsistent()) {
+                    da_to_remove.add(durative_action);
+                }
+            });
+            da_to_remove.stream().forEach(da -> {
+                agent.removeDurativeAction(da);
+            });
+
+            agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).forEach(v -> {
+                a_to_remove.forEach(a -> v.removeAction(a));
+                da_to_remove.forEach(da -> {
+                    v.removeAtStartDurativeAction(da);
+                    v.removeAtEndDurativeAction(da);
+                });
+            });
+        }
 
         visitGoal(problem.getGoal());
 
@@ -439,6 +502,20 @@ public class PDDLTranslator {
             goal = goal.getEnclosingEnv();
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
+        }
+    }
+
+    private void removeValue(Env env, StateVariableValue value) {
+        if (env instanceof Precondition) {
+            if (((Precondition) env).getValue() == value) {
+                env.setConsistent(false);
+            }
+        } else if (env instanceof And) {
+            ((And) env).getEnvs().forEach(e -> removeValue(e, value));
+        } else if (env instanceof Or) {
+            ((Or) env).getEnvs().forEach(e -> removeValue(e, value));
+        } else {
+            throw new UnsupportedOperationException("Not supported yet..");
         }
     }
 }

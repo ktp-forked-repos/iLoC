@@ -1,4 +1,10 @@
 Translation(translator) ::= <<
+/**
+* Domain name: <translator.domain.name>
+* Problem name: <translator.problem.name>
+* Nr. fluents: <length(translator.agent.stateVariables)>
+* Nr. actions: <length([translator.agent.actions, translator.agent.durativeActions])>
+*/
 
 <translator.agent.stateVariables.values : {state_variable |
 <StateVariable(translator, state_variable)>}; separator="\n">
@@ -32,9 +38,7 @@ class <state_variable.name> extends StateVariable {
 StateVariablePredicate(translator, value) ::= <<
 predicate <value.name>() {
     duration >= 1;
-<if(!value.leaf)>
     <value>
-<endif>
 \}
 >>
 

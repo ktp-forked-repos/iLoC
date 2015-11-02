@@ -41,6 +41,10 @@ class StateVariable {
         values.put(value.getName(), value);
     }
 
+    public void removeValue(StateVariableValue value) {
+        values.remove(value.getName(), value);
+    }
+
     public StateVariableValue getValue(String name) {
         return values.get(name);
     }

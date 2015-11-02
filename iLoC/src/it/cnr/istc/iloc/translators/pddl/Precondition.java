@@ -24,6 +24,7 @@ class Precondition implements Env {
 
     private final Action action;
     private final StateVariableValue value;
+    private boolean consistent = true;
 
     Precondition(Action action, StateVariableValue value) {
         this.action = action;
@@ -50,12 +51,12 @@ class Precondition implements Env {
 
     @Override
     public boolean isConsistent() {
-        return true;
+        return consistent;
     }
 
     @Override
-    public void setConsistent(boolean inconsistent) {
-        throw new AssertionError();
+    public void setConsistent(boolean consistent) {
+        this.consistent = consistent;
     }
 
     @Override

@@ -49,6 +49,10 @@ class StateVariableValue {
         actions.add(action);
     }
 
+    public void removeAction(Action action) {
+        actions.remove(action);
+    }
+
     public Collection<Action> getActions() {
         return Collections.unmodifiableCollection(actions);
     }
@@ -57,12 +61,20 @@ class StateVariableValue {
         atStartDurativeActions.add(action);
     }
 
+    public void removeAtStartDurativeAction(DurativeAction action) {
+        atStartDurativeActions.remove(action);
+    }
+
     public Collection<DurativeAction> getAtStartDurativeActions() {
         return Collections.unmodifiableCollection(atStartDurativeActions);
     }
 
     public void addAtEndDurativeAction(DurativeAction action) {
         atEndDurativeActions.add(action);
+    }
+
+    public void removeAtEndDurativeAction(DurativeAction action) {
+        atEndDurativeActions.remove(action);
     }
 
     public Collection<DurativeAction> getAtEndDurativeActions() {

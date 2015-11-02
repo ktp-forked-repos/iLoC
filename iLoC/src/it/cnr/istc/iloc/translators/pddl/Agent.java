@@ -47,6 +47,10 @@ class Agent {
         state_variables.put(stateVariable.getName(), stateVariable);
     }
 
+    public void removeStateVariable(StateVariable stateVariable) {
+        state_variables.remove(stateVariable.getName(), stateVariable);
+    }
+
     public Map<String, StateVariable> getStateVariables() {
         return Collections.unmodifiableMap(state_variables);
     }
@@ -59,6 +63,10 @@ class Agent {
         actions.put(action.getName(), action);
     }
 
+    public void removeAction(Action action) {
+        actions.remove(action.getName(), action);
+    }
+
     public Map<String, Action> getActions() {
         return Collections.unmodifiableMap(actions);
     }
@@ -69,6 +77,10 @@ class Agent {
 
     public void addDurativeAction(DurativeAction action) {
         durative_actions.put(action.getName(), action);
+    }
+
+    public void removeDurativeAction(DurativeAction action) {
+        durative_actions.remove(action.getName(), action);
     }
 
     public Map<String, DurativeAction> getDurativeActions() {
