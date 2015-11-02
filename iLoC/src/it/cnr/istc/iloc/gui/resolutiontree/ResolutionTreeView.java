@@ -265,7 +265,7 @@ public class ResolutionTreeView extends Display implements ISolverListener {
     public void branch(INode n, List<INode> childs) {
         synchronized (m_vis) {
             nodes.get(n).set(NODE_TYPE, "default");
-            childs.stream().forEach(child -> {
+            childs.forEach(child -> {
                 Node c_c = t.addChild(nodes.get(n));
                 c_c.set(NODE_TYPE, "default");
                 c_c.set(VisualItem.LABEL, Integer.toString(n.getFlaws().size()));

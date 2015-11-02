@@ -75,7 +75,7 @@ class PredicateTerm implements Term {
     public Term negate(Term enclosingTerm) {
         PredicateTerm predicate_term = new PredicateTerm(enclosingTerm, !directed);
         predicate_term.setPredicate(predicate);
-        arguments.stream().forEach(argument -> predicate_term.addArgument(argument));
+        arguments.forEach(argument -> predicate_term.addArgument(argument));
         return predicate_term;
     }
 

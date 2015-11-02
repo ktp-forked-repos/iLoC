@@ -94,7 +94,7 @@ class StatementExecutor extends DDLBaseVisitor<Boolean> {
     @Override
     public Boolean visitLocal_variable_statement(DDLParser.Local_variable_statementContext ctx) {
         IType c_type = new TypeVisitor(solver, parser, scopes).visit(ctx.type());
-        ctx.variable_dec().stream().forEach(variable_dec -> {
+        ctx.variable_dec().forEach(variable_dec -> {
             IObject object;
             if (variable_dec.expr() != null) {
                 object = new ObjectVisitor(solver, parser, scopes, environment).visit(variable_dec.expr());
@@ -169,7 +169,7 @@ class StatementExecutor extends DDLBaseVisitor<Boolean> {
 
             Map<String, IObject> assignments = new HashMap<>();
             if (ctx.assignment_list() != null) {
-                ctx.assignment_list().assignment().stream().forEach(ac -> {
+                ctx.assignment_list().assignment().forEach(ac -> {
                     assignments.put(ac.field.getText(), new ObjectVisitor(solver, parser, scopes, environment).visit(ac.value));
                 });
             }

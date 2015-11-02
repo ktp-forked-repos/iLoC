@@ -174,7 +174,7 @@ public class PropositionalStateType extends Type {
             IConstraintNetwork network = solver.getConstraintNetwork();
             Map<IType, List<IObject>> type_instances = instances.stream().collect(Collectors.groupingBy(instance -> instance.getType()));
             type_instances.keySet().stream().map(type -> type.getFormulas(model)).forEach(formulas -> {
-                formulas.keySet().stream().forEach(instance -> {
+                formulas.keySet().forEach(instance -> {
                     List<IFormula> c_formulas = new ArrayList<>(formulas.get(instance));
                     for (int i = 0; i < c_formulas.size(); i++) {
                         for (int j = i + 1; j < c_formulas.size(); j++) {

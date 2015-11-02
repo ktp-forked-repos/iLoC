@@ -61,7 +61,7 @@ class And implements Env {
     @Override
     public void simplify() {
         if (envs.stream().allMatch(env -> env.isConsistent())) {
-            envs.stream().forEach(env -> env.simplify());
+            envs.forEach(env -> env.simplify());
             this.consistent = envs.stream().allMatch(env -> env.isConsistent());
         } else {
             this.consistent = false;

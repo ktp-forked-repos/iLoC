@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl.parser;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,7 +35,7 @@ public class PredicateTerm implements Term {
 
     public PredicateTerm(boolean directed, Predicate predicate, Term... arguments) {
         assert predicate != null;
-        assert Stream.of(arguments).noneMatch(term -> term == null);
+        assert Stream.of(arguments).noneMatch(Objects::isNull);
         this.directed = directed;
         this.predicate = predicate;
         this.arguments = Arrays.asList(arguments);

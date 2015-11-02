@@ -18,6 +18,7 @@ package it.cnr.istc.iloc.translators.pddl.parser;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,7 +33,7 @@ public class OpTerm implements Term {
 
     public OpTerm(Op op, Term... terms) {
         assert op != null;
-        assert Stream.of(terms).noneMatch(term -> term == null);
+        assert Stream.of(terms).noneMatch(Objects::isNull);
         this.op = op;
         this.terms = Arrays.asList(terms);
     }

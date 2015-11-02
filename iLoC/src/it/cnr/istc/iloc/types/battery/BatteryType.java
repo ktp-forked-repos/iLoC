@@ -229,7 +229,7 @@ public class BatteryType extends Type {
             }
 
             if (closed_batteries) {
-                instances.stream().forEach(battery -> {
+                instances.forEach(battery -> {
                     Collection<IFormula> c_formulas = formulas.get(battery);
                     BatteryTimeline timeline = new BatteryTimeline(solver, model, battery, c_formulas);
                     for (int i = 0; i < timeline.values.size(); i++) {
@@ -257,8 +257,8 @@ public class BatteryType extends Type {
                                 }
                             }
                             List<IBool> or = new ArrayList<>(good_charges.size() * good_consumptions.size());
-                            good_consumptions.stream().forEach((cons) -> {
-                                good_charges.stream().forEach((charge) -> {
+                            good_consumptions.forEach((cons) -> {
+                                good_charges.forEach((charge) -> {
                                     or.add(network.leq(cons.get(Constants.END), charge.get(Constants.START)));
                                     or.add(network.not(cons.getScope().eq(charge.getScope())));
                                 });
@@ -291,8 +291,8 @@ public class BatteryType extends Type {
                                 }
                             }
                             List<IBool> or = new ArrayList<>(good_charges.size() * good_consumptions.size());
-                            good_consumptions.stream().forEach((cons) -> {
-                                good_charges.stream().forEach((charge) -> {
+                            good_consumptions.forEach((cons) -> {
+                                good_charges.forEach((charge) -> {
                                     or.add(network.leq(charge.get(Constants.END), cons.get(Constants.START)));
                                     or.add(network.not(charge.getScope().eq(cons.getScope())));
                                 });
@@ -319,11 +319,11 @@ public class BatteryType extends Type {
                         }).collect(Collectors.toList()));
 
                         final List<IBool> or = new ArrayList<>();
-                        c_formulas.stream().forEach(formula -> {
+                        c_formulas.forEach(formula -> {
                             or.add(network.not(battery.eq(formula.getScope())));
                         });
                         instances.stream().filter(instance -> (instance != battery)).forEach(instance -> {
-                            formulas.get(instance).stream().forEach(formula -> {
+                            formulas.get(instance).forEach(formula -> {
                                 or.add(battery.eq(formula.getScope()));
                             });
                         });

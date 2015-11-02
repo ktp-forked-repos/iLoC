@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl.parser;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +32,7 @@ public class OrTerm implements Term {
     private final List<Term> terms;
 
     public OrTerm(Term... terms) {
-        assert Stream.of(terms).noneMatch(term -> term == null);
+        assert Stream.of(terms).noneMatch(Objects::isNull);
         this.terms = Arrays.asList(terms);
     }
 

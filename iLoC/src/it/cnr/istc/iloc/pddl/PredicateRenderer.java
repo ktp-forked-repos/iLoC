@@ -55,9 +55,9 @@ class PredicateRenderer implements AttributeRenderer {
                 actions.put(action, terms);
             }
         });
-        actions.entrySet().stream().forEach(entrySet -> {
+        actions.entrySet().forEach(entrySet -> {
             Action action = entrySet.getKey();
-            entrySet.getValue().stream().forEach(t -> {
+            entrySet.getValue().forEach(t -> {
                 StringBuilder sb = new StringBuilder();
                 PredicateTerm term = (PredicateTerm) t;
                 assert term.getPredicate() == predicate;
@@ -102,9 +102,9 @@ class PredicateRenderer implements AttributeRenderer {
                 durative_actions.put(action, terms);
             }
         });
-        durative_actions.entrySet().stream().forEach(entrySet -> {
+        durative_actions.entrySet().forEach(entrySet -> {
             DurativeAction action = entrySet.getKey();
-            entrySet.getValue().stream().forEach(t -> {
+            entrySet.getValue().forEach(t -> {
                 StringBuilder sb = new StringBuilder();
                 PredicateTerm term = (PredicateTerm) t;
                 assert term.getPredicate() == predicate;

@@ -37,10 +37,10 @@ import it.cnr.istc.iloc.utils.CartesianProductGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.stringtemplate.v4.ST;
@@ -72,8 +72,8 @@ public class PDDLTranslator {
     private final Domain domain;
     private final Problem problem;
     private Agent agent;
-    private Set<Predicate> static_predicates;
-    private Set<Function> static_functions;
+    private Collection<Predicate> static_predicates;
+    private Collection<Function> static_functions;
     private final Map<String, String> static_assignments = new HashMap<>();
     private final Map<String, Constant> assignments = new HashMap<>();
     private Env env;
@@ -204,7 +204,7 @@ public class PDDLTranslator {
                 break;
             }
 
-            v_to_remove.stream().forEach(v -> {
+            v_to_remove.forEach(v -> {
                 v.getStateVariable().removeValue(v);
                 if (v.getStateVariable().getValues().isEmpty()) {
                     agent.removeStateVariable(v.getStateVariable());
@@ -213,7 +213,7 @@ public class PDDLTranslator {
 
             List<Action> a_to_remove = new ArrayList<>();
             agent.getActions().values().forEach(action -> {
-                v_to_remove.stream().forEach(v -> {
+                v_to_remove.forEach(v -> {
                     removeValue(action.getPrecondition(), v);
                 });
                 action.getPrecondition().simplify();
@@ -221,13 +221,13 @@ public class PDDLTranslator {
                     a_to_remove.add(action);
                 }
             });
-            a_to_remove.stream().forEach(a -> {
+            a_to_remove.forEach(a -> {
                 agent.removeAction(a);
             });
 
             List<DurativeAction> da_to_remove = new ArrayList<>();
             agent.getDurativeActions().values().forEach(durative_action -> {
-                v_to_remove.stream().forEach(v -> {
+                v_to_remove.forEach(v -> {
                     removeValue(durative_action.getCondition(), v);
                 });
                 durative_action.getCondition().simplify();
@@ -235,7 +235,7 @@ public class PDDLTranslator {
                     da_to_remove.add(durative_action);
                 }
             });
-            da_to_remove.stream().forEach(da -> {
+            da_to_remove.forEach(da -> {
                 agent.removeDurativeAction(da);
             });
 
@@ -320,13 +320,13 @@ public class PDDLTranslator {
             And and = new And(env);
             env.addEnv(and);
             env = and;
-            ((AndTerm) term).getTerms().stream().forEach(t -> visitPrecondition(action, t));
+            ((AndTerm) term).getTerms().forEach(t -> visitPrecondition(action, t));
             env = and.getEnclosingEnv();
         } else if (term instanceof OrTerm) {
             Or or = new Or(env);
             env.addEnv(or);
             env = or;
-            ((OrTerm) term).getTerms().stream().forEach(t -> visitPrecondition(action, t));
+            ((OrTerm) term).getTerms().forEach(t -> visitPrecondition(action, t));
             env = env.getEnclosingEnv();
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
@@ -354,7 +354,7 @@ public class PDDLTranslator {
             And and = new And(env);
             env.addEnv(and);
             env = and;
-            ((AndTerm) term).getTerms().stream().forEach(t -> visitEffect(action, t));
+            ((AndTerm) term).getTerms().forEach(t -> visitEffect(action, t));
             env = and.getEnclosingEnv();
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
@@ -436,13 +436,13 @@ public class PDDLTranslator {
             And and = new And(goal);
             goal.addEnv(and);
             goal = and;
-            ((AndTerm) term).getTerms().stream().forEach(t -> visitGoal(t));
+            ((AndTerm) term).getTerms().forEach(t -> visitGoal(t));
             goal = and.getEnclosingEnv();
         } else if (term instanceof OrTerm) {
             Or or = new Or(goal);
             goal.addEnv(or);
             goal = or;
-            ((OrTerm) term).getTerms().stream().forEach(t -> visitGoal(t));
+            ((OrTerm) term).getTerms().forEach(t -> visitGoal(t));
             goal = goal.getEnclosingEnv();
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());

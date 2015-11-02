@@ -18,6 +18,7 @@ package it.cnr.istc.iloc.translators.pddl.parser;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +32,7 @@ public class ExistsTerm implements Term {
     private final Term formula;
 
     public ExistsTerm(Variable[] variables, Term formula) {
-        assert Stream.of(variables).noneMatch(variable -> variable == null);
+        assert Stream.of(variables).noneMatch(Objects::isNull);
         assert formula != null;
         this.variables = Arrays.asList(variables);
         this.formula = formula;

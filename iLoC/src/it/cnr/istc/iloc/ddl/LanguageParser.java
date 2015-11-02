@@ -63,12 +63,12 @@ public class LanguageParser {
         WALKER.walk(new TypeDeclaration(solver, parser, scopes), compilation_unit);
         WALKER.walk(new TypeRefinement(solver, parser, scopes), compilation_unit);
         WALKER.walk(new Preprocessing(solver, parser, scopes), compilation_unit);
-        compilation_unit.statement().stream().forEach(statementContext -> {
+        compilation_unit.statement().forEach(statementContext -> {
             WALKER.walk(new StatementTesting(solver, parser, scopes), statementContext);
         });
 
         StatementExecutor statementExecutor = new StatementExecutor(solver, parser, scopes, solver);
-        compilation_unit.statement().stream().forEach(statement -> {
+        compilation_unit.statement().forEach(statement -> {
             statementExecutor.visit(statement);
         });
     }
@@ -87,23 +87,23 @@ public class LanguageParser {
             snippets.add(new CodeSnippet(f, parser, context));
         }
 
-        snippets.stream().forEach(snippet -> {
+        snippets.forEach(snippet -> {
             WALKER.walk(new TypeDeclaration(solver, snippet.parser, scopes), snippet.context);
         });
-        snippets.stream().forEach(snippet -> {
+        snippets.forEach(snippet -> {
             WALKER.walk(new TypeRefinement(solver, snippet.parser, scopes), snippet.context);
         });
-        snippets.stream().forEach(snippet -> {
+        snippets.forEach(snippet -> {
             WALKER.walk(new Preprocessing(solver, snippet.parser, scopes), snippet.context);
         });
-        snippets.stream().forEach(snippet -> {
-            snippet.context.statement().stream().forEach(statementContext -> {
+        snippets.forEach(snippet -> {
+            snippet.context.statement().forEach(statementContext -> {
                 WALKER.walk(new StatementTesting(solver, snippet.parser, scopes), statementContext);
             });
         });
-        snippets.stream().forEach(snippet -> {
+        snippets.forEach(snippet -> {
             StatementExecutor statementExecutor = new StatementExecutor(solver, snippet.parser, scopes, solver);
-            snippet.context.statement().stream().forEach(statement -> {
+            snippet.context.statement().forEach(statement -> {
                 statementExecutor.visit(statement);
             });
         });

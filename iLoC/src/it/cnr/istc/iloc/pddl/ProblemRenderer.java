@@ -49,14 +49,14 @@ class ProblemRenderer implements AttributeRenderer {
         sb.append(translation.render());
 
         Map<String, String> known_terms = new HashMap();
-        problem.getDomain().getConstants().values().stream().forEach(constant -> {
+        problem.getDomain().getConstants().values().forEach(constant -> {
             known_terms.put(constant.getName(), constant.getName());
         });
-        problem.getObjects().values().stream().forEach(object -> {
+        problem.getObjects().values().forEach(object -> {
             known_terms.put(object.getName(), object.getName());
         });
 
-        problem.getInitEls().stream().forEach(init_el -> {
+        problem.getInitEls().forEach(init_el -> {
             sb.append(init_el.toString(file, known_terms, Collections.emptySet(), Term.Mode.InitEl)).append("\n");
         });
 

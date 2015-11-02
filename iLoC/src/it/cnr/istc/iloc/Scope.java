@@ -158,7 +158,7 @@ class Scope implements IScope {
     @Override
     public Collection<IMethod> getMethods() {
         Collection<IMethod> c_methods = new ArrayList<>(methods.size());
-        methods.values().stream().forEach((ms) -> {
+        methods.values().forEach((ms) -> {
             c_methods.addAll(ms);
         });
         return Collections.unmodifiableCollection(c_methods);

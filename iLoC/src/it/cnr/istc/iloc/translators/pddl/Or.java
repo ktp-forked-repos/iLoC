@@ -60,7 +60,7 @@ class Or implements Env {
 
     @Override
     public void simplify() {
-        envs.stream().forEach(env -> env.simplify());
+        envs.forEach(env -> env.simplify());
         envs.removeIf(env -> !env.isConsistent());
         this.consistent = !envs.isEmpty();
     }

@@ -56,7 +56,7 @@ class DDLMethod extends Method {
         }
 
         StatementExecutor statementExecutor = new StatementExecutor(solver, parser, scopes, c_environment);
-        context.statement().stream().forEach(statement -> {
+        context.statement().forEach(statement -> {
             statementExecutor.visit(statement);
         });
 

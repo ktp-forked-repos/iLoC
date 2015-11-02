@@ -75,7 +75,7 @@ class TypeRefinement extends DDLBaseListener {
     @Override
     public void enterField_declaration(DDLParser.Field_declarationContext ctx) {
         IType c_type = new TypeVisitor(solver, parser, scopes).visit(ctx.type());
-        ctx.variable_dec().stream().forEach((variable_dec) -> {
+        ctx.variable_dec().forEach((variable_dec) -> {
             scope.defineField(new DDLField(variable_dec.expr(), variable_dec.name.getText(), c_type));
         });
     }

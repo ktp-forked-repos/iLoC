@@ -35,7 +35,7 @@ public class SolverManager {
             Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.solver = new Solver(properties);
-        listeners.stream().forEach(listener -> {
+        listeners.forEach(listener -> {
             listener.solverChanged(solver);
         });
     }
@@ -48,7 +48,7 @@ public class SolverManager {
             Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.solver = new Solver(properties);
-        listeners.stream().forEach(listener -> {
+        listeners.forEach(listener -> {
             listener.solverChanged(solver);
         });
     }

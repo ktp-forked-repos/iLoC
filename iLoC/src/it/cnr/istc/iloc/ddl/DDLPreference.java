@@ -46,7 +46,7 @@ class DDLPreference extends Preference {
     @Override
     public void execute(IEnvironment environment) {
         StatementExecutor statementExecutor = new StatementExecutor(solver, parser, scopes, new Environment(solver, environment));
-        context.block().statement().stream().forEach(statement -> {
+        context.block().statement().forEach(statement -> {
             statementExecutor.visit(statement);
         });
     }

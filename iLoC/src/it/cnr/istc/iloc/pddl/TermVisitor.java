@@ -139,7 +139,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
         WALKER.walk(typedListVariable, ctx.typed_list_variable());
         ExistsTerm exists_term = new ExistsTerm(term);
         term = exists_term;
-        typedListVariable.variables.stream().forEach(variable -> exists_term.addVariable(variable));
+        typedListVariable.variables.forEach(variable -> exists_term.addVariable(variable));
         exists_term.setFormula(visit(ctx.gD()));
         return exists_term;
     }
@@ -150,7 +150,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
         WALKER.walk(typedListVariable, ctx.typed_list_variable());
         ForAllTerm for_all_term = new ForAllTerm(term);
         term = for_all_term;
-        typedListVariable.variables.stream().forEach(variable -> for_all_term.addVariable(variable));
+        typedListVariable.variables.forEach(variable -> for_all_term.addVariable(variable));
         for_all_term.setFormula(visit(ctx.gD()));
         return for_all_term;
     }
@@ -364,7 +364,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
         WALKER.walk(typedListVariable, ctx.typed_list_variable());
         ForAllTerm for_all_term = new ForAllTerm(term);
         term = for_all_term;
-        typedListVariable.variables.stream().forEach(variable -> for_all_term.addVariable(variable));
+        typedListVariable.variables.forEach(variable -> for_all_term.addVariable(variable));
         for_all_term.setFormula(visit(ctx.effect()));
         return for_all_term;
     }
@@ -471,7 +471,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
         WALKER.walk(typedListVariable, ctx.typed_list_variable());
         ForAllTerm for_all_term = new ForAllTerm(term);
         term = for_all_term;
-        typedListVariable.variables.stream().forEach(variable -> for_all_term.addVariable(variable));
+        typedListVariable.variables.forEach(variable -> for_all_term.addVariable(variable));
         for_all_term.setFormula(visit(ctx.da_GD()));
         return for_all_term;
     }
@@ -582,7 +582,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
         WALKER.walk(typedListVariable, ctx.typed_list_variable());
         ForAllTerm for_all_term = new ForAllTerm(term);
         term = for_all_term;
-        typedListVariable.variables.stream().forEach(variable -> for_all_term.addVariable(variable));
+        typedListVariable.variables.forEach(variable -> for_all_term.addVariable(variable));
         for_all_term.setFormula(visit(ctx.da_effect()));
         return for_all_term;
     }

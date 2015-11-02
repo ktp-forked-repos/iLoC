@@ -17,36 +17,23 @@
 package it.cnr.istc.iloc.translators.pddl.parser;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class AndTerm implements Term {
+public class Mutex {
 
-    private final List<Term> terms;
+    private final List<Variable> variables;
+    private final List<Predicate> predicates;
 
-    public AndTerm(Term... terms) {
-        assert Stream.of(terms).noneMatch(Objects::isNull);
-        this.terms = Arrays.asList(terms);
-    }
-
-    public List<Term> getTerms() {
-        return Collections.unmodifiableList(terms);
-    }
-
-    @Override
-    public Term negate() {
-        return new OrTerm(terms.stream().map(term -> term.negate()).toArray(Term[]::new));
-    }
-
-    @Override
-    public String toString() {
-        return "(and " + terms.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + ")";
+    public Mutex(Variable[] variables, Predicate[] predicates) {
+        assert Stream.of(variables).noneMatch(Objects::isNull);
+        assert Stream.of(predicates).noneMatch(Objects::isNull);
+        this.variables = Arrays.asList(variables);
+        this.predicates = Arrays.asList(predicates);
     }
 }

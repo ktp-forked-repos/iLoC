@@ -41,7 +41,7 @@ class DynamicCausalGraph implements IDynamicCausalGraph {
     @Override
     public void addFormula(IFormula formula) {
         formulas.add(formula);
-        listeners.stream().forEach(listener -> {
+        listeners.forEach(listener -> {
             listener.formulaAdded(formula);
         });
     }
@@ -49,14 +49,14 @@ class DynamicCausalGraph implements IDynamicCausalGraph {
     @Override
     public void removeFormula(IFormula formula) {
         formulas.remove(formula);
-        listeners.stream().forEach(listener -> {
+        listeners.forEach(listener -> {
             listener.formulaRemoved(formula);
         });
     }
 
     @Override
     public void formulaActivated(IFormula formula) {
-        listeners.stream().forEach(listener -> {
+        listeners.forEach(listener -> {
             listener.formulaActivated(formula);
         });
     }
@@ -64,7 +64,7 @@ class DynamicCausalGraph implements IDynamicCausalGraph {
     @Override
     public void formulaUnified(IFormula formula, List<IFormula> formulas, List<IBool> constraints) {
         unifications.put(formula, new Unification(formulas, constraints));
-        listeners.stream().forEach(listener -> {
+        listeners.forEach(listener -> {
             listener.formulaUnified(formula, formulas, constraints);
         });
     }
@@ -72,7 +72,7 @@ class DynamicCausalGraph implements IDynamicCausalGraph {
     @Override
     public void formulaInactivated(IFormula formula) {
         unifications.remove(formula);
-        listeners.stream().forEach(listener -> {
+        listeners.forEach(listener -> {
             listener.formulaInactivated(formula);
         });
     }
@@ -80,10 +80,10 @@ class DynamicCausalGraph implements IDynamicCausalGraph {
     @Override
     public void addCausalGraphListener(IDynamicCausalGraphListener listener) {
         listeners.add(listener);
-        formulas.stream().forEach(formula -> {
+        formulas.forEach(formula -> {
             listener.formulaAdded(formula);
         });
-        formulas.stream().forEach(formula -> {
+        formulas.forEach(formula -> {
             switch (formula.getFormulaState()) {
                 case Inactive:
                     listener.formulaInactivated(formula);

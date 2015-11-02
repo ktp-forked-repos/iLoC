@@ -187,28 +187,28 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
                     costNodeFill.setEnabled(false);
                     break;
                 case AllReachableNodes:
-                    nodes.keySet().stream().forEach(node -> {
+                    nodes.keySet().forEach(node -> {
                         nodes.get(node).set(NODE_COST, -SolverManager.getInstance().getSolver().getStaticCausalGraph().getAllReachableNodes(node).size());
                     });
                     defaultNodeFill.setEnabled(false);
                     costNodeFill.setEnabled(true);
                     break;
                 case AllMinReachableNodes:
-                    nodes.keySet().stream().forEach(node -> {
+                    nodes.keySet().forEach(node -> {
                         nodes.get(node).set(NODE_COST, -SolverManager.getInstance().getSolver().getStaticCausalGraph().getAllMinReachableNodes(node).size());
                     });
                     defaultNodeFill.setEnabled(false);
                     costNodeFill.setEnabled(true);
                     break;
                 case MinReachableNodes:
-                    nodes.keySet().stream().forEach(node -> {
+                    nodes.keySet().forEach(node -> {
                         nodes.get(node).set(NODE_COST, -SolverManager.getInstance().getSolver().getStaticCausalGraph().getMinReachableNodes(node).size());
                     });
                     defaultNodeFill.setEnabled(false);
                     costNodeFill.setEnabled(true);
                     break;
                 case MinCausalDistance:
-                    nodes.keySet().stream().forEach(node -> {
+                    nodes.keySet().forEach(node -> {
                         nodes.get(node).set(NODE_COST, -SolverManager.getInstance().getSolver().getStaticCausalGraph().getMinCausalDistance(node));
                     });
                     defaultNodeFill.setEnabled(false);

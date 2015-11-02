@@ -71,7 +71,7 @@ class BatteryTimeline {
         c_pulses.add(model.evaluate((INumber) solver.get(Constants.ORIGIN)));
         c_pulses.add(model.evaluate((INumber) solver.get(Constants.HORIZON)));
 
-        formulas.stream().forEach(formula -> {
+        formulas.forEach(formula -> {
             Number start_pulse = model.evaluate((INumber) formula.get(Constants.START));
             c_pulses.add(start_pulse);
             if (!starting_values.containsKey(start_pulse)) {

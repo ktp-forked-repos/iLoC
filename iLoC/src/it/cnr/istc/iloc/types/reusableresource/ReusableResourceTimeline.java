@@ -64,7 +64,7 @@ class ReusableResourceTimeline {
         c_pulses.add(model.evaluate((INumber) solver.get(Constants.ORIGIN)));
         c_pulses.add(model.evaluate((INumber) solver.get(Constants.HORIZON)));
 
-        formulas.stream().forEach(f -> {
+        formulas.forEach(f -> {
             Number start_pulse = model.evaluate((INumber) f.get(Constants.START));
             c_pulses.add(start_pulse);
             if (!starting_values.containsKey(start_pulse)) {

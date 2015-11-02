@@ -31,7 +31,7 @@ class Predicate {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("(").append(name).append("\n");
-        variables.stream().forEach(variable -> {
+        variables.forEach(variable -> {
             sb.append("  ").append(variable.getName()).append(" - ").append(variable.getType().getName()).append("\n");
         });
         sb.append(")");

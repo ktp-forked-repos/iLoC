@@ -16,10 +16,12 @@
  */
 package it.cnr.istc.iloc.translators.pddl.parser;
 
+import it.cnr.istc.iloc.utils.CombinationGenerator;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -117,12 +119,25 @@ public class Domain {
         durative_actions.put(durative_action.getName(), durative_action);
     }
 
-    public Set<Predicate> getStaticPredicates() {
+    public Collection<Predicate> getStaticPredicates() {
         return predicates.values().stream().filter(predicate -> actions.values().stream().noneMatch(action -> containsPredicate(action.getEffect(), predicate)) && durative_actions.values().stream().noneMatch(action -> containsPredicate(action.getEffect(), predicate))).collect(Collectors.toSet());
     }
 
-    public Set<Function> getStaticFunctions() {
+    public Collection<Function> getStaticFunctions() {
         return functions.values().stream().filter(function -> actions.values().stream().noneMatch(action -> containsFunction(action.getEffect(), function)) && durative_actions.values().stream().noneMatch(action -> containsFunction(action.getEffect(), function))).collect(Collectors.toSet());
+    }
+
+    public Collection<Mutex> getMutexes() {
+        Collection<Mutex> mutexes = new ArrayList<>();
+        // We compute the initial candidates..
+        predicates.values().forEach(predicate -> {
+            for (int i = 1; i < predicate.getVariables().size(); i++) {
+                for (Variable[] vs : new CombinationGenerator<>(i, predicate.getVariables().stream().toArray(Variable[]::new))) {
+                    mutexes.add(new Mutex(vs, new Predicate[]{predicate}));
+                }
+            }
+        });
+        return mutexes;
     }
 
     @Override

@@ -55,9 +55,9 @@ class FunctionRenderer implements AttributeRenderer {
                 actions.put(action, terms);
             }
         });
-        actions.entrySet().stream().forEach(entrySet -> {
+        actions.entrySet().forEach(entrySet -> {
             Action action = entrySet.getKey();
-            entrySet.getValue().stream().forEach(t -> {
+            entrySet.getValue().forEach(t -> {
                 StringBuilder sb = new StringBuilder();
                 AssignOpTerm term = (AssignOpTerm) t;
                 assert term.getFunctionTerm().getFunction() == function;
@@ -111,9 +111,9 @@ class FunctionRenderer implements AttributeRenderer {
                 durative_actions.put(action, terms);
             }
         });
-        durative_actions.entrySet().stream().forEach(entrySet -> {
+        durative_actions.entrySet().forEach(entrySet -> {
             DurativeAction action = entrySet.getKey();
-            entrySet.getValue().stream().forEach(t -> {
+            entrySet.getValue().forEach(t -> {
                 StringBuilder sb = new StringBuilder();
                 FunctionTerm term = (FunctionTerm) t;
                 assert term.getFunction() == function;

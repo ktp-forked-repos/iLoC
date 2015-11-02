@@ -49,7 +49,7 @@ class TypedListVariableListener extends PDDLBaseListener {
 
         assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText();
         Type c_type = type;
-        ctx.variable().stream().forEach(variable -> {
+        ctx.variable().forEach(variable -> {
             variables.add(new Variable("?" + Utils.lowercase(variable.name().getText()), c_type));
         });
     }

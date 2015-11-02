@@ -210,7 +210,7 @@ public class ConsumableResourceType extends Type {
             }
 
             if (closed_consumable_resources) {
-                instances.stream().forEach(consumable_resource -> {
+                instances.forEach(consumable_resource -> {
                     Collection<IFormula> c_formulas = formulas.get(consumable_resource);
                     ConsumableResourceTimeline timeline = new ConsumableResourceTimeline(solver, model, consumable_resource, c_formulas);
                     for (int i = 0; i < timeline.values.size(); i++) {
@@ -238,8 +238,8 @@ public class ConsumableResourceType extends Type {
                                 }
                             }
                             List<IBool> or = new ArrayList<>(good_productions.size() * good_consumptions.size());
-                            good_consumptions.stream().forEach(cons -> {
-                                good_productions.stream().forEach(prod -> {
+                            good_consumptions.forEach(cons -> {
+                                good_productions.forEach(prod -> {
                                     or.add(network.leq(cons.get(Constants.END), prod.get(Constants.START)));
                                     or.add(network.not(cons.getScope().eq(prod.getScope())));
                                 });
@@ -272,8 +272,8 @@ public class ConsumableResourceType extends Type {
                                 }
                             }
                             List<IBool> or = new ArrayList<>(good_productions.size() * good_consumptions.size());
-                            good_consumptions.stream().forEach(cons -> {
-                                good_productions.stream().forEach(prod -> {
+                            good_consumptions.forEach(cons -> {
+                                good_productions.forEach(prod -> {
                                     or.add(network.leq(prod.get(Constants.END), cons.get(Constants.START)));
                                     or.add(network.not(prod.getScope().eq(cons.getScope())));
                                 });
@@ -300,11 +300,11 @@ public class ConsumableResourceType extends Type {
                         }).collect(Collectors.toList()));
 
                         final List<IBool> or = new ArrayList<>();
-                        c_formulas.stream().forEach(formula -> {
+                        c_formulas.forEach(formula -> {
                             or.add(network.not(consumable_resource.eq(formula.getScope())));
                         });
                         instances.stream().filter(instance -> (instance != consumable_resource)).forEach(instance -> {
-                            formulas.get(instance).stream().forEach(formula -> {
+                            formulas.get(instance).forEach(formula -> {
                                 or.add(consumable_resource.eq(formula.getScope()));
                             });
                         });

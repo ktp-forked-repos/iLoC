@@ -72,8 +72,8 @@ class TypeDeclaration extends DDLBaseListener {
     public void enterEnum_declaration(DDLParser.Enum_declarationContext ctx) {
         DDLEnumType enum_type = new DDLEnumType(solver, scope, ctx.name.getText());
         scopes.put(ctx, enum_type);
-        ctx.enum_constants().stream().forEach((ec) -> {
-            ec.StringLiteral().stream().forEach((tn) -> {
+        ctx.enum_constants().forEach(ec -> {
+            ec.StringLiteral().forEach(tn -> {
                 enum_type.addEnum(solver.getConstraintNetwork().newString(tn.getSymbol().getText()));
             });
         });

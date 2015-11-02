@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl.parser;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ public class FunctionTerm implements Term {
 
     public FunctionTerm(Function function, Term... arguments) {
         assert function != null;
-        assert Stream.of(arguments).noneMatch(term -> term == null);
+        assert Stream.of(arguments).noneMatch(Objects::isNull);
         this.function = function;
         this.arguments = Arrays.asList(arguments);
     }

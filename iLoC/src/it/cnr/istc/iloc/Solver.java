@@ -234,13 +234,13 @@ public class Solver implements ISolver {
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
-            listeners.stream().forEach(listener -> {
+            listeners.forEach(listener -> {
                 listener.contentChanged(model, currentNode);
             });
             return model;
         } else {
             // We have found an inconsistent node as a consequence of a constraint propagation on the current node
-            listeners.stream().forEach(listener -> {
+            listeners.forEach(listener -> {
                 listener.inconsistentNode(currentNode);
             });
             return null;
@@ -253,13 +253,13 @@ public class Solver implements ISolver {
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
-            listeners.stream().forEach(listener -> {
+            listeners.forEach(listener -> {
                 listener.contentChanged(model, currentNode);
             });
             return model;
         } else {
             // We have found an inconsistent node as a consequence of a constraint propagation on the current node
-            listeners.stream().forEach(listener -> {
+            listeners.forEach(listener -> {
                 listener.inconsistentNode(currentNode);
             });
             return null;
@@ -290,13 +290,13 @@ public class Solver implements ISolver {
             } else if (consistent) {
                 // Current node is propagated and is consistent
                 IModel model = constraintNetwork.getModel();
-                listeners.stream().forEach(listener -> {
+                listeners.forEach(listener -> {
                     listener.contentChanged(model, currentNode);
                 });
                 return true;
             } else {
                 // We have found an inconsistent node as a consequence of a constraint propagation on the current node
-                listeners.stream().forEach(listener -> {
+                listeners.forEach(listener -> {
                     listener.inconsistentNode(currentNode);
                 });
                 return false;
@@ -309,13 +309,13 @@ public class Solver implements ISolver {
                 return null;
             } else if (consistent) {
                 // Target node is propagated and consistent
-                listeners.stream().forEach(listener -> {
+                listeners.forEach(listener -> {
                     listener.currentNode(currentNode);
                 });
                 return true;
             } else {
                 // We have found an inconsistent node as a consequence of a constraint propagation on the current node
-                listeners.stream().forEach(listener -> {
+                listeners.forEach(listener -> {
                     listener.inconsistentNode(currentNode);
                 });
                 return false;
@@ -345,13 +345,13 @@ public class Solver implements ISolver {
                 });
                 currentNode = currentNode.getParent();
                 constraintNetwork.pop();
-                listeners.stream().forEach(listener -> {
+                listeners.forEach(listener -> {
                     listener.currentNode(currentNode);
                 });
             }
 
             // We push till the target node
-            path.stream().forEach(n -> {
+            path.forEach(n -> {
                 constraintNetwork.push();
                 currentNode = n;
                 n.resolve();
@@ -362,13 +362,13 @@ public class Solver implements ISolver {
                 return null;
             } else if (consistent) {
                 // Target node is propagated and consistent
-                listeners.stream().forEach(listener -> {
+                listeners.forEach(listener -> {
                     listener.currentNode(currentNode);
                 });
                 return true;
             } else {
                 // We have found an inconsistent node as a consequence of a constraint propagation on the current node
-                listeners.stream().forEach(listener -> {
+                listeners.forEach(listener -> {
                     listener.inconsistentNode(currentNode);
                 });
                 return false;
@@ -391,7 +391,7 @@ public class Solver implements ISolver {
                     if (flaw == null) {
                         // Hurray!!! We have found a solution!
                         IModel model = constraintNetwork.getModel();
-                        listeners.stream().forEach(listener -> {
+                        listeners.forEach(listener -> {
                             listener.solutionNode(model, currentNode);
                         });
 
@@ -425,17 +425,17 @@ public class Solver implements ISolver {
     public void solveFlaw(IFlaw flaw) {
         Collection<IResolver> resolvers = flaw.getResolvers();
         List<INode> childs = new ArrayList<>(resolvers.size());
-        resolvers.stream().forEach(resolver -> {
+        resolvers.forEach(resolver -> {
             INode child = new Node(currentNode);
             child.addResolver(resolver);
             childs.add(child);
         });
         n_nodes += childs.size();
-        listeners.stream().forEach(listener -> {
+        listeners.forEach(listener -> {
             listener.branch(currentNode, childs);
         });
         Collections.reverse(childs);
-        childs.stream().forEach(child -> fringe.addFirst(child));
+        childs.forEach(child -> fringe.addFirst(child));
     }
 
     @Override
@@ -554,7 +554,7 @@ public class Solver implements ISolver {
     @Override
     public Collection<IMethod> getMethods() {
         Collection<IMethod> c_methods = new ArrayList<>(methods.size());
-        methods.values().stream().forEach((ms) -> {
+        methods.values().forEach((ms) -> {
             c_methods.addAll(ms);
         });
         return Collections.unmodifiableCollection(c_methods);

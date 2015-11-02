@@ -44,7 +44,7 @@ class Formula extends SimpleObject implements IFormula {
 
         // We assign values to fields
         assert assignments.keySet().stream().noneMatch(field_name -> (!predicate.getFields().containsKey(field_name))) : assignments.keySet() + " not in " + predicate.getFields().keySet();
-        assignments.entrySet().stream().forEach(entry -> {
+        assignments.entrySet().forEach(entry -> {
             set(entry.getKey(), entry.getValue());
         });
 

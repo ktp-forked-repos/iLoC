@@ -93,7 +93,7 @@ public class PDDLTranslator {
                         domain.addType(c_superclass);
                     }
                     final Type superclass = c_superclass;
-                    ctx.name().stream().forEach(type_name -> {
+                    ctx.name().forEach(type_name -> {
                         Type type = new Type(Utils.capitalize(type_name.getText()));
                         type.setSuperclass(superclass);
                         domain.addType(type);
@@ -122,7 +122,7 @@ public class PDDLTranslator {
 
                     assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText();
                     Type c_type = type;
-                    ctx.name().stream().forEach(name -> {
+                    ctx.name().forEach(name -> {
                         domain.addConstant(c_type.newInstance(Utils.lowercase(name.getText())));
                     });
                 }
@@ -188,7 +188,7 @@ public class PDDLTranslator {
         /**
          * We define the structures.
          */
-        domain_context.structure_def().stream().forEach(structure_def -> {
+        domain_context.structure_def().forEach(structure_def -> {
             if (structure_def.action_def() != null) {
                 WALKER.walk(new PDDLBaseListener() {
 
@@ -237,7 +237,7 @@ public class PDDLTranslator {
                         type = ctx.type().primitive_type(0).name() == null ? Type.OBJECT : domain.getType(Utils.capitalize(ctx.type().primitive_type(0).name().getText()));
                     }
                     final Type c_type = type;
-                    ctx.name().stream().forEach(object -> {
+                    ctx.name().forEach(object -> {
                         problem.addObject(c_type.newInstance(Utils.lowercase(object.getText())));
                     });
                 }
@@ -247,7 +247,7 @@ public class PDDLTranslator {
         /**
          * We define the initial state
          */
-        problem_context.init().init_el().stream().forEach(init_el -> {
+        problem_context.init().init_el().forEach(init_el -> {
             problem.addInitEl(term_visitor.visit(init_el));
         });
 
@@ -290,14 +290,14 @@ public class PDDLTranslator {
     private static ProblemInstance makeGround(ProblemInstance instance) {
         Domain ground_domain = new Domain(instance.domain.getName());
 
-        instance.domain.getTypes().values().stream().forEach(type -> {
+        instance.domain.getTypes().values().forEach(type -> {
             ground_domain.addType(type);
         });
-        instance.domain.getConstants().values().stream().forEach(c -> {
+        instance.domain.getConstants().values().forEach(c -> {
             ground_domain.addConstant(c);
         });
 
-        instance.domain.getPredicates().values().stream().forEach(predicate -> {
+        instance.domain.getPredicates().values().forEach(predicate -> {
             if (predicate.getVariables().isEmpty()) {
                 ground_domain.addPredicate(predicate);
             } else {
@@ -308,7 +308,7 @@ public class PDDLTranslator {
             }
         });
 
-        instance.domain.getFunctions().values().stream().forEach(function -> {
+        instance.domain.getFunctions().values().forEach(function -> {
             if (function.getVariables().isEmpty()) {
                 ground_domain.addFunction(function);
             } else {
@@ -319,7 +319,7 @@ public class PDDLTranslator {
             }
         });
 
-        instance.domain.getActions().values().stream().forEach(action -> {
+        instance.domain.getActions().values().forEach(action -> {
             if (action.getVariables().isEmpty()) {
                 ground_domain.addAction(action);
             } else {
@@ -335,7 +335,7 @@ public class PDDLTranslator {
             }
         });
 
-        instance.domain.getDurativeActions().values().stream().forEach(action -> {
+        instance.domain.getDurativeActions().values().forEach(action -> {
             if (action.getVariables().isEmpty()) {
                 ground_domain.addDurativeAction(action);
             } else {
@@ -354,7 +354,7 @@ public class PDDLTranslator {
 
         Problem ground_problem = new Problem(ground_domain, instance.problem.getName());
 
-        instance.problem.getObjects().values().stream().forEach(o -> {
+        instance.problem.getObjects().values().forEach(o -> {
             ground_problem.addObject(o);
         });
 
@@ -362,7 +362,7 @@ public class PDDLTranslator {
         instance.domain.getTypes().values().stream().flatMap(type -> type.getInstances().stream()).forEach(c -> {
             known_terms.put(c.getName(), new ConstantTerm(null, c.getName()));
         });
-        instance.problem.getInitEls().stream().forEach(init_el -> {
+        instance.problem.getInitEls().forEach(init_el -> {
             ground_problem.addInitEl(init_el.ground(ground_domain, null, known_terms));
         });
         ground_problem.setGoal(instance.problem.getGoal().ground(ground_domain, null, known_terms));

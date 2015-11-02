@@ -66,7 +66,7 @@ public class TimelinesChart extends ChartPanel {
                 new PropositionalImpulsiveAgentTimelineVisualizer(),
                 new ReusableResourceTimelineVisualizer(),
                 new StateVariableTimelineVisualizer()
-        ).stream().forEach(visualizer -> {
+        ).forEach(visualizer -> {
             visualizers.put(visualizer.getTimelineType(), visualizer);
         });
 
@@ -90,7 +90,7 @@ public class TimelinesChart extends ChartPanel {
             public void chartMouseClicked(ChartMouseEvent cme) {
                 if (cme.getEntity() != null && cme.getEntity() instanceof XYItemEntity) {
                     Object dataItem = getDataItem(cme.getEntity());
-                    visualizers.values().stream().forEach(visualizer -> {
+                    visualizers.values().forEach(visualizer -> {
                         visualizer.mouseClicked(dataItem);
                     });
                 }
@@ -121,13 +121,13 @@ public class TimelinesChart extends ChartPanel {
 
     private Map<String, IObject> extractObjects(IModel model, IEnvironment environment, Collection<? extends IField> fields, Collection<IObject> found_timelines) {
         Map<String, IObject> c_objects = new LinkedHashMap<>();
-        fields.stream().forEach(field -> {
+        fields.forEach(field -> {
             IObject object = environment.get(model, field.getName());
             if (!found_timelines.contains(object) && getVisualizer(object.getType()) != null) {
                 found_timelines.add(object);
                 c_objects.put(field.getName(), object);
                 Map<String, IObject> o_objects = extractObjects(model, object, object.getType().getFields().values().stream().filter(f -> !f.isSynthetic()).collect(Collectors.toList()), found_timelines);
-                o_objects.entrySet().stream().forEach(entry -> {
+                o_objects.entrySet().forEach(entry -> {
                     c_objects.put(field.getName() + "." + entry.getKey(), entry.getValue());
                 });
             }
@@ -139,7 +139,7 @@ public class TimelinesChart extends ChartPanel {
         final CombinedDomainXYPlot combined_plot = new CombinedDomainXYPlot(new DateAxis("Time"));
         combined_plot.setGap(3.0);
         combined_plot.setOrientation(PlotOrientation.VERTICAL);
-        objects.entrySet().stream().forEach(entry -> {
+        objects.entrySet().forEach(entry -> {
             ITimelineVisualizer visualizer = getVisualizer(entry.getValue().getType());
             if (visualizer != null) {
                 XYPlot p = visualizer.getPlot(model, entry.getValue());

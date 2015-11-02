@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl.parser;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ public class Function {
     private final List<Variable> variables;
 
     public Function(String name, Type type, Variable... variables) {
-        assert Stream.of(variables).noneMatch(variable -> variable == null);
+        assert Stream.of(variables).noneMatch(Objects::isNull);
         assert type != null;
         this.name = name;
         this.type = type;

@@ -164,7 +164,7 @@ public interface IType extends IScope {
     public default Map<IObject, Collection<IFormula>> getFormulas(IModel model) {
         final Collection<IObject> instances = getInstances();
         final Map<IObject, Collection<IFormula>> formulas = new IdentityHashMap<>(instances.size());
-        instances.stream().forEach(instance -> {
+        instances.forEach(instance -> {
             formulas.put(instance, new ArrayList<>());
         });
         getPredicates().values().stream().flatMap(predicate -> predicate.getInstances().stream()).map(formula -> (IFormula) formula).filter(formula -> formula.getFormulaState() == FormulaState.Active).forEach(formula -> {

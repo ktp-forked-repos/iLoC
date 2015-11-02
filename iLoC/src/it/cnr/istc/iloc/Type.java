@@ -319,16 +319,16 @@ public class Type extends Scope implements IType {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("(").append(name).append("\n");
-        getFields().keySet().stream().forEach((field) -> {
+        getFields().keySet().forEach((field) -> {
             sb.append("  ").append(field).append("\n");
         });
-        constructors.stream().forEach((c) -> {
+        constructors.forEach((c) -> {
             sb.append("  ").append(this.name).append(".<init>").append("(").append(Stream.of(c.getParameters()).map(p -> p.getType().getName() + " " + p.getName()).collect(Collectors.joining(", "))).append(")\n");
         });
-        getMethods().stream().forEach((m) -> {
+        getMethods().forEach((m) -> {
             sb.append("  ").append(this.name).append(".").append(m.getName()).append("(").append(Stream.of(m.getParameters()).map(p -> p.getType().getName() + " " + p.getName()).collect(Collectors.joining(", "))).append(")\n");
         });
-        getPredicates().values().stream().forEach((p) -> {
+        getPredicates().values().forEach((p) -> {
             sb.append("  ").append(this.name).append(".").append(p.getName()).append("(").append(p.getFields().values().stream().filter(field -> !field.isSynthetic()).map(par -> par.getType().getName() + " " + par.getName()).collect(Collectors.joining(", "))).append(")\n");
         });
         sb.append(")");

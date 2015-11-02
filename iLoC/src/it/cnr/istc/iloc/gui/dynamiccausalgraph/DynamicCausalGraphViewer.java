@@ -219,7 +219,7 @@ public class DynamicCausalGraphViewer extends Display implements IDynamicCausalG
             if (!edges.containsKey(formula)) {
                 edges.put(formula, new IdentityHashMap<>());
             }
-            with.stream().forEach(to -> {
+            with.forEach(to -> {
                 Edge e = g.addEdge(nodes.get(formula), nodes.get(to));
                 edges.get(formula).put(to, e);
             });
@@ -233,7 +233,7 @@ public class DynamicCausalGraphViewer extends Display implements IDynamicCausalG
                 nodes.get(formula).set(NODE_TYPE, formula.getFormulaState().name());
                 if (unifications.containsKey(formula)) {
                     Unification merge = unifications.remove(formula);
-                    merge.with.stream().forEach(with -> {
+                    merge.with.forEach(with -> {
                         g.removeEdge(edges.get(formula).remove(with));
                     });
                     if (edges.get(formula).isEmpty()) {
