@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl.parser;
+package it.cnr.istc.iloc.translators.pddl;
 
+import it.cnr.istc.iloc.translators.pddl.parser.Predicate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,28 +28,27 @@ import java.util.stream.Stream;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class InvariantTerm {
+public class Atom {
 
     private final Predicate predicate;
-    private final List<Variable> arguments;
+    private final List<Parameter> variables;
 
-    public InvariantTerm(Predicate predicate, Variable... arguments) {
-        assert predicate != null;
-        assert Stream.of(arguments).noneMatch(Objects::isNull);
+    Atom(Predicate predicate, Parameter... variables) {
+        assert Stream.of(variables).noneMatch(Objects::isNull);
         this.predicate = predicate;
-        this.arguments = Arrays.asList(arguments);
+        this.variables = Arrays.asList(variables);
     }
 
     public Predicate getPredicate() {
         return predicate;
     }
 
-    public List<Variable> getArguments() {
-        return Collections.unmodifiableList(arguments);
+    public List<Parameter> getVariables() {
+        return Collections.unmodifiableList(variables);
     }
 
     @Override
     public String toString() {
-        return "(" + predicate.getName() + " " + arguments.stream().map(argument -> argument.toString()).collect(Collectors.joining(" ")) + ")";
+        return "(" + predicate.getName() + " " + variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" ")) + ")";
     }
 }

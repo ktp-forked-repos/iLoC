@@ -14,15 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.cnr.istc.iloc.translators.pddl.parser;
+package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  *
@@ -30,26 +29,30 @@ import java.util.stream.Stream;
  */
 public class Invariant {
 
-    private final List<Variable> variables;
-    private final List<Predicate> predicates;
+    private final Map<String, Parameter> parameters = new LinkedHashMap<>();
+    private final List<Atom> atoms = new ArrayList<>();
 
-    public Invariant(Variable[] variables, Predicate[] predicates) {
-        assert Stream.of(variables).noneMatch(Objects::isNull);
-        assert Stream.of(predicates).noneMatch(Objects::isNull);
-        this.variables = Arrays.asList(variables);
-        this.predicates = Arrays.asList(predicates);
+    Invariant() {
     }
 
-    public List<Variable> getVariables() {
-        return Collections.unmodifiableList(variables);
+    void addParameter(Parameter parameter) {
+        parameters.put(parameter.getName(), parameter);
     }
 
-    public List<Predicate> getPredicates() {
-        return Collections.unmodifiableList(predicates);
+    public Map<String, Parameter> getParameters() {
+        return Collections.unmodifiableMap(parameters);
+    }
+
+    void addAtom(Atom atom) {
+        atoms.add(atom);
+    }
+
+    public List<Atom> getAtoms() {
+        return Collections.unmodifiableList(atoms);
     }
 
     @Override
     public String toString() {
-        return "∀" + variables.stream().map(v -> v.getName()).collect(Collectors.joining(", ")) + " " + predicates.stream().map(p -> p.toString()).collect(Collectors.joining(" + ")) + "↓";
+        return parameters.values().stream().map(v -> v.getName()).collect(Collectors.joining(", ")) + (parameters.isEmpty() ? "" : " ") + atoms.stream().map(p -> p.toString()).collect(Collectors.joining(" + "));
     }
 }

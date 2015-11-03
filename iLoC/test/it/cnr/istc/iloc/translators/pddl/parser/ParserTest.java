@@ -16,6 +16,8 @@
  */
 package it.cnr.istc.iloc.translators.pddl.parser;
 
+import it.cnr.istc.iloc.translators.pddl.Invariant;
+import it.cnr.istc.iloc.translators.pddl.InvariantSynthesizer;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -35,7 +37,7 @@ public class ParserTest {
     public void testBlocksWorldInvariantSynthesisTranslator() {
         try {
             PDDLInstance instance = Parser.parse(new File(ParserTest.class.getResource("blocks-domain.pddl").getPath()), new File(ParserTest.class.getResource("blocks-problem.pddl").getPath()));
-            Collection<Invariant> invariants = instance.getDomain().getInvariants();
+            Collection<Invariant> invariants = InvariantSynthesizer.getInvariants(instance.getDomain());
             invariants.forEach(invariant -> {
                 System.out.println(invariant);
             });
@@ -51,7 +53,7 @@ public class ParserTest {
     public void testLogisticsInvariantSynthesisTranslator() {
         try {
             PDDLInstance instance = Parser.parse(new File(ParserTest.class.getResource("logistics-domain.pddl").getPath()), new File(ParserTest.class.getResource("logistics-problem.pddl").getPath()));
-            Collection<Invariant> invariants = instance.getDomain().getInvariants();
+            Collection<Invariant> invariants = InvariantSynthesizer.getInvariants(instance.getDomain());
             invariants.forEach(invariant -> {
                 System.out.println(invariant);
             });

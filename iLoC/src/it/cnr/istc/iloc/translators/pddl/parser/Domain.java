@@ -16,18 +16,11 @@
  */
 package it.cnr.istc.iloc.translators.pddl.parser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  *
@@ -132,41 +125,6 @@ public class Domain {
         return functions.values().stream().filter(function -> actions.values().stream().noneMatch(action -> containsFunction(action.getEffect(), function)) && durative_actions.values().stream().noneMatch(action -> containsFunction(action.getEffect(), function))).collect(Collectors.toSet());
     }
 
-    public Collection<Invariant> getInvariants() {
-        Set<Invariant> invariants = new HashSet<>();
-
-        // We compute the initial invariant candidates..
-        Collection<Predicate> staticPredicates = getStaticPredicates();
-        Set<Invariant> candidates = predicates.values().stream().filter(predicate -> !staticPredicates.contains(predicate)).flatMap(predicate -> Stream.concat(Stream.of(new Invariant(new Variable[0], new Predicate[]{predicate})), predicate.getVariables().stream().map(variable -> new Invariant(new Variable[]{variable}, new Predicate[]{predicate})))).collect(Collectors.toSet());
-
-        // We check for threats..
-        while (!candidates.isEmpty()) {
-            // We remove too heavy candidates..
-            candidates.removeIf(invariant -> actions.values().stream().anyMatch(action -> countAddPredicates(action.getEffect(), invariant) > 1));
-
-            Set<Invariant> refined_invariants = new HashSet<>();
-            candidates.forEach(invariant -> {
-                // We find a threatening action..
-                Optional<Action> threatening_action = actions.values().stream().filter(action -> countAddPredicates(action.getEffect(), invariant) != countDelPredicates(action.getEffect(), invariant)).findAny();
-                if (threatening_action.isPresent()) {
-                    // We refine the invariant according to the found threatening action..
-                    getInvariantRefinements(invariant, threatening_action.get().getEffect()).forEach(predicate -> {
-                        // TODO: Invariant variables should be renamed according to the action..
-                        List<Predicate> ps = new ArrayList<>(invariant.getPredicates());
-                        ps.add(predicate);
-                        refined_invariants.add(new Invariant(invariant.getVariables().stream().toArray(Variable[]::new), ps.stream().toArray(Predicate[]::new)));
-                    });
-                } else {
-                    // We accept the invariant..
-                    invariants.add(invariant);
-                }
-            });
-            candidates.clear();
-            candidates.addAll(refined_invariants);
-        }
-        return invariants;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -229,36 +187,6 @@ public class Domain {
             return false;
         } else if (term instanceof ConstantTerm) {
             return false;
-        } else {
-            throw new UnsupportedOperationException(term.getClass().getName());
-        }
-    }
-
-    private static long countAddPredicates(Term term, Invariant invariant) {
-        return getPredicateTerms(term).stream().filter(predicate_term -> invariant.getPredicates().contains(predicate_term.getPredicate()) && predicate_term.isDirected()).count();
-    }
-
-    private static long countDelPredicates(Term term, Invariant invariant) {
-        return getPredicateTerms(term).stream().filter(predicate_term -> invariant.getPredicates().contains(predicate_term.getPredicate()) && !predicate_term.isDirected()).count();
-    }
-
-    private static Collection<Predicate> getInvariantRefinements(Invariant invariant, Term term) {
-        return getPredicateTerms(term).stream().filter(predicate_term -> !invariant.getPredicates().contains(predicate_term.getPredicate()) && !predicate_term.isDirected()).map(predicate_term -> predicate_term.getPredicate()).collect(Collectors.toList());
-    }
-
-    private static Collection<PredicateTerm> getPredicateTerms(Term term) {
-        if (term instanceof PredicateTerm) {
-            return Arrays.asList(((PredicateTerm) term));
-        } else if (term instanceof FunctionTerm) {
-            return Collections.emptyList();
-        } else if (term instanceof AndTerm) {
-            return ((AndTerm) term).getTerms().stream().flatMap(t -> getPredicateTerms(t).stream()).collect(Collectors.toList());
-        } else if (term instanceof AssignOpTerm) {
-            return Collections.emptyList();
-        } else if (term instanceof VariableTerm) {
-            return Collections.emptyList();
-        } else if (term instanceof ConstantTerm) {
-            return Collections.emptyList();
         } else {
             throw new UnsupportedOperationException(term.getClass().getName());
         }
