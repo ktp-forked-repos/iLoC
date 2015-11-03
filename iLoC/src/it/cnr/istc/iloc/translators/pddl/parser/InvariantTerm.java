@@ -19,7 +19,6 @@ package it.cnr.istc.iloc.translators.pddl.parser;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,28 +27,28 @@ import java.util.stream.Stream;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class Invariant {
+public class InvariantTerm {
 
-    private final List<Variable> variables;
-    private final List<Predicate> predicates;
+    private final Predicate predicate;
+    private final List<Variable> arguments;
 
-    public Invariant(Variable[] variables, Predicate[] predicates) {
-        assert Stream.of(variables).noneMatch(Objects::isNull);
-        assert Stream.of(predicates).noneMatch(Objects::isNull);
-        this.variables = Arrays.asList(variables);
-        this.predicates = Arrays.asList(predicates);
+    public InvariantTerm(Predicate predicate, Variable... arguments) {
+        assert predicate != null;
+        assert Stream.of(arguments).noneMatch(Objects::isNull);
+        this.predicate = predicate;
+        this.arguments = Arrays.asList(arguments);
     }
 
-    public List<Variable> getVariables() {
-        return Collections.unmodifiableList(variables);
+    public Predicate getPredicate() {
+        return predicate;
     }
 
-    public List<Predicate> getPredicates() {
-        return Collections.unmodifiableList(predicates);
+    public List<Variable> getArguments() {
+        return Collections.unmodifiableList(arguments);
     }
 
     @Override
     public String toString() {
-        return "∀" + variables.stream().map(v -> v.getName()).collect(Collectors.joining(", ")) + " " + predicates.stream().map(p -> p.toString()).collect(Collectors.joining(" + ")) + "↓";
+        return "(" + predicate.getName() + " " + arguments.stream().map(argument -> argument.toString()).collect(Collectors.joining(" ")) + ")";
     }
 }
