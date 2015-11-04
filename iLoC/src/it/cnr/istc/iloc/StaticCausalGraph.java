@@ -16,10 +16,8 @@
  */
 package it.cnr.istc.iloc;
 
-import it.cnr.istc.iloc.api.FormulaState;
 import it.cnr.istc.iloc.api.IDisjunct;
 import it.cnr.istc.iloc.api.IDisjunction;
-import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.IPredicate;
 import it.cnr.istc.iloc.api.IPreference;
 import it.cnr.istc.iloc.api.IScope;
@@ -33,7 +31,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,15 +48,13 @@ class StaticCausalGraph implements IStaticCausalGraph {
     private final Map<INode, IScope> nodes = new IdentityHashMap<>();
     private final Map<INode, Map<INode, Collection<IEdge>>> links = new IdentityHashMap<>();
     private final Map<INode, Set<INode>> all_reachable_nodes = new HashMap<>();
-    private final Map<INode, Set<INode>> all_min_reachable_nodes = new HashMap<>();
-    private final Map<INode, Set<INode>> min_reachable_nodes = new HashMap<>();
-    private final Map<INode, Integer> min_causal_distance = new HashMap<>();
     private final Collection<IStaticCausalGraphListener> listeners = new ArrayList<>();
 
     @Override
     public void addType(IType type) {
         assert !types.contains(type);
         types.add(type);
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.typeAdded(type);
         });
@@ -69,6 +64,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
     public void removeType(IType type) {
         assert types.contains(type);
         types.remove(type);
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.typeRemoved(type);
         });
@@ -86,6 +82,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
         predicates.put(predicate, node);
         nodes.put(node, predicate);
         links.put(node, new HashMap<>());
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
         });
@@ -104,6 +101,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
         disjunctions.put(disjunction, node);
         nodes.put(node, disjunction);
         links.put(node, new HashMap<>());
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
         });
@@ -122,6 +120,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
         disjuncts.put(disjunct, node);
         nodes.put(node, disjunct);
         links.put(node, new HashMap<>());
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
         });
@@ -140,6 +139,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
         preferences.put(preference, node);
         nodes.put(node, preference);
         links.put(node, new HashMap<>());
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
         });
@@ -155,6 +155,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
     public INoOpNode addNoOp() {
         INoOpNode node = new NoOpNode();
         links.put(node, new HashMap<>());
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
         });
@@ -171,9 +172,15 @@ class StaticCausalGraph implements IStaticCausalGraph {
         disjuncts.remove(scope);
         preferences.remove(scope);
         links.remove(node, new HashMap<>());
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
         });
+    }
+
+    @Override
+    public Collection<INode> getNodes() {
+        return links.keySet();
     }
 
     @Override
@@ -183,6 +190,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
             links.get(source).put(target, new ArrayList<>());
         }
         links.get(source).get(target).add(edge);
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.edgeAdded(edge);
         });
@@ -195,9 +203,15 @@ class StaticCausalGraph implements IStaticCausalGraph {
         if (links.get(edge.getSource()).get(edge.getTarget()).isEmpty()) {
             links.get(edge.getSource()).remove(edge.getTarget());
         }
+        all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.edgeRemoved(edge);
         });
+    }
+
+    @Override
+    public Collection<IEdge> getEdges() {
+        return links.values().stream().flatMap(t -> t.values().stream().flatMap(edges -> edges.stream())).collect(Collectors.toList());
     }
 
     @Override
@@ -216,132 +230,6 @@ class StaticCausalGraph implements IStaticCausalGraph {
             all_reachable_nodes.put(node, c_nodes);
         }
         return all_reachable_nodes.get(node);
-    }
-
-    @Override
-    public Set<INode> getAllMinReachableNodes(INode node) {
-        if (!all_min_reachable_nodes.containsKey(node)) {
-            all_min_reachable_nodes.put(node, getAllMinReachableNodes(node, new HashSet<>(nodes.size())));
-        }
-        return all_min_reachable_nodes.get(node);
-    }
-
-    private Set<INode> getAllMinReachableNodes(INode node, Set<INode> visited) {
-        if (!all_min_reachable_nodes.containsKey(node)) {
-            all_min_reachable_nodes.put(node, getMinReachableNodes(node, new HashSet<>(nodes.size())));
-        }
-        if (!visited.contains(node)) {
-            if (node instanceof IPredicateNode) {
-                visited.add(node);
-            }
-            if (node instanceof IDisjunctionNode) {
-                int min_nodes_size = Integer.MAX_VALUE;
-                Set<INode> min_nodes = null;
-                for (IDisjunct disjunct : ((IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
-                    Set<INode> c_nodes = getAllMinReachableNodes(getNode(disjunct), new HashSet<>(visited));
-                    if (c_nodes.size() < min_nodes_size) {
-                        min_nodes_size = c_nodes.size();
-                        min_nodes = c_nodes;
-                    }
-                }
-                visited.addAll(min_nodes);
-            } else if (!(node instanceof INoOpNode)) {
-                visited.addAll(node.getExitingEdges().stream().filter(edge -> edge.getType() == IEdge.Type.Goal).flatMap(edge -> getAllMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
-            }
-            return visited;
-        } else {
-            return Collections.emptySet();
-        }
-    }
-
-    @Override
-    public Set<INode> getMinReachableNodes(INode node) {
-        if (!min_reachable_nodes.containsKey(node)) {
-            min_reachable_nodes.put(node, getMinReachableNodes(node, new HashSet<>(nodes.size())));
-        }
-        return min_reachable_nodes.get(node);
-    }
-
-    private Set<INode> getMinReachableNodes(INode node, Set<INode> visited) {
-        if (min_reachable_nodes.containsKey(node)) {
-            return min_reachable_nodes.get(node);
-        }
-        if (!visited.contains(node)) {
-            if (node instanceof IPredicateNode) {
-                if (((IPredicateNode) node).getPredicate().getInstances().stream().map(instance -> (IFormula) instance).noneMatch(formula -> formula.getFormulaState() == FormulaState.Active)) {
-                    visited.add(node);
-                } else {
-                    return visited;
-                }
-            }
-            if (node instanceof IDisjunctionNode) {
-                int min_nodes_size = Integer.MAX_VALUE;
-                Set<INode> min_nodes = null;
-                for (IDisjunct disjunct : ((IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
-                    Set<INode> c_nodes = getMinReachableNodes(getNode(disjunct), new HashSet<>(visited));
-                    if (c_nodes.size() < min_nodes_size) {
-                        min_nodes_size = c_nodes.size();
-                        min_nodes = c_nodes;
-                    }
-                }
-                visited.addAll(min_nodes);
-            } else if (!(node instanceof INoOpNode)) {
-                visited.addAll(node.getExitingEdges().stream().filter(edge -> edge.getType() == IEdge.Type.Goal).flatMap(edge -> getMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
-            }
-            return visited;
-        } else {
-            return Collections.emptySet();
-        }
-    }
-
-    @Override
-    public int getMinCausalDistance(INode node) {
-        if (!min_causal_distance.containsKey(node)) {
-            min_causal_distance.put(node, getMinCausalDistance(node, new HashSet<>(nodes.size())));
-        }
-        return min_causal_distance.get(node);
-    }
-
-    private int getMinCausalDistance(INode node, Set<INode> visited) {
-        if (min_causal_distance.containsKey(node)) {
-            return min_causal_distance.get(node);
-        }
-        if (!visited.contains(node)) {
-            if (node instanceof IPredicateNode) {
-                if (((IPredicateNode) node).getPredicate().getInstances().stream().map(instance -> (IFormula) instance).noneMatch(formula -> formula.getFormulaState() == FormulaState.Active)) {
-                    visited.add(node);
-                } else {
-                    return 0;
-                }
-            }
-            if (node instanceof IDisjunctionNode) {
-                int min_distance = Integer.MAX_VALUE;
-                for (IDisjunct disjunct : ((IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
-                    int c_distance = getMinCausalDistance(getNode(disjunct), new HashSet<>(visited));
-                    if (c_distance < min_distance) {
-                        min_distance = c_distance;
-                    }
-                }
-                return min_distance;
-            } else if (!(node instanceof INoOpNode)) {
-                OptionalInt max = node.getExitingEdges().stream().filter(edge -> edge.getType() == IEdge.Type.Goal).mapToInt(edge -> getMinCausalDistance(edge.getTarget(), visited)).max();
-                return 1 + (max.isPresent() ? max.getAsInt() : 0);
-            }
-            return 0;
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public void recomputeCosts() {
-        all_reachable_nodes.clear();
-        all_min_reachable_nodes.clear();
-        min_reachable_nodes.clear();
-        min_causal_distance.clear();
-        links.keySet().forEach(node -> {
-            estimateCost(node);
-        });
     }
 
     @Override

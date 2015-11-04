@@ -22,6 +22,7 @@ import it.cnr.istc.iloc.api.IDisjunct;
 import it.cnr.istc.iloc.api.IDisjunction;
 import it.cnr.istc.iloc.api.IDisjunctionFlaw;
 import it.cnr.istc.iloc.api.IEnvironment;
+import it.cnr.istc.iloc.api.IEstimator;
 import it.cnr.istc.iloc.api.IResolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.ArrayList;
@@ -37,12 +38,14 @@ import java.util.stream.Collectors;
 public class DisjunctionFlaw implements IDisjunctionFlaw {
 
     private final IEnvironment environment;
+    private final IEstimator estimator;
     private final IDisjunction disjunction;
     private final IStaticCausalGraph staticCausalGraph;
 
     public DisjunctionFlaw(IEnvironment environment, IDisjunction disjunction) {
         assert !disjunction.getDisjuncts().isEmpty();
         this.environment = environment;
+        this.estimator = environment.getSolver().getEstimator();
         this.disjunction = disjunction;
         this.staticCausalGraph = environment.getSolver().getStaticCausalGraph();
     }
@@ -54,13 +57,13 @@ public class DisjunctionFlaw implements IDisjunctionFlaw {
 
     @Override
     public double getEstimatedCost() {
-        return environment.getSolver().getStaticCausalGraph().estimateCost(environment.getSolver().getStaticCausalGraph().getNode(disjunction));
+        return estimator.estimate(staticCausalGraph.getNode(disjunction));
     }
 
     @Override
     public Collection<IResolver> getResolvers() {
         List<IDisjunct> disjuncts = new ArrayList<>(disjunction.getDisjuncts());
-        Collections.sort(disjuncts, (IDisjunct d0, IDisjunct d1) -> Double.compare(staticCausalGraph.estimateCost(staticCausalGraph.getNode(d0)), staticCausalGraph.estimateCost(staticCausalGraph.getNode(d1))));
+        Collections.sort(disjuncts, (IDisjunct d0, IDisjunct d1) -> Double.compare(estimator.estimate(staticCausalGraph.getNode(d0)), estimator.estimate(staticCausalGraph.getNode(d1))));
         return disjuncts.stream().map(disjunct -> new IResolver() {
 
             private boolean expanded = false;

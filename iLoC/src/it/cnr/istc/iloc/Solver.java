@@ -20,6 +20,7 @@ import it.cnr.istc.iloc.api.Constants;
 import it.cnr.istc.iloc.api.IConstraintNetwork;
 import it.cnr.istc.iloc.api.IDynamicCausalGraph;
 import it.cnr.istc.iloc.api.IEnvironment;
+import it.cnr.istc.iloc.api.IEstimator;
 import it.cnr.istc.iloc.api.IField;
 import it.cnr.istc.iloc.api.IFlaw;
 import it.cnr.istc.iloc.api.IFormula;
@@ -36,6 +37,7 @@ import it.cnr.istc.iloc.api.ISolverListener;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import it.cnr.istc.iloc.api.IType;
 import it.cnr.istc.iloc.ddl.LanguageParser;
+import it.cnr.istc.iloc.estimators.D0Estimator;
 import it.cnr.istc.iloc.utils.NativeUtils;
 import java.io.File;
 import java.io.IOException;
@@ -90,6 +92,7 @@ public class Solver implements ISolver {
     private final IConstraintNetwork constraintNetwork;
     private final IStaticCausalGraph staticCausalGraph = new StaticCausalGraph();
     private final IDynamicCausalGraph dynamicCausalGraph = new DynamicCausalGraph();
+    private final IEstimator estimator = new D0Estimator(this);
     private final Map<String, IField> fields = new LinkedHashMap<>();
     private final Map<String, Collection<IMethod>> methods = new HashMap<>();
     private final Map<String, IType> types = new LinkedHashMap<>(0);
@@ -231,6 +234,7 @@ public class Solver implements ISolver {
     @Override
     public IModel read(String script) {
         parser.read(script);
+        estimator.recomputeCosts();
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
@@ -250,6 +254,7 @@ public class Solver implements ISolver {
     @Override
     public IModel read(File... files) throws IOException {
         parser.read(files);
+        estimator.recomputeCosts();
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
@@ -279,6 +284,11 @@ public class Solver implements ISolver {
     @Override
     public IDynamicCausalGraph getDynamicCausalGraph() {
         return dynamicCausalGraph;
+    }
+
+    @Override
+    public IEstimator getEstimator() {
+        return estimator;
     }
 
     @Override
@@ -379,7 +389,6 @@ public class Solver implements ISolver {
     @Override
     public boolean solve() {
         bound = properties.containsKey("Bound") ? Integer.parseInt(properties.getProperty("Bound")) : predicates.size() + types.values().stream().mapToInt(type -> type.getPredicates().size()).sum();
-        staticCausalGraph.recomputeCosts();
         while (true) {
             while (!fringe.isEmpty()) {
                 Boolean reached = goTo(fringe.pollFirst());

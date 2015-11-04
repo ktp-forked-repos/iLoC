@@ -39,10 +39,7 @@ public class StaticCausalGraphJInternalFrame extends JInternalFrame implements S
         viewJMenu = new javax.swing.JMenu();
         costFunctionJMenu = new javax.swing.JMenu();
         defaultJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
-        allReachableNodesJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
-        allMinReachableNodesJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
-        minReachableJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
-        minCausalDistanceJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
+        estimatorJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
 
         setIconifiable(true);
         setMaximizable(true);
@@ -65,41 +62,14 @@ public class StaticCausalGraphJInternalFrame extends JInternalFrame implements S
         });
         costFunctionJMenu.add(defaultJRadioButtonMenuItem);
 
-        costFunctionButtonGroup.add(allReachableNodesJRadioButtonMenuItem);
-        allReachableNodesJRadioButtonMenuItem.setText("All reachable");
-        allReachableNodesJRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        costFunctionButtonGroup.add(estimatorJRadioButtonMenuItem);
+        estimatorJRadioButtonMenuItem.setText("Estimator based");
+        estimatorJRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                allReachableNodesJRadioButtonMenuItemActionPerformed(evt);
+                estimatorJRadioButtonMenuItemActionPerformed(evt);
             }
         });
-        costFunctionJMenu.add(allReachableNodesJRadioButtonMenuItem);
-
-        costFunctionButtonGroup.add(allMinReachableNodesJRadioButtonMenuItem);
-        allMinReachableNodesJRadioButtonMenuItem.setText("All min reachable");
-        allMinReachableNodesJRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                allMinReachableNodesJRadioButtonMenuItemActionPerformed(evt);
-            }
-        });
-        costFunctionJMenu.add(allMinReachableNodesJRadioButtonMenuItem);
-
-        costFunctionButtonGroup.add(minReachableJRadioButtonMenuItem);
-        minReachableJRadioButtonMenuItem.setText("Min reachable");
-        minReachableJRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                minReachableJRadioButtonMenuItemActionPerformed(evt);
-            }
-        });
-        costFunctionJMenu.add(minReachableJRadioButtonMenuItem);
-
-        costFunctionButtonGroup.add(minCausalDistanceJRadioButtonMenuItem);
-        minCausalDistanceJRadioButtonMenuItem.setText("Min causal distance");
-        minCausalDistanceJRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                minCausalDistanceJRadioButtonMenuItemActionPerformed(evt);
-            }
-        });
-        costFunctionJMenu.add(minCausalDistanceJRadioButtonMenuItem);
+        costFunctionJMenu.add(estimatorJRadioButtonMenuItem);
 
         viewJMenu.add(costFunctionJMenu);
 
@@ -125,29 +95,14 @@ public class StaticCausalGraphJInternalFrame extends JInternalFrame implements S
         staticCausalGraphViewer.setCostFunction(StaticCausalGraphViewer.CostFunction.Default);
     }//GEN-LAST:event_defaultJRadioButtonMenuItemActionPerformed
 
-    private void allReachableNodesJRadioButtonMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allReachableNodesJRadioButtonMenuItemActionPerformed
-        staticCausalGraphViewer.setCostFunction(StaticCausalGraphViewer.CostFunction.AllReachableNodes);
-    }//GEN-LAST:event_allReachableNodesJRadioButtonMenuItemActionPerformed
-
-    private void allMinReachableNodesJRadioButtonMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allMinReachableNodesJRadioButtonMenuItemActionPerformed
-        staticCausalGraphViewer.setCostFunction(StaticCausalGraphViewer.CostFunction.AllMinReachableNodes);
-    }//GEN-LAST:event_allMinReachableNodesJRadioButtonMenuItemActionPerformed
-
-    private void minReachableJRadioButtonMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minReachableJRadioButtonMenuItemActionPerformed
-        staticCausalGraphViewer.setCostFunction(StaticCausalGraphViewer.CostFunction.MinReachableNodes);
-    }//GEN-LAST:event_minReachableJRadioButtonMenuItemActionPerformed
-
-    private void minCausalDistanceJRadioButtonMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minCausalDistanceJRadioButtonMenuItemActionPerformed
-        staticCausalGraphViewer.setCostFunction(StaticCausalGraphViewer.CostFunction.MinCausalDistance);
-    }//GEN-LAST:event_minCausalDistanceJRadioButtonMenuItemActionPerformed
+    private void estimatorJRadioButtonMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_estimatorJRadioButtonMenuItemActionPerformed
+        staticCausalGraphViewer.setCostFunction(StaticCausalGraphViewer.CostFunction.Estimator);
+    }//GEN-LAST:event_estimatorJRadioButtonMenuItemActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JRadioButtonMenuItem allMinReachableNodesJRadioButtonMenuItem;
-    private javax.swing.JRadioButtonMenuItem allReachableNodesJRadioButtonMenuItem;
     private javax.swing.ButtonGroup costFunctionButtonGroup;
     private javax.swing.JMenu costFunctionJMenu;
     private javax.swing.JRadioButtonMenuItem defaultJRadioButtonMenuItem;
-    private javax.swing.JRadioButtonMenuItem minCausalDistanceJRadioButtonMenuItem;
-    private javax.swing.JRadioButtonMenuItem minReachableJRadioButtonMenuItem;
+    private javax.swing.JRadioButtonMenuItem estimatorJRadioButtonMenuItem;
     private javax.swing.JMenuBar staticCausalGraphJMenuBar;
     private it.cnr.istc.iloc.gui.staticcausalgraph.StaticCausalGraphViewer staticCausalGraphViewer;
     private javax.swing.JMenu viewJMenu;
@@ -157,11 +112,9 @@ public class StaticCausalGraphJInternalFrame extends JInternalFrame implements S
     public void solverChanged(ISolver solver) {
         if (this.solver != null) {
             this.solver.getStaticCausalGraph().removeCausalGraphListener(this.staticCausalGraphViewer);
-            this.solver.getDynamicCausalGraph().removeCausalGraphListener(this.staticCausalGraphViewer);
         }
         this.staticCausalGraphViewer.init();
         this.solver = solver;
         this.solver.getStaticCausalGraph().addCausalGraphListener(this.staticCausalGraphViewer);
-        this.solver.getDynamicCausalGraph().addCausalGraphListener(this.staticCausalGraphViewer);
     }
 }

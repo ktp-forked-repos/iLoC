@@ -19,9 +19,11 @@
 package it.cnr.istc.iloc;
 
 import it.cnr.istc.iloc.api.IEnvironment;
+import it.cnr.istc.iloc.api.IEstimator;
 import it.cnr.istc.iloc.api.IPreference;
 import it.cnr.istc.iloc.api.IPreferenceFlaw;
 import it.cnr.istc.iloc.api.IResolver;
+import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,11 +34,15 @@ import java.util.Collection;
 public class PreferenceFlaw implements IPreferenceFlaw {
 
     private final IEnvironment environment;
+    private final IEstimator estimator;
     private final IPreference preference;
+    private final IStaticCausalGraph staticCausalGraph;
 
     public PreferenceFlaw(IEnvironment environment, IPreference preference) {
         this.environment = environment;
+        this.estimator = environment.getSolver().getEstimator();
         this.preference = preference;
+        this.staticCausalGraph = environment.getSolver().getStaticCausalGraph();
     }
 
     @Override
@@ -46,7 +52,7 @@ public class PreferenceFlaw implements IPreferenceFlaw {
 
     @Override
     public double getEstimatedCost() {
-        return environment.getSolver().getStaticCausalGraph().estimateCost(environment.getSolver().getStaticCausalGraph().getNode(preference));
+        return estimator.estimate(staticCausalGraph.getNode(preference));
     }
 
     @Override

@@ -50,7 +50,7 @@ public class ResolutionTreeView extends Display implements ISolverListener {
     private static final String GRAPH = "tree";
     private static final String NODES = "tree.nodes";
     private static final String EDGES = "tree.edges";
-    private static final String NODE_COST_HEURISTIC_BASED = "node_cost_heuristic_based";
+    private static final String NODE_COST_ESTIMATOR_BASED = "node_cost_heuristic_based";
     private static final String NODE_COST_FLAW_NUMBER_BASED = "node_cost_flaw_number_based";
     private static final String NODE_TYPE = "node_type";
     private static final String EDGE_DECORATORS = "edgeDeco";
@@ -60,7 +60,7 @@ public class ResolutionTreeView extends Display implements ISolverListener {
     private final VisualGraph vg;
     private final Map<INode, Node> nodes = new IdentityHashMap<>();
     private final ColorAction defaultNodeFill = new ColorAction(NODES, VisualItem.FILLCOLOR);
-    private final ColorAction costNodeHeuristicBasedFill = new DataColorAction(NODES, NODE_COST_HEURISTIC_BASED, Constants.ORDINAL, VisualItem.FILLCOLOR, ColorLib.getHotPalette());
+    private final ColorAction costNodeHeuristicBasedFill = new DataColorAction(NODES, NODE_COST_ESTIMATOR_BASED, Constants.ORDINAL, VisualItem.FILLCOLOR, ColorLib.getHotPalette());
     private final ColorAction costNodeFlawNumberBasedFill = new DataColorAction(NODES, NODE_COST_FLAW_NUMBER_BASED, Constants.ORDINAL, VisualItem.FILLCOLOR, ColorLib.getHotPalette());
 
     static {
@@ -75,7 +75,7 @@ public class ResolutionTreeView extends Display implements ISolverListener {
 
         t.getNodeTable().addColumn(VisualItem.LABEL, String.class);
         t.getNodeTable().addColumn(NODE_TYPE, String.class);
-        t.getNodeTable().addColumn(NODE_COST_HEURISTIC_BASED, Integer.class);
+        t.getNodeTable().addColumn(NODE_COST_ESTIMATOR_BASED, Integer.class);
         t.getNodeTable().addColumn(NODE_COST_FLAW_NUMBER_BASED, Integer.class);
         t.getEdgeTable().addColumn(VisualItem.LABEL, String.class);
 
@@ -208,7 +208,7 @@ public class ResolutionTreeView extends Display implements ISolverListener {
             INode node = SolverManager.getInstance().getSolver().getCurrentNode();
             root.set(VisualItem.LABEL, Integer.toString(node.getFlaws().size()));
             root.set(NODE_TYPE, "default");
-            root.set(NODE_COST_HEURISTIC_BASED, (int) -(node.getKnownCost() + node.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum()));
+            root.set(NODE_COST_ESTIMATOR_BASED, (int) -(node.getKnownCost() + node.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum()));
             root.set(NODE_COST_FLAW_NUMBER_BASED, -node.getFlaws().size());
             Rectangle2D bounds = m_vis.getVisualItem(NODES, root).getBounds();
             panToAbs(new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()));
@@ -225,7 +225,7 @@ public class ResolutionTreeView extends Display implements ISolverListener {
             if (nodes.containsKey(n)) {
                 nodes.get(n).set(NODE_TYPE, "current");
                 nodes.get(n).set(VisualItem.LABEL, Integer.toString(n.getFlaws().size()));
-                nodes.get(n).set(NODE_COST_HEURISTIC_BASED, (int) -(n.getKnownCost() + n.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum()));
+                nodes.get(n).set(NODE_COST_ESTIMATOR_BASED, (int) -(n.getKnownCost() + n.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum()));
                 nodes.get(n).set(NODE_COST_FLAW_NUMBER_BASED, -n.getFlaws().size());
             }
         }
@@ -269,7 +269,7 @@ public class ResolutionTreeView extends Display implements ISolverListener {
                 Node c_c = t.addChild(nodes.get(n));
                 c_c.set(NODE_TYPE, "default");
                 c_c.set(VisualItem.LABEL, Integer.toString(n.getFlaws().size()));
-                c_c.set(NODE_COST_HEURISTIC_BASED, (int) -(child.getKnownCost() + child.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum()));
+                c_c.set(NODE_COST_ESTIMATOR_BASED, (int) -(child.getKnownCost() + child.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum()));
                 c_c.set(NODE_COST_FLAW_NUMBER_BASED, -child.getFlaws().size());
                 c_c.getParentEdge().set(VisualItem.LABEL, child.getResolvers().stream().map(res -> res.getClass().getSimpleName()).collect(Collectors.toList()).toString());
                 nodes.put(child, c_c);

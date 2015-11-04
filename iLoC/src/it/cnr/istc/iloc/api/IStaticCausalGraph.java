@@ -135,6 +135,15 @@ public interface IStaticCausalGraph {
     public void removeNode(INode node);
 
     /**
+     * Returns all the nodes currently registered on the current static causal
+     * graph.
+     *
+     * @return a collection of nodes currently registered on the current static
+     * causal graph.
+     */
+    public Collection<INode> getNodes();
+
+    /**
      * Adds an edge between two nodes in this static causal graph.
      *
      * @param type the type of the edge
@@ -150,6 +159,15 @@ public interface IStaticCausalGraph {
      * @param edge the edge to be removed from this static causal graph.
      */
     public void removeEdge(IEdge edge);
+
+    /**
+     * Returns all the edges currently registered on the current static causal
+     * graph.
+     *
+     * @return a collection of edges currently registered on the current static
+     * causal graph.
+     */
+    public Collection<IEdge> getEdges();
 
     /**
      * Returns all the nodes that are reachable from the given node.
@@ -171,58 +189,6 @@ public interface IStaticCausalGraph {
     public default boolean existsPath(INode source, INode target) {
         return getAllReachableNodes(source).contains(target);
     }
-
-    /**
-     * Returns the minimum possible reachable nodes that are reachable from the
-     * given node. This method takes care of possible OR nodes.
-     *
-     * @param node the node from which the minimum number of reachable nodes are
-     * computed.
-     * @return the minimum possible reachable nodes that are reachable from the
-     * given node.
-     */
-    public Set<INode> getAllMinReachableNodes(INode node);
-
-    /**
-     * Returns the minimum possible reachable nodes that are reachable from the
-     * given node. This method takes care of possible OR nodes as well as the
-     * current status of the current partial solution (i.e., if there exist
-     * active formulas).
-     *
-     * @param node the node from which the minimum number of reachable nodes are
-     * computed.
-     * @return the minimum possible reachable nodes that are reachable from the
-     * given node.
-     */
-    public Set<INode> getMinReachableNodes(INode node);
-
-    /**
-     * Returns a lower bound for the resolution of the given node. This method
-     * takes care of possible OR nodes as well as the current status of the
-     * current partial solution (i.e., if there exist active formulas).
-     *
-     * @param node the node from which lower bound for the resolution is
-     * computed.
-     * @return the lower bound for the resolution of the given node.
-     */
-    public int getMinCausalDistance(INode node);
-
-    /**
-     * Returns the estimated cost for the given node according to the chosen
-     * heuristic.
-     *
-     * @param node the node to be estimated.
-     * @return a value indicating an estimated cost for solving a flaw similar
-     * to the given node.
-     */
-    public default double estimateCost(INode node) {
-        return getMinCausalDistance(node);
-    }
-
-    /**
-     * Recomputes all the currently estimated costs.
-     */
-    public void recomputeCosts();
 
     /**
      * Adds a listener to the given static causal graph for detecting
