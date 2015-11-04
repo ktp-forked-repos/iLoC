@@ -68,7 +68,7 @@ public class HAddEstimator implements IEstimator {
             if (node instanceof IStaticCausalGraph.IDisjunctionNode) {
                 return ((IStaticCausalGraph.IDisjunctionNode) node).getDisjunction().getDisjuncts().stream().mapToInt(disjunct -> estimate(solver.getStaticCausalGraph().getNode(disjunct), new HashSet<>(visited))).min().orElse(0);
             } else if (!(node instanceof IStaticCausalGraph.INoOpNode)) {
-                return 1 + node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).mapToInt(edge -> estimate(edge.getTarget(), visited)).max().orElse(0);
+                return 1 + node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).mapToInt(edge -> estimate(edge.getTarget(), visited)).sum();
             }
             return 0;
         } else {
