@@ -49,13 +49,13 @@ public class AllMinReachableEstimator implements IEstimator {
         all_min_reachable_nodes.clear();
         Collection<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes();
         nodes.forEach(node -> {
-            all_min_reachable_nodes.put(node, getAllMinReachableNodes(node, new HashSet<>(nodes.size())));
+            all_min_reachable_nodes.put(node, estimate(node, new HashSet<>(nodes.size())));
         });
     }
 
-    private Set<IStaticCausalGraph.INode> getAllMinReachableNodes(IStaticCausalGraph.INode node, Set<IStaticCausalGraph.INode> visited) {
+    private Set<IStaticCausalGraph.INode> estimate(IStaticCausalGraph.INode node, Set<IStaticCausalGraph.INode> visited) {
         if (!all_min_reachable_nodes.containsKey(node)) {
-            all_min_reachable_nodes.put(node, getAllMinReachableNodes(node, new HashSet<>()));
+            all_min_reachable_nodes.put(node, estimate(node, new HashSet<>()));
         }
         if (!visited.contains(node)) {
             if (node instanceof IStaticCausalGraph.IPredicateNode) {
@@ -65,7 +65,7 @@ public class AllMinReachableEstimator implements IEstimator {
                 int min_nodes_size = Integer.MAX_VALUE;
                 Set<IStaticCausalGraph.INode> min_nodes = null;
                 for (IDisjunct disjunct : ((IStaticCausalGraph.IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
-                    Set<IStaticCausalGraph.INode> c_nodes = getAllMinReachableNodes(solver.getStaticCausalGraph().getNode(disjunct), new HashSet<>(visited));
+                    Set<IStaticCausalGraph.INode> c_nodes = estimate(solver.getStaticCausalGraph().getNode(disjunct), new HashSet<>(visited));
                     if (c_nodes.size() < min_nodes_size) {
                         min_nodes_size = c_nodes.size();
                         min_nodes = c_nodes;
@@ -73,7 +73,7 @@ public class AllMinReachableEstimator implements IEstimator {
                 }
                 visited.addAll(min_nodes);
             } else if (!(node instanceof IStaticCausalGraph.INoOpNode)) {
-                visited.addAll(node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).flatMap(edge -> getAllMinReachableNodes(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
+                visited.addAll(node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).flatMap(edge -> estimate(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
             }
             return visited;
         } else {
@@ -84,5 +84,10 @@ public class AllMinReachableEstimator implements IEstimator {
     @Override
     public double estimate(IStaticCausalGraph.INode node) {
         return all_min_reachable_nodes.get(node).size();
+    }
+
+    @Override
+    public double estimate(Collection<IStaticCausalGraph.INode> nodes) {
+        return nodes.stream().mapToDouble(node -> estimate(node)).sum();
     }
 }

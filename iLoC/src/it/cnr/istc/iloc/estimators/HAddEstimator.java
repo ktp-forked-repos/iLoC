@@ -17,78 +17,68 @@
 package it.cnr.istc.iloc.estimators;
 
 import it.cnr.istc.iloc.api.FormulaState;
-import it.cnr.istc.iloc.api.IDisjunct;
 import it.cnr.istc.iloc.api.IEstimator;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
- * Heuristic estimator which estimates the costs of the nodes considering the
- * currently active formulas of the dynamic causal graph.
+ * An adaptation of the h_add heuristic as described in
+ * <P>
+ * Haslum, Patrik, and Héctor Geffner. "Admissible Heuristics for Optimal
+ * Planning." AIPS. 2000.
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class MinReachableEstimator implements IEstimator {
+public class HAddEstimator implements IEstimator {
 
     private final ISolver solver;
-    private final Map<IStaticCausalGraph.INode, Set<IStaticCausalGraph.INode>> min_reachable_nodes = new HashMap<>();
+    private final Map<IStaticCausalGraph.INode, Integer> min_causal_distance = new HashMap<>();
 
-    public MinReachableEstimator(ISolver solver) {
+    public HAddEstimator(ISolver solver) {
         this.solver = solver;
     }
 
     @Override
     public void recomputeCosts() {
-        min_reachable_nodes.clear();
+        min_causal_distance.clear();
         Collection<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes();
         nodes.forEach(node -> {
-            min_reachable_nodes.put(node, estimate(node, new HashSet<>(nodes.size())));
+            min_causal_distance.put(node, estimate(node, new HashSet<>(nodes.size())));
         });
     }
 
-    private Set<IStaticCausalGraph.INode> estimate(IStaticCausalGraph.INode node, Set<IStaticCausalGraph.INode> visited) {
-        if (!min_reachable_nodes.containsKey(node)) {
-            min_reachable_nodes.put(node, estimate(node, new HashSet<>()));
+    private int estimate(IStaticCausalGraph.INode node, Set<IStaticCausalGraph.INode> visited) {
+        if (min_causal_distance.containsKey(node)) {
+            return min_causal_distance.get(node);
         }
         if (!visited.contains(node)) {
             if (node instanceof IStaticCausalGraph.IPredicateNode) {
                 if (((IStaticCausalGraph.IPredicateNode) node).getPredicate().getInstances().stream().map(instance -> (IFormula) instance).noneMatch(formula -> formula.getFormulaState() == FormulaState.Active)) {
                     visited.add(node);
                 } else {
-                    return visited;
+                    return 0;
                 }
             }
             if (node instanceof IStaticCausalGraph.IDisjunctionNode) {
-                int min_nodes_size = Integer.MAX_VALUE;
-                Set<IStaticCausalGraph.INode> min_nodes = null;
-                for (IDisjunct disjunct : ((IStaticCausalGraph.IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
-                    Set<IStaticCausalGraph.INode> c_nodes = estimate(solver.getStaticCausalGraph().getNode(disjunct), new HashSet<>(visited));
-                    if (c_nodes.size() < min_nodes_size) {
-                        min_nodes_size = c_nodes.size();
-                        min_nodes = c_nodes;
-                    }
-                }
-                visited.addAll(min_nodes);
+                return ((IStaticCausalGraph.IDisjunctionNode) node).getDisjunction().getDisjuncts().stream().mapToInt(disjunct -> estimate(solver.getStaticCausalGraph().getNode(disjunct), new HashSet<>(visited))).min().orElse(0);
             } else if (!(node instanceof IStaticCausalGraph.INoOpNode)) {
-                visited.addAll(node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).flatMap(edge -> estimate(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
+                return 1 + node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).mapToInt(edge -> estimate(edge.getTarget(), visited)).max().orElse(0);
             }
-            return visited;
+            return 0;
         } else {
-            return Collections.emptySet();
+            return 0;
         }
     }
 
     @Override
     public double estimate(IStaticCausalGraph.INode node) {
-        return min_reachable_nodes.get(node).size();
+        return min_causal_distance.get(node);
     }
 
     @Override

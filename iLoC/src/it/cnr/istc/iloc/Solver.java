@@ -37,7 +37,7 @@ import it.cnr.istc.iloc.api.ISolverListener;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import it.cnr.istc.iloc.api.IType;
 import it.cnr.istc.iloc.ddl.LanguageParser;
-import it.cnr.istc.iloc.estimators.D0Estimator;
+import it.cnr.istc.iloc.estimators.HAddEstimator;
 import it.cnr.istc.iloc.utils.NativeUtils;
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +92,7 @@ public class Solver implements ISolver {
     private final IConstraintNetwork constraintNetwork;
     private final IStaticCausalGraph staticCausalGraph = new StaticCausalGraph();
     private final IDynamicCausalGraph dynamicCausalGraph = new DynamicCausalGraph();
-    private final IEstimator estimator = new D0Estimator(this);
+    private final IEstimator estimator = new HAddEstimator(this);
     private final Map<String, IField> fields = new LinkedHashMap<>();
     private final Map<String, Collection<IMethod>> methods = new HashMap<>();
     private final Map<String, IType> types = new LinkedHashMap<>(0);

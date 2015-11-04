@@ -17,7 +17,6 @@
 package it.cnr.istc.iloc.estimators;
 
 import it.cnr.istc.iloc.api.FormulaState;
-import it.cnr.istc.iloc.api.IDisjunct;
 import it.cnr.istc.iloc.api.IEstimator;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.ISolver;
@@ -26,19 +25,22 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.Set;
 
 /**
+ * An adaptation of the h_max heuristic as described in
+ * <P>
+ * Haslum, Patrik, and Héctor Geffner. "Admissible Heuristics for Optimal
+ * Planning." AIPS. 2000.
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class D0Estimator implements IEstimator {
+public class HMaxEstimator implements IEstimator {
 
     private final ISolver solver;
     private final Map<IStaticCausalGraph.INode, Integer> min_causal_distance = new HashMap<>();
 
-    public D0Estimator(ISolver solver) {
+    public HMaxEstimator(ISolver solver) {
         this.solver = solver;
     }
 
@@ -64,17 +66,9 @@ public class D0Estimator implements IEstimator {
                 }
             }
             if (node instanceof IStaticCausalGraph.IDisjunctionNode) {
-                int min_distance = Integer.MAX_VALUE;
-                for (IDisjunct disjunct : ((IStaticCausalGraph.IDisjunctionNode) node).getDisjunction().getDisjuncts()) {
-                    int c_distance = estimate(solver.getStaticCausalGraph().getNode(disjunct), new HashSet<>(visited));
-                    if (c_distance < min_distance) {
-                        min_distance = c_distance;
-                    }
-                }
-                return min_distance;
+                return ((IStaticCausalGraph.IDisjunctionNode) node).getDisjunction().getDisjuncts().stream().mapToInt(disjunct -> estimate(solver.getStaticCausalGraph().getNode(disjunct), new HashSet<>(visited))).min().orElse(0);
             } else if (!(node instanceof IStaticCausalGraph.INoOpNode)) {
-                OptionalInt max = node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).mapToInt(edge -> estimate(edge.getTarget(), visited)).max();
-                return 1 + (max.isPresent() ? max.getAsInt() : 0);
+                return 1 + node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).mapToInt(edge -> estimate(edge.getTarget(), visited)).max().orElse(0);
             }
             return 0;
         } else {
@@ -85,5 +79,10 @@ public class D0Estimator implements IEstimator {
     @Override
     public double estimate(IStaticCausalGraph.INode node) {
         return min_causal_distance.get(node);
+    }
+
+    @Override
+    public double estimate(Collection<IStaticCausalGraph.INode> nodes) {
+        return nodes.stream().mapToDouble(node -> estimate(node)).max().orElse(0);
     }
 }
