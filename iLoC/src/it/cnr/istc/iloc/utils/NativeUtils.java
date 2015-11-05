@@ -16,6 +16,7 @@
  */
 package it.cnr.istc.iloc.utils;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
@@ -31,7 +32,7 @@ public class NativeUtils {
      * @throws Exception
      */
     public static void addLibraryPath() throws Exception {
-        String libraryPath = ".\\lib\\";
+        String libraryPath = "." + File.separator + "lib" + File.separator;
 
         String os_name = System.getProperty("os.name");
         if (os_name.equals("Linux")) {
@@ -44,7 +45,7 @@ public class NativeUtils {
             libraryPath += "osx";
         }
 
-        libraryPath += "\\";
+        libraryPath += File.separator;
 
         String os_arch = System.getProperty("os.arch");
         if (os_arch.endsWith("86")) {
