@@ -38,8 +38,6 @@ public class ParserTest {
         try {
             PDDLInstance instance = Parser.parse(new File(ParserTest.class.getResource("blocks-domain.pddl").getPath()), new File(ParserTest.class.getResource("blocks-problem.pddl").getPath()));
             Collection<Invariant> invariants = InvariantSynthesizer.getInvariants(instance.getDomain());
-            invariants.forEach(invariant -> {
-            });
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -53,8 +51,6 @@ public class ParserTest {
         try {
             PDDLInstance instance = Parser.parse(new File(ParserTest.class.getResource("logistics-domain.pddl").getPath()), new File(ParserTest.class.getResource("logistics-problem.pddl").getPath()));
             Collection<Invariant> invariants = InvariantSynthesizer.getInvariants(instance.getDomain());
-            invariants.forEach(invariant -> {
-            });
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }

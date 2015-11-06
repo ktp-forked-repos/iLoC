@@ -37,7 +37,6 @@ import it.cnr.istc.iloc.api.ISolverListener;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import it.cnr.istc.iloc.api.IType;
 import it.cnr.istc.iloc.ddl.LanguageParser;
-import it.cnr.istc.iloc.estimators.HAddEstimator;
 import it.cnr.istc.iloc.estimators.HMaxEstimator;
 import it.cnr.istc.iloc.utils.NativeUtils;
 import java.io.File;
