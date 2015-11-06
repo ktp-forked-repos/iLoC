@@ -34,9 +34,11 @@ import it.cnr.istc.iloc.translators.pddl.parser.Problem;
 import it.cnr.istc.iloc.translators.pddl.parser.Term;
 import it.cnr.istc.iloc.translators.pddl.parser.VariableTerm;
 import it.cnr.istc.iloc.utils.CartesianProductGenerator;
+import it.cnr.istc.iloc.utils.CombinationGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -452,6 +454,66 @@ public class PDDLTranslator {
             ((And) env).getEnvs().forEach(e -> removeValue(e, value));
         } else if (env instanceof Or) {
             ((Or) env).getEnvs().forEach(e -> removeValue(e, value));
+        } else {
+            throw new UnsupportedOperationException("Not supported yet..");
+        }
+    }
+
+    private double computeH2Cost(Collection<StateVariableValue> values) {
+        if (values.stream().anyMatch(v -> contains(init, v))) {
+            return 0;
+        }
+        double min_cost = Double.POSITIVE_INFINITY;
+        if (values.size() < 2) {
+            for (Action action : values.iterator().next().getActions()) {
+                double c_cost = computeH2Cost(getTerms(action.getPrecondition()));
+                if (c_cost < min_cost) {
+                    min_cost = c_cost;
+                }
+            }
+        } else {
+            for (StateVariableValue[] vs : new CombinationGenerator<>(2, values.toArray(new StateVariableValue[values.size()]))) {
+                // The actions that generate both the values..
+                for (Action action : vs[0].getActions().stream().filter(t -> vs[1].getActions().contains(t)).collect(Collectors.toList())) {
+                    double c_cost = computeH2Cost(getTerms(action.getPrecondition()));
+                    if (c_cost < min_cost) {
+                        min_cost = c_cost;
+                    }
+                }
+                // The actions that generate the first value but not the second..
+                for (Action action : vs[0].getActions().stream().filter(t -> !vs[1].getActions().contains(t)).collect(Collectors.toList())) {
+                    double c_cost = computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[1])).collect(Collectors.toList()));
+                    if (c_cost < min_cost) {
+                        min_cost = c_cost;
+                    }
+                }
+                // The actions that generate the second value but not the first..
+                for (Action action : vs[1].getActions().stream().filter(t -> !vs[0].getActions().contains(t)).collect(Collectors.toList())) {
+                    double c_cost = computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[0])).collect(Collectors.toList()));
+                    if (c_cost < min_cost) {
+                        min_cost = c_cost;
+                    }
+                }
+            }
+        }
+        return 1 + min_cost;
+    }
+
+    private static Collection<StateVariableValue> getTerms(Env env) {
+        if (env instanceof Precondition) {
+            return Arrays.asList(((Precondition) env).getValue());
+        } else if (env instanceof And) {
+            return ((And) env).getEnvs().stream().flatMap(e -> getTerms(e).stream()).collect(Collectors.toList());
+        } else {
+            throw new UnsupportedOperationException("Not supported yet..");
+        }
+    }
+
+    private static boolean contains(Env env, StateVariableValue value) {
+        if (env instanceof Precondition) {
+            return ((Precondition) env).getValue() == value;
+        } else if (env instanceof And) {
+            return ((And) env).getEnvs().stream().anyMatch(e -> contains(e, value));
         } else {
             throw new UnsupportedOperationException("Not supported yet..");
         }
