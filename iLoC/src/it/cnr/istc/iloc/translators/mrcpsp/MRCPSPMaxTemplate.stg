@@ -1,0 +1,57 @@
+MRCPSPMax(class_name, instance_name, renewable_resources, nonrenewable_resources, doubly_constrained_resources, activities, constraints) ::= <<
+class <class_name> {
+
+<renewable_resources : {renewable_resource |
+    ReusableResource <renewable_resource.name> = new ReusableResource(<renewable_resource.capacity>);}>
+<nonrenewable_resources : {nonrenewable_resource |
+    ConsumableResource <nonrenewable_resource.name> = new ConsumableResource(0, <nonrenewable_resource.capacity>);}>
+<rest(trunc(activities)) : {activity |
+<activity>}>
+}
+
+<class_name> <instance_name> = new <class_name>();
+
+<rest(trunc(activities)) : {activity |
+goal activity_<activity.id> = new <instance_name>.Activity<activity.id>();}>
+
+<constraints : {constraint |
+<constraint>;}>
+>>
+
+
+Activity(renewable_resources, nonrenewable_resources, doubly_constrained_resources, activity) ::= <<
+
+
+    predicate Activity<activity.id>(<activity.modes : {mode |bool mode_<mode.id>}; separator=", ">, number start, number end, number duration){
+        duration = end - start;
+        start >= origin;
+        end \<= horizon;
+        duration > 0;
+<renewable_resources : {renewable_resource |         goal <renewable_resource.name>_use = new <renewable_resource.name>.Use(start : start, end : end, duration : duration);
+}>
+<nonrenewable_resources : {nonrenewable_resource |         goal <nonrenewable_resource.name>_use = new <nonrenewable_resource.name>.Consume(start : start, end : end, duration : duration);
+}>
+        <activity.modes : {mode |mode_<mode.id>}; separator=" ^ ">;
+        <activity.modes : {mode |<Mode(renewable_resources, nonrenewable_resources, mode)>;
+}>    }
+>>
+
+
+Mode(renewable_resources, nonrenewable_resources, mode) ::= <<
+mode_<mode.id> -> (duration == <mode.duration> && <[renewable_resources, nonrenewable_resources], [mode.renewable_resource_usages, mode.nonrenewable_resource_usages] : {resource, usage |<resource.name>_use.amount == <usage>}; separator=" && ">)
+>>
+
+
+Constraint(constraint) ::= <<
+(activity_<constraint.first_activity.id>.mode_<constraint.first_mode.id> && activity_<constraint.second_activity.id>.mode_<constraint.second_mode.id>) -> <if(constraint.minimum)><constraint.weight> \<= activity_<constraint.second_activity.id>.start - activity_<constraint.first_activity.id>.start<else>activity_<constraint.first_activity.id>.start - activity_<constraint.second_activity.id>.start \<= <constraint.weight><endif>
+>>
+
+
+FromFirstActivityConstraint(constraint) ::= <<
+activity_<constraint.second_activity.id>.mode_<constraint.second_mode.id> -> <if(constraint.minimum)><constraint.weight> \<= activity_<constraint.second_activity.id>.start - origin<else>activity_<constraint.second_activity.id>.start - origin \<= <constraint.weight><endif>
+>>
+
+
+ToLastActivityConstraint(constraint) ::= <<
+activity_<constraint.first_activity.id>.mode_<constraint.first_mode.id> -> <if(constraint.minimum)><constraint.weight> \<= horizon - activity_<constraint.first_activity.id>.start<else>horizon - activity_<constraint.first_activity.id>.start \<= <constraint.weight><endif>
+>>

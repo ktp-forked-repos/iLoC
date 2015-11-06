@@ -1,0 +1,8 @@
+NumericLiteral=4
+LBRACKET=1
+RBRACKET=2
+WS=5
+MINUS=3
+']'=2
+'-'=3
+'['=1
