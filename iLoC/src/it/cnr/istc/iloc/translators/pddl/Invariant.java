@@ -16,11 +16,13 @@
  */
 package it.cnr.istc.iloc.translators.pddl;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +32,7 @@ import java.util.stream.Collectors;
 public class Invariant {
 
     private final Map<String, Parameter> parameters = new LinkedHashMap<>();
-    private final List<Atom> atoms = new ArrayList<>();
+    private final Set<Atom> atoms = new LinkedHashSet<>();
 
     Invariant() {
     }
@@ -47,8 +49,35 @@ public class Invariant {
         atoms.add(atom);
     }
 
-    public List<Atom> getAtoms() {
-        return Collections.unmodifiableList(atoms);
+    public Collection<Atom> getAtoms() {
+        return Collections.unmodifiableCollection(atoms);
+    }
+
+    public Collection<Parameter> getCountedVariables() {
+        return atoms.stream().flatMap(atom -> atom.getVariables().stream().filter(var -> !parameters.containsValue(var))).collect(Collectors.toList());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.parameters);
+        hash = 97 * hash + Objects.hashCode(this.atoms);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Invariant other = (Invariant) obj;
+        return Objects.equals(this.parameters, other.parameters) && Objects.equals(this.atoms, other.atoms);
     }
 
     @Override

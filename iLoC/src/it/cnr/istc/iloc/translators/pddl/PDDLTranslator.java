@@ -302,12 +302,10 @@ public class PDDLTranslator {
                     // We can simplify the disjunction or even remove the action..
                     env.setConsistent(false);
                 }
+            } else if (((PredicateTerm) term).isDirected()) {
+                env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("True")));
             } else {
-                if (((PredicateTerm) term).isDirected()) {
-                    env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("True")));
-                } else {
-                    env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("False")));
-                }
+                env.addEnv(new Precondition(action, agent.getStateVariable(predicate_name).getValue("False")));
             }
         } else if (term instanceof EqTerm) {
             if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm) {
@@ -383,12 +381,10 @@ public class PDDLTranslator {
                 } else {
                     static_assignments.put(predicate_name, "False");
                 }
+            } else if (((PredicateTerm) term).isDirected()) {
+                init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("True")));
             } else {
-                if (((PredicateTerm) term).isDirected()) {
-                    init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("True")));
-                } else {
-                    init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("False")));
-                }
+                init.addEnv(new InitEl(agent.getStateVariable(predicate_name).getValue("False")));
             }
         } else if (term instanceof EqTerm) {
             if (((EqTerm) term).getFirstTerm() instanceof FunctionTerm) {
@@ -402,12 +398,10 @@ public class PDDLTranslator {
                         // We are instantiating a static numeric function..
                         static_assignments.put(function_name, ((NumberTerm) ((EqTerm) term).getSecondTerm()).getValue().toString());
                     }
+                } else if (((EqTerm) term).getSecondTerm() instanceof ConstantTerm) {
+                    init.addEnv(new InitEl(agent.getStateVariable(function_name).getValue(((ConstantTerm) ((EqTerm) term).getSecondTerm()).getConstant().getName())));
                 } else {
-                    if (((EqTerm) term).getSecondTerm() instanceof ConstantTerm) {
-                        init.addEnv(new InitEl(agent.getStateVariable(function_name).getValue(((ConstantTerm) ((EqTerm) term).getSecondTerm()).getConstant().getName())));
-                    } else {
-                        init.addEnv(new InitEl(agent.getStateVariable(function_name).getValue(((NumberTerm) ((EqTerm) term).getSecondTerm()).getValue().toString())));
-                    }
+                    init.addEnv(new InitEl(agent.getStateVariable(function_name).getValue(((NumberTerm) ((EqTerm) term).getSecondTerm()).getValue().toString())));
                 }
             } else {
                 throw new UnsupportedOperationException(term.getClass().getName());

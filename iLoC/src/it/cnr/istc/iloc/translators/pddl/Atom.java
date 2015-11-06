@@ -48,6 +48,29 @@ public class Atom {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + Objects.hashCode(this.predicate);
+        hash = 73 * hash + Objects.hashCode(this.variables);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Atom other = (Atom) obj;
+        return Objects.equals(this.predicate, other.predicate) && Objects.equals(this.variables, other.variables);
+    }
+
+    @Override
     public String toString() {
         return "(" + predicate.getName() + " " + variables.stream().map(variable -> variable.getName() + " - " + variable.getType().getName()).collect(Collectors.joining(" ")) + ")";
     }

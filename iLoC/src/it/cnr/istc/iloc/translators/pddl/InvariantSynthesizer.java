@@ -48,6 +48,15 @@ public class InvariantSynthesizer {
         return new InvariantSynthesizer(domain).synthesizeInvariants();
     }
 
+    /**
+     * Computes the number of add predicates in the given term considered by the
+     * invariant.
+     *
+     * @param term the term to be checked.
+     * @param invariant the invariant considered for counting.
+     * @return the number of add predicates in the given term considered by the
+     * environment.
+     */
     private static long countAddPredicates(Term term, Invariant invariant) {
         long count = 0;
         Collection<PredicateTerm> terms = getPredicateTerms(term);
@@ -64,9 +73,31 @@ public class InvariantSynthesizer {
         return count;
     }
 
+    /**
+     * Computes the number of del predicates in the given term not considered by
+     * the invariant.
+     *
+     * @param term the term to be checked.
+     * @param invariant the invariant considered for counting.
+     * @return the number of add predicates in the given term not considered by
+     * the environment.
+     */
     private static long countDelPredicates(Term term, Invariant invariant) {
         Collection<PredicateTerm> terms = getPredicateTerms(term);
-        return invariant.getAtoms().stream().map(atom -> terms.stream().filter(t -> t.getPredicate() == atom.getPredicate() && !t.isDirected()).findAny().isPresent()).count();
+        return invariant.getAtoms().stream().mapToLong(atom -> terms.stream().filter(t -> t.getPredicate() == atom.getPredicate() && !t.isDirected()).count()).sum();
+    }
+
+    /**
+     * Returns {@code true} if the given invariant is threatened by the given
+     * action.
+     *
+     * @param action the action which might threat the invariant.
+     * @param invariant the invariant which might be threathened by the action.
+     * @return {@code true} if the given invariant is threatened by the given
+     * action.
+     */
+    private boolean isThreatened(it.cnr.istc.iloc.translators.pddl.parser.Action action, Invariant invariant) {
+        return countAddPredicates(action.getEffect(), invariant) > countDelPredicates(action.getEffect(), invariant);
     }
 
     private static Collection<Invariant> refine(Invariant invariant, Term term) {
@@ -143,20 +174,26 @@ public class InvariantSynthesizer {
         Collection<Predicate> staticPredicates = domain.getStaticPredicates();
         Collection<Invariant> candidates = new ArrayList<>();
         domain.getPredicates().values().stream().filter(predicate -> !staticPredicates.contains(predicate)).forEach(predicate -> {
-            Invariant inv = new Invariant();
-            inv.addAtom(new Atom(predicate, predicate.getVariables().stream().map(var -> new Parameter(var.getName(), var.getType())).toArray(Parameter[]::new)));
-            candidates.add(inv);
+            if (predicate.getVariables().size() <= 1) {
+                // We are interested in candidates with at most one counted variable..
+                Invariant inv = new Invariant();
+                inv.addAtom(new Atom(predicate, predicate.getVariables().stream().map(var -> new Parameter(var.getName(), var.getType())).toArray(Parameter[]::new)));
+                candidates.add(inv);
+            }
             for (int i = 1; i <= predicate.getVariables().size(); i++) {
-                for (Variable[] vs : new CombinationGenerator<>(i, predicate.getVariables().stream().toArray(Variable[]::new))) {
-                    Invariant c_inv = new Invariant();
-                    Map<String, Parameter> pars = new HashMap<>();
-                    for (Variable var : vs) {
-                        Parameter par = new Parameter(var.getName(), var.getType());
-                        pars.put(par.getName(), par);
-                        c_inv.addParameter(par);
+                if (predicate.getVariables().size() - i <= 1) {
+                    // We are interested in candidates with at most one counted variable..
+                    for (Variable[] vs : new CombinationGenerator<>(i, predicate.getVariables().stream().toArray(Variable[]::new))) {
+                        Invariant inv = new Invariant();
+                        Map<String, Parameter> pars = new HashMap<>();
+                        for (Variable var : vs) {
+                            Parameter par = new Parameter(var.getName(), var.getType());
+                            pars.put(par.getName(), par);
+                            inv.addParameter(par);
+                        }
+                        inv.addAtom(new Atom(predicate, predicate.getVariables().stream().map(var -> pars.containsKey(var.getName()) ? pars.get(var.getName()) : new Parameter(var.getName(), var.getType())).toArray(Parameter[]::new)));
+                        candidates.add(inv);
                     }
-                    c_inv.addAtom(new Atom(predicate, predicate.getVariables().stream().map(var -> pars.containsKey(var.getName()) ? pars.get(var.getName()) : new Parameter(var.getName(), var.getType())).toArray(Parameter[]::new)));
-                    candidates.add(c_inv);
                 }
             }
         });
@@ -169,12 +206,12 @@ public class InvariantSynthesizer {
             Set<Invariant> refined_invariants = new HashSet<>();
             candidates.forEach(invariant -> {
                 // We find a threatening action..
-                Optional<it.cnr.istc.iloc.translators.pddl.parser.Action> threatening_action = domain.getActions().values().stream().filter(action -> countAddPredicates(action.getEffect(), invariant) != countDelPredicates(action.getEffect(), invariant)).findAny();
+                Optional<it.cnr.istc.iloc.translators.pddl.parser.Action> threatening_action = domain.getActions().values().stream().filter(action -> isThreatened(action, invariant)).findAny();
                 if (threatening_action.isPresent()) {
                     // We refine the invariant according to the found threatening action..
                     refined_invariants.addAll(refine(invariant, threatening_action.get().getEffect()));
                 } else {
-                    // We accept the invariant..
+                    // Since the invariant is not threatened by any schematic operator, we can accept it..
                     invariants.add(invariant);
                 }
             });
