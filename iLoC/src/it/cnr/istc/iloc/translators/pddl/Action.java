@@ -41,4 +41,13 @@ class Action {
     public Env getEffect() {
         return effect;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(:precondition ").append(precondition.toString()).append(")\n");
+        sb.append("(:effect ").append(effect.toString()).append(")\n");
+        sb.append(")");
+        return sb.toString();
+    }
 }

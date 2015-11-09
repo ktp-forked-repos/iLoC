@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -66,5 +67,10 @@ class And implements Env {
         } else {
             this.consistent = false;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "(and " + envs.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + ")";
     }
 }

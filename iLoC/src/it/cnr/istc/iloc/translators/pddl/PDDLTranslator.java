@@ -200,57 +200,68 @@ public class PDDLTranslator {
             }
         });
 
+        visitGoal(problem.getGoal());
+
+        Collection<StateVariableValue> goal_terms = getTerms(goal);
+        double h_2 = computeH2Cost(goal_terms);
+
         while (true) {
+            // We collect values which are not effects of any action..
             List<StateVariableValue> v_to_remove = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream().filter(v -> v.isLeaf())).collect(Collectors.toList());
             if (v_to_remove.isEmpty()) {
                 break;
             }
 
             v_to_remove.forEach(v -> {
+                // We remove these values from their state variables..
                 v.getStateVariable().removeValue(v);
                 if (v.getStateVariable().getValues().isEmpty()) {
+                    // If the state variable has no allowed values, we can remove it definitely..
                     agent.removeStateVariable(v.getStateVariable());
                 }
             });
 
             List<Action> a_to_remove = new ArrayList<>();
             agent.getActions().values().forEach(action -> {
+                // We remove these values from the action precondition..
                 v_to_remove.forEach(v -> {
                     removeValue(action.getPrecondition(), v);
                 });
+                // .. we perform some simplification ..
                 action.getPrecondition().simplify();
                 if (!action.getPrecondition().isConsistent()) {
+                    // .. and if the action becomes impossible, we remove the action..
                     a_to_remove.add(action);
                 }
             });
             a_to_remove.forEach(a -> {
                 agent.removeAction(a);
+                // We remove the removable actions from the values, possible creating new impossible values..
+                getTerms(a.getEffect()).forEach(t -> t.removeAction(a));
             });
 
             List<DurativeAction> da_to_remove = new ArrayList<>();
             agent.getDurativeActions().values().forEach(durative_action -> {
+                // We remove these values from the action condition..
                 v_to_remove.forEach(v -> {
                     removeValue(durative_action.getCondition(), v);
                 });
+                // .. we perform some simplification ..
                 durative_action.getCondition().simplify();
                 if (!durative_action.getCondition().isConsistent()) {
+                    // .. and if the action becomes impossible, we remove the action..
                     da_to_remove.add(durative_action);
                 }
             });
             da_to_remove.forEach(da -> {
                 agent.removeDurativeAction(da);
-            });
-
-            agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).forEach(v -> {
-                a_to_remove.forEach(a -> v.removeAction(a));
-                da_to_remove.forEach(da -> {
-                    v.removeAtStartDurativeAction(da);
-                    v.removeAtEndDurativeAction(da);
+                // We remove the removable durative actions from the values, possible creating new impossible values..
+                getTerms(da.getEffect()).forEach(t -> {
+                    t.removeAtStartDurativeAction(da);
+                    t.removeAtEndDurativeAction(da);
                 });
             });
         }
-
-        visitGoal(problem.getGoal());
 
         ST translation = GROUP_FILE.getInstanceOf("Translation");
         translation.add("translator", this);
@@ -502,6 +513,8 @@ public class PDDLTranslator {
     private static Collection<StateVariableValue> getTerms(Env env) {
         if (env instanceof Precondition) {
             return Arrays.asList(((Precondition) env).getValue());
+        } else if (env instanceof Goal) {
+            return Arrays.asList(((Goal) env).getValue());
         } else if (env instanceof And) {
             return ((And) env).getEnvs().stream().flatMap(e -> getTerms(e).stream()).collect(Collectors.toList());
         } else {
@@ -510,8 +523,8 @@ public class PDDLTranslator {
     }
 
     private static boolean contains(Env env, StateVariableValue value) {
-        if (env instanceof Precondition) {
-            return ((Precondition) env).getValue() == value;
+        if (env instanceof InitEl) {
+            return ((InitEl) env).getValue() == value;
         } else if (env instanceof And) {
             return ((And) env).getEnvs().stream().anyMatch(e -> contains(e, value));
         } else {

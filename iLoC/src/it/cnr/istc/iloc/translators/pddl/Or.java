@@ -19,6 +19,7 @@ package it.cnr.istc.iloc.translators.pddl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -63,5 +64,10 @@ class Or implements Env {
         envs.forEach(env -> env.simplify());
         envs.removeIf(env -> !env.isConsistent());
         this.consistent = !envs.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return "(or " + envs.stream().map(term -> term.toString()).collect(Collectors.joining(" ")) + ")";
     }
 }
