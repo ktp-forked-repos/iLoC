@@ -88,4 +88,9 @@ class StateVariableValue {
     public boolean isLeaf() {
         return getSize() == 0;
     }
+
+    @Override
+    public String toString() {
+        return stateVariable.getName() + "." + name + "()";
+    }
 }

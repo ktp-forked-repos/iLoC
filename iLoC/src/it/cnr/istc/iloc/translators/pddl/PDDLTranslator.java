@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.stringtemplate.v4.ST;
@@ -203,7 +204,9 @@ public class PDDLTranslator {
         visitGoal(problem.getGoal());
 
         Collection<StateVariableValue> goal_terms = getTerms(goal);
-        double h_2 = computeH2Cost(goal_terms);
+
+        Map<Object, Double> costs = new HashMap<>();
+        double h_2 = computeH2Cost(goal_terms, costs);
 
         while (true) {
             // We collect values which are not effects of any action..
@@ -470,37 +473,57 @@ public class PDDLTranslator {
         }
     }
 
-    private double computeH2Cost(Collection<StateVariableValue> values) {
-        if (values.stream().anyMatch(v -> contains(init, v))) {
+    private double computeH2Cost(Collection<StateVariableValue> values, Map<Object, Double> costs) {
+        values.forEach(v -> System.out.println(v));
+        System.out.println("*****************************************");
+
+        if (values.stream().allMatch(v -> contains(init, v))) {
             return 0;
         }
         double min_cost = Double.POSITIVE_INFINITY;
         if (values.size() < 2) {
-            for (Action action : values.iterator().next().getActions()) {
-                double c_cost = computeH2Cost(getTerms(action.getPrecondition()));
-                if (c_cost < min_cost) {
-                    min_cost = c_cost;
+            StateVariableValue value = values.iterator().next();
+            if (!costs.containsKey(value)) {
+                costs.put(value, min_cost);
+                for (Action action : values.iterator().next().getActions()) {
+                    double c_cost = computeH2Cost(getTerms(action.getPrecondition()), costs);
+                    if (c_cost < min_cost) {
+                        min_cost = c_cost;
+                    }
                 }
+                costs.put(value, min_cost);
+            } else {
+                return costs.get(value);
             }
         } else {
             for (StateVariableValue[] vs : new CombinationGenerator<>(2, values.toArray(new StateVariableValue[values.size()]))) {
-                // The actions that generate both the values..
-                for (Action action : vs[0].getActions().stream().filter(t -> vs[1].getActions().contains(t)).collect(Collectors.toList())) {
-                    double c_cost = computeH2Cost(getTerms(action.getPrecondition()));
-                    if (c_cost < min_cost) {
-                        min_cost = c_cost;
+                Pair pair = new Pair(vs[0], vs[1]);
+                if (!costs.containsKey(pair)) {
+                    costs.put(pair, min_cost);
+                    // The actions that generate both the values..
+                    for (Action action : vs[0].getActions().stream().filter(t -> vs[1].getActions().contains(t)).collect(Collectors.toList())) {
+                        double c_cost = computeH2Cost(getTerms(action.getPrecondition()), costs);
+                        if (c_cost < min_cost) {
+                            min_cost = c_cost;
+                        }
                     }
-                }
-                // The actions that generate the first value but not the second..
-                for (Action action : vs[0].getActions().stream().filter(t -> !vs[1].getActions().contains(t)).collect(Collectors.toList())) {
-                    double c_cost = computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[1])).collect(Collectors.toList()));
-                    if (c_cost < min_cost) {
-                        min_cost = c_cost;
+                    // The actions that generate the first value but not the second..
+                    for (Action action : vs[0].getActions().stream().filter(t -> !vs[1].getActions().contains(t)).collect(Collectors.toList())) {
+                        double c_cost = computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[1])).collect(Collectors.toList()), costs);
+                        if (c_cost < min_cost) {
+                            min_cost = c_cost;
+                        }
                     }
-                }
-                // The actions that generate the second value but not the first..
-                for (Action action : vs[1].getActions().stream().filter(t -> !vs[0].getActions().contains(t)).collect(Collectors.toList())) {
-                    double c_cost = computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[0])).collect(Collectors.toList()));
+                    // The actions that generate the second value but not the first..
+                    for (Action action : vs[1].getActions().stream().filter(t -> !vs[0].getActions().contains(t)).collect(Collectors.toList())) {
+                        double c_cost = computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[0])).collect(Collectors.toList()), costs);
+                        if (c_cost < min_cost) {
+                            min_cost = c_cost;
+                        }
+                    }
+                    costs.put(pair, min_cost);
+                } else {
+                    double c_cost = costs.get(pair);
                     if (c_cost < min_cost) {
                         min_cost = c_cost;
                     }
@@ -515,6 +538,8 @@ public class PDDLTranslator {
             return Arrays.asList(((Precondition) env).getValue());
         } else if (env instanceof Goal) {
             return Arrays.asList(((Goal) env).getValue());
+        } else if (env instanceof Effect) {
+            return Arrays.asList(((Effect) env).getValue());
         } else if (env instanceof And) {
             return ((And) env).getEnvs().stream().flatMap(e -> getTerms(e).stream()).collect(Collectors.toList());
         } else {
@@ -529,6 +554,44 @@ public class PDDLTranslator {
             return ((And) env).getEnvs().stream().anyMatch(e -> contains(e, value));
         } else {
             throw new UnsupportedOperationException("Not supported yet..");
+        }
+    }
+
+    private static class Pair {
+
+        private final StateVariableValue first, second;
+
+        Pair(StateVariableValue first, StateVariableValue second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 31 * hash + Objects.hashCode(this.first);
+            hash = 31 * hash + Objects.hashCode(this.second);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Pair other = (Pair) obj;
+            return (Objects.equals(this.first, other.first) && Objects.equals(this.second, other.second)) || Objects.equals(this.first, other.second) && Objects.equals(this.second, other.first);
+        }
+
+        @Override
+        public String toString() {
+            return "(" + first + ", " + second + ')';
         }
     }
 }
