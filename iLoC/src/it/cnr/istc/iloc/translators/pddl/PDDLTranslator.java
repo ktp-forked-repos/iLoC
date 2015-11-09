@@ -208,6 +208,15 @@ public class PDDLTranslator {
         Map<Object, Double> costs = new HashMap<>();
         double h_2 = computeH2Cost(goal_terms, costs);
 
+        costs.entrySet().stream().filter(cost -> cost.getValue() == Double.POSITIVE_INFINITY && cost.getKey() instanceof StateVariableValue).map(unreachable -> (StateVariableValue) unreachable.getKey()).forEach(unreachable -> {
+            Collection<Action> a_to_remove = new ArrayList<>(unreachable.getActions());
+            a_to_remove.forEach(a -> unreachable.removeAction(a));
+            Collection<DurativeAction> da_at_start_to_remove = new ArrayList<>(unreachable.getAtStartDurativeActions());
+            da_at_start_to_remove.forEach(a -> unreachable.removeAtStartDurativeAction(a));
+            Collection<DurativeAction> da_at_end_to_remove = new ArrayList<>(unreachable.getAtEndDurativeActions());
+            da_at_end_to_remove.forEach(a -> unreachable.addAtEndDurativeAction(a));
+        });
+
         while (true) {
             // We collect values which are not effects of any action..
             List<StateVariableValue> v_to_remove = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream().filter(v -> v.isLeaf())).collect(Collectors.toList());
@@ -474,9 +483,6 @@ public class PDDLTranslator {
     }
 
     private double computeH2Cost(Collection<StateVariableValue> values, Map<Object, Double> costs) {
-        values.forEach(v -> System.out.println(v));
-        System.out.println("*****************************************");
-
         if (values.stream().allMatch(v -> contains(init, v))) {
             return 0;
         }
