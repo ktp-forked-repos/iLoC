@@ -45,6 +45,7 @@ class Action {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("(action ").append(name).append("\n");
         sb.append("(:precondition ").append(precondition.toString()).append(")\n");
         sb.append("(:effect ").append(effect.toString()).append(")\n");
         sb.append(")");

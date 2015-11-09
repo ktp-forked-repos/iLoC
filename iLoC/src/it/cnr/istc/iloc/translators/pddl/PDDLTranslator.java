@@ -172,10 +172,15 @@ public class PDDLTranslator {
                 env = a.getPrecondition();
                 visitPrecondition(a, action.getPrecondition());
                 a.getPrecondition().simplify();
-                if (a.getPrecondition().isConsistent()) {
-                    env = a.getEffect();
-                    visitEffect(a, action.getEffect());
+                env = a.getEffect();
+                visitEffect(a, action.getEffect());
+                a.getEffect().simplify();
+                if (a.getPrecondition().isConsistent() && a.getEffect().isConsistent()) {
                     agent.addAction(a);
+                } else {
+                    getTerms(a.getEffect()).forEach(term -> {
+                        term.removeAction(a);
+                    });
                 }
             }
         });
@@ -188,14 +193,16 @@ public class PDDLTranslator {
                     assignments.put(action.getVariables().get(i).getName(), cs[i]);
                 }
                 DurativeAction da = new DurativeAction(action.getName() + "_" + Stream.of(cs).map(c -> c.getName()).collect(Collectors.joining("_")));
+                env = da.getDuration();
+                visitDuration(da, action.getDuration());
+                da.getDuration().simplify();
                 env = da.getCondition();
                 visitCondition(da, action.getCondition());
                 da.getCondition().simplify();
+                env = da.getEffect();
+                visitEffect(da, action.getEffect());
+                da.getEffect().simplify();
                 if (da.getCondition().isConsistent()) {
-                    env = da.getDuration();
-                    visitDuration(da, action.getDuration());
-                    env = da.getEffect();
-                    visitEffect(da, action.getEffect());
                     agent.addDurativeAction(da);
                 }
             }
@@ -363,16 +370,25 @@ public class PDDLTranslator {
                 StateVariableValue value = agent.getStateVariable(predicate_name).getValue("True");
                 value.addAction(action);
                 env.addEnv(new Effect(action, value));
+                if (agent.getStateVariable(predicate_name).getValue("False").getActions().contains(action)) {
+                    env.setConsistent(false);
+                }
             } else {
                 StateVariableValue value = agent.getStateVariable(predicate_name).getValue("False");
                 value.addAction(action);
                 env.addEnv(new Effect(action, value));
+                if (agent.getStateVariable(predicate_name).getValue("True").getActions().contains(action)) {
+                    env.setConsistent(false);
+                }
             }
         } else if (term instanceof AssignOpTerm) {
             String function_name = ground(((AssignOpTerm) term).getFunctionTerm());
             StateVariableValue value = agent.getStateVariable(function_name).getValue(ground(((AssignOpTerm) term).getValue()));
             value.addAction(action);
             env.addEnv(new Effect(action, value));
+            if (agent.getStateVariable(function_name).getValues().values().stream().filter(v -> v != value).anyMatch(v -> v.getActions().contains(action))) {
+                env.setConsistent(false);
+            }
         } else if (term instanceof AndTerm) {
             And and = new And(env);
             env.addEnv(and);

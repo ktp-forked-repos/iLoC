@@ -61,4 +61,9 @@ class Effect implements Env {
     @Override
     public void simplify() {
     }
+
+    @Override
+    public String toString() {
+        return value.getStateVariable().getName() + "." + value.getName() + "()";
+    }
 }
