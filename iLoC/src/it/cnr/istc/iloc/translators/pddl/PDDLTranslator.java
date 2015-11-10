@@ -210,7 +210,7 @@ public class PDDLTranslator {
 
         visitGoal(problem.getGoal());
 
-        Collection<StateVariableValue> goal_terms = getTerms(goal);
+        List<StateVariableValue> goal_terms = getTerms(goal);
 
         Map<Object, Double> costs = new HashMap<>();
         double h_2 = computeH2Cost(goal_terms, costs);
@@ -499,63 +499,75 @@ public class PDDLTranslator {
     }
 
     private double computeH2Cost(Collection<StateVariableValue> values, Map<Object, Double> costs) {
+        assert !values.isEmpty();
+        // Base case..
         if (values.stream().allMatch(v -> contains(init, v))) {
             return 0;
         }
-        double min_cost = Double.POSITIVE_INFINITY;
-        if (values.size() < 2) {
+        if (values.size() == 1) {
+            // We compute the estimation for a single proposition..
+            double min_cost = Double.POSITIVE_INFINITY;
             StateVariableValue value = values.iterator().next();
             if (!costs.containsKey(value)) {
                 costs.put(value, min_cost);
                 for (Action action : values.iterator().next().getActions()) {
-                    double c_cost = computeH2Cost(getTerms(action.getPrecondition()), costs);
+                    double c_cost = 1 + computeH2Cost(getTerms(action.getPrecondition()), costs);
                     if (c_cost < min_cost) {
                         min_cost = c_cost;
                     }
                 }
+                System.out.println(value + " <= " + min_cost);
                 costs.put(value, min_cost);
+                return min_cost;
             } else {
                 return costs.get(value);
             }
         } else {
+            // We estimate the cost as the max cost of pairs of propositions..
+            double max_cost = Double.NEGATIVE_INFINITY;
             for (StateVariableValue[] vs : new CombinationGenerator<>(2, values.toArray(new StateVariableValue[values.size()]))) {
+                double min_pair_cost = Double.POSITIVE_INFINITY;
                 Pair pair = new Pair(vs[0], vs[1]);
                 if (!costs.containsKey(pair)) {
-                    costs.put(pair, min_cost);
+                    costs.put(pair, min_pair_cost);
                     // The actions that generate both the values..
                     for (Action action : vs[0].getActions().stream().filter(t -> vs[1].getActions().contains(t)).collect(Collectors.toList())) {
-                        double c_cost = computeH2Cost(getTerms(action.getPrecondition()), costs);
-                        if (c_cost < min_cost) {
-                            min_cost = c_cost;
+                        double c_cost = 1 + computeH2Cost(getTerms(action.getPrecondition()), costs);
+                        if (c_cost < min_pair_cost) {
+                            min_pair_cost = c_cost;
                         }
                     }
                     // The actions that generate the first value but not the second..
                     for (Action action : vs[0].getActions().stream().filter(t -> !vs[1].getActions().contains(t)).collect(Collectors.toList())) {
-                        double c_cost = computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[1])).collect(Collectors.toList()), costs);
-                        if (c_cost < min_cost) {
-                            min_cost = c_cost;
+                        double c_cost = 1 + computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[1])).collect(Collectors.toList()), costs);
+                        if (c_cost < min_pair_cost) {
+                            min_pair_cost = c_cost;
                         }
                     }
                     // The actions that generate the second value but not the first..
                     for (Action action : vs[1].getActions().stream().filter(t -> !vs[0].getActions().contains(t)).collect(Collectors.toList())) {
-                        double c_cost = computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[0])).collect(Collectors.toList()), costs);
-                        if (c_cost < min_cost) {
-                            min_cost = c_cost;
+                        double c_cost = 1 + computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[0])).collect(Collectors.toList()), costs);
+                        if (c_cost < min_pair_cost) {
+                            min_pair_cost = c_cost;
                         }
                     }
-                    costs.put(pair, min_cost);
+                    System.out.println(pair + " <= " + min_pair_cost);
+                    costs.put(pair, min_pair_cost);
                 } else {
                     double c_cost = costs.get(pair);
-                    if (c_cost < min_cost) {
-                        min_cost = c_cost;
+                    if (c_cost < min_pair_cost) {
+                        min_pair_cost = c_cost;
                     }
                 }
+                if (min_pair_cost > max_cost) {
+                    max_cost = min_pair_cost;
+                }
             }
+            return max_cost;
         }
-        return 1 + min_cost;
     }
 
-    private static Collection<StateVariableValue> getTerms(Env env) {
+    private static List<StateVariableValue> getTerms(Env env) {
         if (env instanceof Precondition) {
             return Arrays.asList(((Precondition) env).getValue());
         } else if (env instanceof Goal) {
