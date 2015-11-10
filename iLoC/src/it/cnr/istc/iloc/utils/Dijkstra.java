@@ -16,11 +16,15 @@
  */
 package it.cnr.istc.iloc.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -86,6 +90,7 @@ public class Dijkstra<V> {
                 if (alternateDist < v.dist) {
                     q.remove(v);
                     v.dist = alternateDist;
+                    v.previous = u;
                     q.add(v);
                 }
             }
@@ -96,6 +101,7 @@ public class Dijkstra<V> {
 
         private final V object;
         private double dist;
+        private Vertex previous = null;
         private final Map<Vertex, Double> neighbours = new HashMap<>();
 
         Vertex(V object, double dist) {
@@ -106,6 +112,16 @@ public class Dijkstra<V> {
         @Override
         public int compareTo(Vertex t) {
             return Double.compare(dist, t.dist);
+        }
+
+        public List<Vertex> getPath() {
+            if (previous == null) {
+                return new ArrayList<>(Arrays.asList(this));
+            } else {
+                List<Vertex> path = previous.getPath();
+                path.add(this);
+                return path;
+            }
         }
 
         @Override
@@ -122,6 +138,11 @@ public class Dijkstra<V> {
             graph.get(v).neighbours.forEach((t, c) -> {
                 sb.append("  -> ").append(t.object).append(" ").append(c).append("\n");
             });
+        });
+
+        sb.append("\n");
+        graph.values().forEach(value -> {
+            sb.append(value.getPath().stream().map(v -> v.object.toString() + " (" + v.dist + ")").collect(Collectors.joining(" -> "))).append("\n");
         });
         return sb.toString();
     }
