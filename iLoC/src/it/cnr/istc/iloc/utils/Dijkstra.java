@@ -49,13 +49,14 @@ public class Dijkstra<V> {
     }
 
     public void addEdge(V v1, V v2, double dist) {
-        if (!graph.containsKey(v1)) {
-            graph.put(v1, new Vertex(v1, Double.POSITIVE_INFINITY));
+        assert (v1 != v2) || dist == 0;
+        assert graph.containsKey(v1);
+        assert graph.containsKey(v2);
+        if (graph.get(v1).neighbours.containsKey(graph.get(v2))) {
+            graph.get(v1).neighbours.put(graph.get(v2), Math.min(graph.get(v1).neighbours.get(graph.get(v2)), dist));
+        } else {
+            graph.get(v1).neighbours.put(graph.get(v2), dist);
         }
-        if (!graph.containsKey(v2)) {
-            graph.put(v2, new Vertex(v2, Double.POSITIVE_INFINITY));
-        }
-        graph.get(v1).neighbours.put(graph.get(v2), dist);
     }
 
     public void dijkstra(V start) {
