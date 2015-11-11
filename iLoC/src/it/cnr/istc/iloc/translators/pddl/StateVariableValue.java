@@ -31,6 +31,7 @@ class StateVariableValue {
     private final Collection<Action> actions = new ArrayList<>();
     private final Collection<DurativeAction> atStartDurativeActions = new ArrayList<>();
     private final Collection<DurativeAction> atEndDurativeActions = new ArrayList<>();
+    private double lb = 0;
 
     StateVariableValue(StateVariable state_variable, String name) {
         this.stateVariable = state_variable;
@@ -87,6 +88,14 @@ class StateVariableValue {
 
     public boolean isLeaf() {
         return getSize() == 0;
+    }
+
+    public double getLb() {
+        return lb;
+    }
+
+    public void setLb(double lb) {
+        this.lb = lb;
     }
 
     @Override

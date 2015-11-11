@@ -35,15 +35,16 @@ import it.cnr.istc.iloc.translators.pddl.parser.Term;
 import it.cnr.istc.iloc.translators.pddl.parser.VariableTerm;
 import it.cnr.istc.iloc.utils.CartesianProductGenerator;
 import it.cnr.istc.iloc.utils.CombinationGenerator;
+import it.cnr.istc.iloc.utils.Dijkstra;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.stringtemplate.v4.ST;
@@ -210,12 +211,26 @@ public class PDDLTranslator {
 
         visitGoal(problem.getGoal());
 
-        List<StateVariableValue> goal_terms = getTerms(goal);
+        clear();
 
-        Map<Object, Double> costs = new HashMap<>();
-        double h_2 = computeH2Cost(goal_terms, costs);
+        Dijkstra<StateVariableValue> h_1 = computeH1Costs();
+        agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).forEach(value -> {
+            if (h_1.getDistance(value) == Double.POSITIVE_INFINITY) {
+                // We have an unreachable value which can be pruned away..
+                Collection<Action> a_to_remove = new ArrayList<>(value.getActions());
+                a_to_remove.forEach(a -> value.removeAction(a));
+                Collection<DurativeAction> da_at_start_to_remove = new ArrayList<>(value.getAtStartDurativeActions());
+                da_at_start_to_remove.forEach(a -> value.removeAtStartDurativeAction(a));
+                Collection<DurativeAction> da_at_end_to_remove = new ArrayList<>(value.getAtEndDurativeActions());
+                da_at_end_to_remove.forEach(a -> value.addAtEndDurativeAction(a));
+            } else {
+                value.setLb(h_1.getDistance(value));
+            }
+        });
+        clear();
 
-        costs.entrySet().stream().filter(cost -> cost.getValue() == Double.POSITIVE_INFINITY && cost.getKey() instanceof StateVariableValue).map(unreachable -> (StateVariableValue) unreachable.getKey()).forEach(unreachable -> {
+        Dijkstra<Object> h_2 = computeH2Costs();
+        agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> h_2.getDistance(value) == Double.POSITIVE_INFINITY).forEach(unreachable -> {
             Collection<Action> a_to_remove = new ArrayList<>(unreachable.getActions());
             a_to_remove.forEach(a -> unreachable.removeAction(a));
             Collection<DurativeAction> da_at_start_to_remove = new ArrayList<>(unreachable.getAtStartDurativeActions());
@@ -223,7 +238,15 @@ public class PDDLTranslator {
             Collection<DurativeAction> da_at_end_to_remove = new ArrayList<>(unreachable.getAtEndDurativeActions());
             da_at_end_to_remove.forEach(a -> unreachable.addAtEndDurativeAction(a));
         });
+        clear();
 
+        ST translation = GROUP_FILE.getInstanceOf("Translation");
+        translation.add("translator", this);
+
+        return translation.render();
+    }
+
+    private void clear() {
         while (true) {
             // We collect values which are not effects of any action..
             List<StateVariableValue> v_to_remove = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream().filter(v -> v.isLeaf())).collect(Collectors.toList());
@@ -281,11 +304,6 @@ public class PDDLTranslator {
                 });
             });
         }
-
-        ST translation = GROUP_FILE.getInstanceOf("Translation");
-        translation.add("translator", this);
-
-        return translation.render();
     }
 
     private String ground(Term term) {
@@ -498,134 +516,115 @@ public class PDDLTranslator {
         }
     }
 
-    private double computeH2Cost(Collection<StateVariableValue> values, Map<Object, Double> costs) {
-        assert !values.isEmpty();
-        // Base case..
-        if (values.stream().allMatch(v -> contains(init, v))) {
-            return 0;
+    private Dijkstra<StateVariableValue> computeH1Costs() {
+        Dijkstra<StateVariableValue> dijkstra = new Dijkstra<>();
+
+        StateVariableValue[] values = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> value.getName().equals("True")).toArray(StateVariableValue[]::new);
+        List<StateVariableValue> init_terms = getTerms(init);
+        for (StateVariableValue value : values) {
+            dijkstra.addVertex(value, init_terms.contains(value) ? 0 : Double.POSITIVE_INFINITY);
         }
-        if (values.size() == 1) {
-            // We compute the estimation for a single proposition..
-            double min_cost = Double.POSITIVE_INFINITY;
-            StateVariableValue value = values.iterator().next();
-            if (!costs.containsKey(value)) {
-                costs.put(value, min_cost);
-                for (Action action : values.iterator().next().getActions()) {
-                    double c_cost = 1 + computeH2Cost(getTerms(action.getPrecondition()), costs);
-                    if (c_cost < min_cost) {
-                        min_cost = c_cost;
-                    }
-                }
-                System.out.println(value + " <= " + min_cost);
-                costs.put(value, min_cost);
-                return min_cost;
-            } else {
-                return costs.get(value);
-            }
-        } else {
-            // We estimate the cost as the max cost of pairs of propositions..
-            double max_cost = Double.NEGATIVE_INFINITY;
-            for (StateVariableValue[] vs : new CombinationGenerator<>(2, values.toArray(new StateVariableValue[values.size()]))) {
-                double min_pair_cost = Double.POSITIVE_INFINITY;
-                Pair pair = new Pair(vs[0], vs[1]);
-                if (!costs.containsKey(pair)) {
-                    costs.put(pair, min_pair_cost);
-                    // The actions that generate both the values..
-                    for (Action action : vs[0].getActions().stream().filter(t -> vs[1].getActions().contains(t)).collect(Collectors.toList())) {
-                        double c_cost = 1 + computeH2Cost(getTerms(action.getPrecondition()), costs);
-                        if (c_cost < min_pair_cost) {
-                            min_pair_cost = c_cost;
-                        }
-                    }
-                    // The actions that generate the first value but not the second..
-                    for (Action action : vs[0].getActions().stream().filter(t -> !vs[1].getActions().contains(t)).collect(Collectors.toList())) {
-                        double c_cost = 1 + computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[1])).collect(Collectors.toList()), costs);
-                        if (c_cost < min_pair_cost) {
-                            min_pair_cost = c_cost;
-                        }
-                    }
-                    // The actions that generate the second value but not the first..
-                    for (Action action : vs[1].getActions().stream().filter(t -> !vs[0].getActions().contains(t)).collect(Collectors.toList())) {
-                        double c_cost = 1 + computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(vs[0])).collect(Collectors.toList()), costs);
-                        if (c_cost < min_pair_cost) {
-                            min_pair_cost = c_cost;
-                        }
-                    }
-                    System.out.println(pair + " <= " + min_pair_cost);
-                    costs.put(pair, min_pair_cost);
+
+        for (StateVariableValue value : values) {
+            value.getActions().forEach(action -> {
+                List<StateVariableValue> terms = getTerms(action.getPrecondition());
+                terms.forEach(term -> dijkstra.addEdge(term, value, 1));
+            });
+        }
+
+        init_terms.stream().forEach(init_term -> {
+            dijkstra.dijkstra(init_term);
+        });
+
+        return dijkstra;
+    }
+
+    private Dijkstra<Object> computeH2Costs() {
+        Dijkstra<Object> dijkstra = new Dijkstra<>();
+
+        StateVariableValue[] values = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> value.getName().equals("True")).toArray(StateVariableValue[]::new);
+        List<StateVariableValue> init_terms = getTerms(init);
+        for (StateVariableValue value : values) {
+            dijkstra.addVertex(value, init_terms.contains(value) ? 0 : Double.POSITIVE_INFINITY);
+        }
+        for (StateVariableValue[] vs : new CombinationGenerator<>(2, values)) {
+            HashSet<StateVariableValue> pair = new HashSet<>(Arrays.asList(vs[0], vs[1]));
+            dijkstra.addVertex(pair, (init_terms.contains(vs[0]) && init_terms.contains(vs[1])) ? 0 : Double.POSITIVE_INFINITY);
+        }
+
+        for (StateVariableValue value : values) {
+            value.getActions().forEach(action -> {
+                List<StateVariableValue> terms = getTerms(action.getPrecondition());
+                if (terms.size() == 1) {
+                    dijkstra.addEdge(terms.get(0), value, 1);
                 } else {
-                    double c_cost = costs.get(pair);
-                    if (c_cost < min_pair_cost) {
-                        min_pair_cost = c_cost;
+                    for (StateVariableValue[] vs : new CombinationGenerator<>(2, terms.stream().toArray(StateVariableValue[]::new))) {
+                        dijkstra.addEdge(new HashSet<>(Arrays.asList(vs[0], vs[1])), value, 1);
                     }
                 }
-                if (min_pair_cost > max_cost) {
-                    max_cost = min_pair_cost;
-                }
-            }
-            return max_cost;
+            });
         }
+        for (StateVariableValue[] vs : new CombinationGenerator<>(2, values)) {
+            HashSet<StateVariableValue> pair = new HashSet<>(Arrays.asList(vs[0], vs[1]));
+            dijkstra.addEdge(vs[0], pair, 0);
+            dijkstra.addEdge(vs[1], pair, 0);
+//            dijkstra.addEdge(pair, vs[0], 0);
+//            dijkstra.addEdge(pair, vs[1], 0);
+            // The actions that generate both the values..
+            vs[0].getActions().stream().filter(t -> vs[1].getActions().contains(t)).forEach(action -> {
+                List<StateVariableValue> terms = getTerms(action.getPrecondition());
+                if (terms.size() == 1) {
+                    dijkstra.addEdge(terms.get(0), pair, 1);
+                } else {
+                    for (StateVariableValue[] c_vs : new CombinationGenerator<>(2, terms.stream().toArray(StateVariableValue[]::new))) {
+                        dijkstra.addEdge(new HashSet<>(Arrays.asList(c_vs[0], c_vs[1])), pair, 1);
+                    }
+                }
+            });
+            // The actions that generate the first value but not the second..
+            vs[0].getActions().stream().filter(t -> !vs[1].getStateVariable().getValues().values().stream().filter(v -> v != vs[1]).anyMatch(v -> v.getActions().contains(t))).forEach(action -> {
+                List<StateVariableValue> preconditions = getTerms(action.getPrecondition()).stream().filter(term -> term != vs[1]).collect(Collectors.toList());
+                if (preconditions.isEmpty()) {
+                    dijkstra.addEdge(vs[1], pair, 1);
+                } else {
+                    preconditions.forEach(term -> {
+                        dijkstra.addEdge(new HashSet<>(Arrays.asList(term, vs[1])), pair, 1);
+                    });
+                }
+            });
+            // The actions that generate the second value but not the first..
+            vs[1].getActions().stream().filter(t -> !vs[0].getStateVariable().getValues().values().stream().filter(v -> v != vs[0]).anyMatch(v -> v.getActions().contains(t))).forEach(action -> {
+                List<StateVariableValue> preconditions = getTerms(action.getPrecondition()).stream().filter(term -> term != vs[0]).collect(Collectors.toList());
+                if (preconditions.isEmpty()) {
+                    dijkstra.addEdge(vs[0], pair, 1);
+                } else {
+                    preconditions.forEach(term -> {
+                        dijkstra.addEdge(new HashSet<>(Arrays.asList(term, vs[0])), pair, 1);
+                    });
+                }
+            });
+        }
+
+        init_terms.stream().forEach(init_term -> {
+            dijkstra.dijkstra(init_term);
+        });
+
+        return dijkstra;
     }
 
     private static List<StateVariableValue> getTerms(Env env) {
         if (env instanceof Precondition) {
             return Arrays.asList(((Precondition) env).getValue());
-        } else if (env instanceof Goal) {
-            return Arrays.asList(((Goal) env).getValue());
         } else if (env instanceof Effect) {
             return Arrays.asList(((Effect) env).getValue());
+        } else if (env instanceof InitEl) {
+            return Arrays.asList(((InitEl) env).getValue());
+        } else if (env instanceof Goal) {
+            return Arrays.asList(((Goal) env).getValue());
         } else if (env instanceof And) {
             return ((And) env).getEnvs().stream().flatMap(e -> getTerms(e).stream()).collect(Collectors.toList());
         } else {
-            throw new UnsupportedOperationException("Not supported yet..");
-        }
-    }
-
-    private static boolean contains(Env env, StateVariableValue value) {
-        if (env instanceof InitEl) {
-            return ((InitEl) env).getValue() == value;
-        } else if (env instanceof And) {
-            return ((And) env).getEnvs().stream().anyMatch(e -> contains(e, value));
-        } else {
-            throw new UnsupportedOperationException("Not supported yet..");
-        }
-    }
-
-    private static class Pair {
-
-        private final StateVariableValue first, second;
-
-        Pair(StateVariableValue first, StateVariableValue second) {
-            this.first = first;
-            this.second = second;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 7;
-            hash = 31 * hash + Objects.hashCode(this.first);
-            hash = 31 * hash + Objects.hashCode(this.second);
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final Pair other = (Pair) obj;
-            return (Objects.equals(this.first, other.first) && Objects.equals(this.second, other.second)) || Objects.equals(this.first, other.second) && Objects.equals(this.second, other.first);
-        }
-
-        @Override
-        public String toString() {
-            return "(" + first + ", " + second + ')';
+            throw new UnsupportedOperationException("Not supported yet.." + env.getClass().getName());
         }
     }
 }

@@ -60,7 +60,6 @@ public class OpTerm implements Term {
     }
 
     public enum Op {
-
         Add, Sub, Mul, Div
     }
 }

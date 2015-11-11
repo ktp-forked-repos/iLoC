@@ -68,7 +68,6 @@ public class Parser {
              * We define all the types of the domain..
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterTyped_list_name(PDDLParser.Typed_list_nameContext ctx) {
                     ctx.name().stream().forEach(type_name -> {
@@ -82,7 +81,6 @@ public class Parser {
              * We set the superclasses (i.e., we manage type inheritance)..
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterTyped_list_name(PDDLParser.Typed_list_nameContext ctx) {
                     Type c_superclass = null;
@@ -108,7 +106,6 @@ public class Parser {
              * We define the constants.
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterTyped_list_name(PDDLParser.Typed_list_nameContext ctx) {
                     Type type = null;
@@ -137,7 +134,6 @@ public class Parser {
              * We define the predicates.
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterAtomic_formula_skeleton(PDDLParser.Atomic_formula_skeletonContext ctx) {
                     Variable[] variables = new Variable[0];
@@ -157,7 +153,6 @@ public class Parser {
              * We define the functions.
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 private Type function_type = null;
 
                 @Override
@@ -194,7 +189,6 @@ public class Parser {
         domain_context.structure_def().stream().forEach(structure_def -> {
             if (structure_def.action_def() != null) {
                 WALKER.walk(new PDDLBaseListener() {
-
                     @Override
                     public void enterAction_def(PDDLParser.Action_defContext ctx) {
                         Variable[] variables = new Variable[0];
@@ -218,7 +212,6 @@ public class Parser {
                 }, structure_def.action_def());
             } else if (structure_def.durative_action_def() != null) {
                 WALKER.walk(new PDDLBaseListener() {
-
                     @Override
                     public void enterDurative_action_def(PDDLParser.Durative_action_defContext ctx) {
                         Variable[] variables = new Variable[0];
@@ -250,7 +243,6 @@ public class Parser {
          */
         if (problem_context.object_declaration() != null) {
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterTyped_list_name(PDDLParser.Typed_list_nameContext ctx) {
                     Type type = null;

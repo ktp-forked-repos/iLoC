@@ -80,7 +80,6 @@ class PDDLRequirements {
     }
 
     enum Requirement {
-
         STRIPS(":strips"),
         TYPING(":typing"),
         NEGATIVE_PRECONDITIONS(":negative-preconditions"),

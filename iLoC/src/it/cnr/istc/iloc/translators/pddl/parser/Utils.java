@@ -62,7 +62,6 @@ class Utils {
     }
 
     enum Keyword {
-
         TYPEDEF("typedef"),
         NUMBER(Constants.NUMBER),
         INT(Constants.INT),

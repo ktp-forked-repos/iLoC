@@ -71,7 +71,6 @@ public class ComparisonTerm implements Term {
     }
 
     public enum Comp {
-
         Gt, Lt, Eq, GEq, LEq;
     }
 }

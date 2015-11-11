@@ -68,7 +68,6 @@ public class AssignOpTerm implements Term {
     }
 
     public enum AssignOp {
-
         Assign, ScaleUp, ScaleDown, Increase, Decrease
     }
 }
