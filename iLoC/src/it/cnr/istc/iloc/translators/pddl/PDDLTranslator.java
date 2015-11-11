@@ -43,8 +43,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.stringtemplate.v4.ST;
@@ -211,26 +214,26 @@ public class PDDLTranslator {
 
         visitGoal(problem.getGoal());
 
-        clear();
-
-        Dijkstra<StateVariableValue> h_1 = computeH1Costs();
-        agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).forEach(value -> {
-            if (h_1.getDistance(value) == Double.POSITIVE_INFINITY) {
-                // We have an unreachable value which can be pruned away..
-                Collection<Action> a_to_remove = new ArrayList<>(value.getActions());
-                a_to_remove.forEach(a -> value.removeAction(a));
-                Collection<DurativeAction> da_at_start_to_remove = new ArrayList<>(value.getAtStartDurativeActions());
-                da_at_start_to_remove.forEach(a -> value.removeAtStartDurativeAction(a));
-                Collection<DurativeAction> da_at_end_to_remove = new ArrayList<>(value.getAtEndDurativeActions());
-                da_at_end_to_remove.forEach(a -> value.addAtEndDurativeAction(a));
-            } else {
-                value.setLb(h_1.getDistance(value));
+//        clear();
+        Map<Object, Double> table = new LinkedHashMap<>();
+        StateVariableValue[] values = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> value.getName().equals("True")).toArray(StateVariableValue[]::new);
+        List<StateVariableValue> init_terms = getTerms(init);
+        for (StateVariableValue value : values) {
+            if (init_terms.contains(value)) {
+                table.put(value, 0d);
             }
-        });
-        clear();
+        }
+        for (StateVariableValue[] vs : new CombinationGenerator<>(2, values)) {
+            if (init_terms.contains(vs[0]) && init_terms.contains(vs[1])) {
+                table.put(new HashSet<>(Arrays.asList(vs[0], vs[1])), 0d);
+            }
+        }
 
-        Dijkstra<Object> h_2 = computeH2Costs();
-        agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> h_2.getDistance(value) == Double.POSITIVE_INFINITY).forEach(unreachable -> {
+        //TODO: Compute costs starting from what is known..
+        double h_2 = computeH2Cost(new HashSet<>(getTerms(goal)), table);
+        table.forEach((value, cost) -> System.out.println(value + " = " + cost));
+
+        agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> !table.containsKey(value) || table.get(value) == Double.POSITIVE_INFINITY).forEach(unreachable -> {
             Collection<Action> a_to_remove = new ArrayList<>(unreachable.getActions());
             a_to_remove.forEach(a -> unreachable.removeAction(a));
             Collection<DurativeAction> da_at_start_to_remove = new ArrayList<>(unreachable.getAtStartDurativeActions());
@@ -238,6 +241,7 @@ public class PDDLTranslator {
             Collection<DurativeAction> da_at_end_to_remove = new ArrayList<>(unreachable.getAtEndDurativeActions());
             da_at_end_to_remove.forEach(a -> unreachable.addAtEndDurativeAction(a));
         });
+
         clear();
 
         ST translation = GROUP_FILE.getInstanceOf("Translation");
@@ -610,6 +614,53 @@ public class PDDLTranslator {
         });
 
         return dijkstra;
+    }
+
+    private static double computeH2Cost(Set<StateVariableValue> values, Map<Object, Double> table) {
+        assert !values.isEmpty();
+        double v = 0;
+        StateVariableValue[] c_values = values.stream().toArray(StateVariableValue[]::new);
+        for (int i = 0; i < c_values.length; i++) {
+            v = Math.max(v, computeH2Cost(c_values[i], table));
+            for (int j = i + 1; j < c_values.length; j++) {
+                v = Double.max(v, computeH2Cost(c_values[i], c_values[j], table));
+            }
+        }
+        return v;
+    }
+
+    private static double computeH2Cost(StateVariableValue value, Map<Object, Double> table) {
+        if (table.containsKey(value)) {
+            return table.get(value);
+        } else {
+            OptionalDouble min = value.getActions().stream().mapToDouble(action -> computeH2Cost(new HashSet<>(getTerms(action.getPrecondition())), table)).min();
+            double c_cost = 1 + min.orElse(Double.POSITIVE_INFINITY);
+            table.put(value, c_cost);
+            System.out.println(value + " = " + c_cost);
+            return c_cost;
+        }
+    }
+
+    private static double computeH2Cost(StateVariableValue v0, StateVariableValue v1, Map<Object, Double> table) {
+        HashSet<StateVariableValue> pair = new HashSet<>(Arrays.asList(v0, v1));
+        if (table.containsKey(pair)) {
+            return table.get(pair);
+        } else {
+            // The actions that generate both the values..
+            double v1_v2 = 1 + v0.getActions().stream().filter(t -> v1.getActions().contains(t)).mapToDouble(action -> computeH2Cost(new HashSet<>(getTerms(action.getPrecondition())), table)).min().orElse(Double.POSITIVE_INFINITY);
+            // The actions that generate the first value but not the second..
+            double v1_not_v2 = 1 + v0.getActions().stream().filter(t -> !v1.getStateVariable().getValues().values().stream().filter(value -> value != v1).anyMatch(value -> value.getActions().contains(t))).mapToDouble(action -> computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(v1)).collect(Collectors.toSet()), table)).min().orElse(Double.POSITIVE_INFINITY);
+            // The actions that generate the second value but not the first..
+            double not_v1_v2 = 1 + v1.getActions().stream().filter(t -> !v0.getStateVariable().getValues().values().stream().filter(value -> value != v0).anyMatch(value -> value.getActions().contains(t))).mapToDouble(action -> computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(v0)).collect(Collectors.toSet()), table)).min().orElse(Double.POSITIVE_INFINITY);
+
+            double c_cost = Double.POSITIVE_INFINITY;
+            c_cost = Double.min(c_cost, v1_v2);
+            c_cost = Double.min(c_cost, v1_not_v2);
+            c_cost = Double.min(c_cost, not_v1_v2);
+            table.put(pair, c_cost);
+            System.out.println(pair + " = " + c_cost);
+            return c_cost;
+        }
     }
 
     private static List<StateVariableValue> getTerms(Env env) {
