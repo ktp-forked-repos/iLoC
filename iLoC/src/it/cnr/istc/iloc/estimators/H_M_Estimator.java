@@ -21,16 +21,13 @@ import it.cnr.istc.iloc.api.IEstimator;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
-import it.cnr.istc.iloc.utils.CombinationGenerator;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * An adaptation of the h_n heuristic as described in
@@ -43,93 +40,57 @@ import java.util.stream.Stream;
 public class H_M_Estimator implements IEstimator {
 
     private final ISolver solver;
-    private final int m;
     private final Map<Object, Double> table = new HashMap<>();
 
-    public H_M_Estimator(ISolver solver, int m) {
+    public H_M_Estimator(ISolver solver) {
         this.solver = solver;
-        this.m = m;
     }
 
     @Override
     public void recomputeCosts() {
         table.clear();
         IStaticCausalGraph cg = solver.getStaticCausalGraph();
-        List<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().filter(node -> !node.getIncomingEdges().isEmpty() || !node.getOutgoingEdges().isEmpty()).collect(Collectors.toList());
+        List<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toList());
         List<IFormula> active_formulas = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).collect(Collectors.toList());
-        int c_m = Math.min(m, active_formulas.stream().map(formula -> formula.getType()).collect(Collectors.toSet()).size());
 
         // Initialization..
-        for (int i = 1; i <= c_m; i++) {
-            for (IStaticCausalGraph.INode[] c_nodes : new CombinationGenerator<>(i, active_formulas.stream().map(formula -> cg.getNode(formula.getType())).toArray(IStaticCausalGraph.INode[]::new))) {
-                table.put(new HashSet<>(Arrays.asList(c_nodes)), 0d);
-            }
-        }
-
-        nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(new HashSet<>(Arrays.asList(node)), Double.POSITIVE_INFINITY));
-        for (int i = 2; i <= c_m; i++) {
-            for (IStaticCausalGraph.INode[] c_nodes : new CombinationGenerator<>(i, nodes.stream().toArray(IStaticCausalGraph.INode[]::new))) {
-                HashSet<IStaticCausalGraph.INode> ns = new HashSet<>(Arrays.asList(c_nodes));
-                if (!table.containsKey(ns)) {
-                    table.put(ns, Stream.of(c_nodes).mapToDouble(node -> table.get(node)).sum());
-                }
-            }
-        }
+        active_formulas.forEach(formula -> table.put(cg.getNode(formula.getType()), 0d));
+        nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
 
         // Main loop (repeat until no change)
         Collection<IStaticCausalGraph.INode> c_nodes = new LinkedList<>(nodes);
+        active_formulas.forEach(formula -> c_nodes.remove(cg.getNode(formula.getType())));
 
         boolean changed;
         do {
             changed = false;
+            Collection<IStaticCausalGraph.INode> to_remove = new ArrayList<>();
             for (IStaticCausalGraph.INode c_node : c_nodes) {
-                if (c_node.toString().equals("Pick_up_a(BlocksAgent scope, number at)")) {
-                    System.out.println(c_node);
-                }
                 double c1;
-                if (c_node instanceof IStaticCausalGraph.IPreferenceNode) {
+                if (c_node instanceof IStaticCausalGraph.IDisjunctionNode) {
+                    c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.get(node)).min().orElse(Double.POSITIVE_INFINITY);
+                } else if (c_node instanceof IStaticCausalGraph.IPreferenceNode) {
                     throw new UnsupportedOperationException("Preferences estimation is not supported yet..");
                 } else {
-                    c1 = 1 + evaluate(c_m, c_node.getOutgoingEdges().stream().map(edge -> edge.getTarget()).collect(Collectors.toSet()));
+                    c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.get(node)).max().orElse(Double.POSITIVE_INFINITY);
                 }
                 // update single atoms added by action a
-                if (table.get(new HashSet<>(Arrays.asList(c_node))) > c1) {
-                    table.put(new HashSet<>(Arrays.asList(c_node)), c1);
+                if (table.get(c_node) > c1) {
+                    table.put(c_node, c1);
+                    to_remove.add(c_node);
                     changed = true;
                 }
-
-                for (int i = 1; i < c_m; i++) {
-                    for (IStaticCausalGraph.INode[] other_nodes : new CombinationGenerator<>(i, nodes.stream().toArray(IStaticCausalGraph.INode[]::new))) {
-                        HashSet<IStaticCausalGraph.INode> ns = new HashSet<>(Arrays.asList(other_nodes));
-                        if (!ns.contains(c_node)) {
-                            double c2 = 1 + evaluate(c_m, Stream.concat(c_node.getOutgoingEdges().stream().map(edge -> edge.getTarget()), Stream.of(other_nodes)).collect(Collectors.toSet()));
-                            // update other atoms
-                            if (table.get(ns) > c2) {
-                                table.put(ns, c2);
-                                changed = true;
-                            }
-                        }
-                    }
-                }
             }
+            c_nodes.removeAll(to_remove);
+            to_remove.clear();
         } while (changed);
-    }
 
-    private double evaluate(int k, Collection<IStaticCausalGraph.INode> nodes) {
-        assert k > 0;
-        assert !nodes.isEmpty();
-        double v = 0;
-        for (int i = 1; i <= k; i++) {
-            for (IStaticCausalGraph.INode[] c_nodes : new CombinationGenerator<>(i, nodes.stream().toArray(IStaticCausalGraph.INode[]::new))) {
-                System.out.println(new HashSet<>(Arrays.asList(c_nodes)));
-                v = Math.max(v, table.get(new HashSet<>(Arrays.asList(c_nodes))));
-            }
-        }
-        return v;
+        // c_nodes contains nodes which are unreachable from the facts..
+        // these nodes might still be reachable from the goals!
     }
 
     @Override
     public double estimate(IStaticCausalGraph.INode node) {
-        return table.get(new HashSet<>(Arrays.asList(node)));
+        return table.get(node);
     }
 }
