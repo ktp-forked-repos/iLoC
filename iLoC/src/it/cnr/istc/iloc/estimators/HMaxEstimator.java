@@ -58,6 +58,7 @@ public class HMaxEstimator implements IEstimator {
 
         // Initialization..
         active_formulas.forEach(formula -> table.put(cg.getNode(formula.getType()), 0d));
+        nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
 
         // Main loop (repeat until no change)
         Collection<IStaticCausalGraph.INode> c_nodes = new LinkedList<>(nodes);
@@ -76,8 +77,8 @@ public class HMaxEstimator implements IEstimator {
                 } else {
                     c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.containsKey(node) ? table.get(node) : Double.POSITIVE_INFINITY).max().orElse(Double.POSITIVE_INFINITY);
                 }
-                // update single atoms added by action a
-                if (!table.containsKey(c_node) && Double.isFinite(c1)) {
+                // update single value by rule c_node
+                if (table.get(c_node) > c1) {
                     table.put(c_node, c1);
                     to_remove.add(c_node);
                     changed = true;
@@ -86,6 +87,8 @@ public class HMaxEstimator implements IEstimator {
             c_nodes.removeAll(to_remove);
             to_remove.clear();
         } while (changed);
+
+        table.values().removeIf(value -> Double.isInfinite(value));
 
         // c_nodes contains nodes which are unreachable from the facts..
         // these nodes might still be reachable from the goals!
