@@ -35,7 +35,6 @@ import it.cnr.istc.iloc.translators.pddl.parser.Term;
 import it.cnr.istc.iloc.translators.pddl.parser.VariableTerm;
 import it.cnr.istc.iloc.utils.CartesianProductGenerator;
 import it.cnr.istc.iloc.utils.CombinationGenerator;
-import it.cnr.istc.iloc.utils.Dijkstra;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -214,24 +212,15 @@ public class PDDLTranslator {
 
         visitGoal(problem.getGoal());
 
-//        clear();
-        Map<Object, Double> table = new LinkedHashMap<>();
-        StateVariableValue[] values = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> value.getName().equals("True")).toArray(StateVariableValue[]::new);
-        List<StateVariableValue> init_terms = getTerms(init);
-        for (StateVariableValue value : values) {
-            if (init_terms.contains(value)) {
-                table.put(value, 0d);
-            }
-        }
-        for (StateVariableValue[] vs : new CombinationGenerator<>(2, values)) {
-            if (init_terms.contains(vs[0]) && init_terms.contains(vs[1])) {
-                table.put(new HashSet<>(Arrays.asList(vs[0], vs[1])), 0d);
-            }
-        }
+        // Initial cleanings.. removes those states which are unreachable according to the domain
+        clear();
 
-        //TODO: Compute costs starting from what is known..
-        double h_2 = computeH2Cost(new HashSet<>(getTerms(goal)), table);
-        table.forEach((value, cost) -> System.out.println(value + " = " + cost));
+        Map<Object, Double> table = computeH2Cost();
+        table.forEach((value, cost) -> {
+            if (value instanceof StateVariableValue && cost > 0 && cost <= Double.POSITIVE_INFINITY) {
+                ((StateVariableValue) value).setLb(cost);
+            }
+        });
 
         agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> !table.containsKey(value) || table.get(value) == Double.POSITIVE_INFINITY).forEach(unreachable -> {
             Collection<Action> a_to_remove = new ArrayList<>(unreachable.getActions());
@@ -242,6 +231,7 @@ public class PDDLTranslator {
             da_at_end_to_remove.forEach(a -> unreachable.addAtEndDurativeAction(a));
         });
 
+        // Final cleanings.. removes those states which are unreachable from the initial state
         clear();
 
         ST translation = GROUP_FILE.getInstanceOf("Translation");
@@ -520,147 +510,73 @@ public class PDDLTranslator {
         }
     }
 
-    private Dijkstra<StateVariableValue> computeH1Costs() {
-        Dijkstra<StateVariableValue> dijkstra = new Dijkstra<>();
+    private Map<Object, Double> computeH2Cost() {
+        Map<Object, Double> table = new LinkedHashMap<>();
 
-        StateVariableValue[] values = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> value.getName().equals("True")).toArray(StateVariableValue[]::new);
+        // initialization
+        StateVariableValue[] values = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).toArray(StateVariableValue[]::new);
         List<StateVariableValue> init_terms = getTerms(init);
         for (StateVariableValue value : values) {
-            dijkstra.addVertex(value, init_terms.contains(value) ? 0 : Double.POSITIVE_INFINITY);
-        }
-
-        for (StateVariableValue value : values) {
-            value.getActions().forEach(action -> {
-                List<StateVariableValue> terms = getTerms(action.getPrecondition());
-                terms.forEach(term -> dijkstra.addEdge(term, value, 1));
-            });
-        }
-
-        init_terms.stream().forEach(init_term -> {
-            dijkstra.dijkstra(init_term);
-        });
-
-        return dijkstra;
-    }
-
-    private Dijkstra<Object> computeH2Costs() {
-        Dijkstra<Object> dijkstra = new Dijkstra<>();
-
-        StateVariableValue[] values = agent.getStateVariables().values().stream().flatMap(sv -> sv.getValues().values().stream()).filter(value -> value.getName().equals("True")).toArray(StateVariableValue[]::new);
-        List<StateVariableValue> init_terms = getTerms(init);
-        for (StateVariableValue value : values) {
-            dijkstra.addVertex(value, init_terms.contains(value) ? 0 : Double.POSITIVE_INFINITY);
+            table.put(value, init_terms.contains(value) ? 0 : Double.POSITIVE_INFINITY);
+            if ((value.getName().equals("False") || value.getName().equals("Undefined")) && init_terms.stream().noneMatch(v -> v.getStateVariable() == value.getStateVariable())) {
+                table.put(value, 0d);
+            }
         }
         for (StateVariableValue[] vs : new CombinationGenerator<>(2, values)) {
             HashSet<StateVariableValue> pair = new HashSet<>(Arrays.asList(vs[0], vs[1]));
-            dijkstra.addVertex(pair, (init_terms.contains(vs[0]) && init_terms.contains(vs[1])) ? 0 : Double.POSITIVE_INFINITY);
+            table.put(pair, table.get(vs[0]) + table.get(vs[1]));
         }
 
-        for (StateVariableValue value : values) {
-            value.getActions().forEach(action -> {
-                List<StateVariableValue> terms = getTerms(action.getPrecondition());
-                if (terms.size() == 1) {
-                    dijkstra.addEdge(terms.get(0), value, 1);
-                } else {
-                    for (StateVariableValue[] vs : new CombinationGenerator<>(2, terms.stream().toArray(StateVariableValue[]::new))) {
-                        dijkstra.addEdge(new HashSet<>(Arrays.asList(vs[0], vs[1])), value, 1);
+        // main loop (repeat until no change)
+        boolean changed;
+        do {
+            changed = false;
+            for (Action action : agent.getActions().values()) {
+                double c1 = 1 + eval(new HashSet<>(getTerms(action.getPrecondition())), table);
+                List<StateVariableValue> eff = getTerms(action.getEffect());
+                for (StateVariableValue p : eff) {
+                    // update single atoms added by action a
+                    if (table.get(p) > c1) {
+                        table.put(p, c1);
+                        changed = true;
+                    }
+                    for (StateVariableValue q : eff) {
+                        if (q != p) {
+                            // update pairs of atoms added by action a
+                            HashSet<StateVariableValue> pair = new HashSet<>(Arrays.asList(p, q));
+                            if (table.get(pair) > c1) {
+                                table.put(pair, c1);
+                                changed = true;
+                            }
+                        }
+                    }
+                    for (StateVariableValue r : values) {
+                        if (eff.stream().noneMatch(v -> v.getStateVariable() == r.getStateVariable()) && r != p) {
+                            double c2 = 1 + eval(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(r)).collect(Collectors.toSet()), table);
+                            HashSet<StateVariableValue> pair = new HashSet<>(Arrays.asList(p, r));
+                            if (table.get(pair) > c2) {
+                                table.put(pair, c2);
+                                changed = true;
+                            }
+                        }
                     }
                 }
-            });
-        }
-        for (StateVariableValue[] vs : new CombinationGenerator<>(2, values)) {
-            HashSet<StateVariableValue> pair = new HashSet<>(Arrays.asList(vs[0], vs[1]));
-            dijkstra.addEdge(vs[0], pair, 0);
-            dijkstra.addEdge(vs[1], pair, 0);
-//            dijkstra.addEdge(pair, vs[0], 0);
-//            dijkstra.addEdge(pair, vs[1], 0);
-            // The actions that generate both the values..
-            vs[0].getActions().stream().filter(t -> vs[1].getActions().contains(t)).forEach(action -> {
-                List<StateVariableValue> terms = getTerms(action.getPrecondition());
-                if (terms.size() == 1) {
-                    dijkstra.addEdge(terms.get(0), pair, 1);
-                } else {
-                    for (StateVariableValue[] c_vs : new CombinationGenerator<>(2, terms.stream().toArray(StateVariableValue[]::new))) {
-                        dijkstra.addEdge(new HashSet<>(Arrays.asList(c_vs[0], c_vs[1])), pair, 1);
-                    }
-                }
-            });
-            // The actions that generate the first value but not the second..
-            vs[0].getActions().stream().filter(t -> !vs[1].getStateVariable().getValues().values().stream().filter(v -> v != vs[1]).anyMatch(v -> v.getActions().contains(t))).forEach(action -> {
-                List<StateVariableValue> preconditions = getTerms(action.getPrecondition()).stream().filter(term -> term != vs[1]).collect(Collectors.toList());
-                if (preconditions.isEmpty()) {
-                    dijkstra.addEdge(vs[1], pair, 1);
-                } else {
-                    preconditions.forEach(term -> {
-                        dijkstra.addEdge(new HashSet<>(Arrays.asList(term, vs[1])), pair, 1);
-                    });
-                }
-            });
-            // The actions that generate the second value but not the first..
-            vs[1].getActions().stream().filter(t -> !vs[0].getStateVariable().getValues().values().stream().filter(v -> v != vs[0]).anyMatch(v -> v.getActions().contains(t))).forEach(action -> {
-                List<StateVariableValue> preconditions = getTerms(action.getPrecondition()).stream().filter(term -> term != vs[0]).collect(Collectors.toList());
-                if (preconditions.isEmpty()) {
-                    dijkstra.addEdge(vs[0], pair, 1);
-                } else {
-                    preconditions.forEach(term -> {
-                        dijkstra.addEdge(new HashSet<>(Arrays.asList(term, vs[0])), pair, 1);
-                    });
-                }
-            });
-        }
-
-        init_terms.stream().forEach(init_term -> {
-            dijkstra.dijkstra(init_term);
-        });
-
-        return dijkstra;
+            }
+        } while (changed);
+        return table;
     }
 
-    private static double computeH2Cost(Set<StateVariableValue> values, Map<Object, Double> table) {
+    private static double eval(Set<StateVariableValue> values, Map<Object, Double> table) {
         assert !values.isEmpty();
         double v = 0;
         StateVariableValue[] c_values = values.stream().toArray(StateVariableValue[]::new);
         for (int i = 0; i < c_values.length; i++) {
-            v = Math.max(v, computeH2Cost(c_values[i], table));
+            v = Math.max(v, table.get(c_values[i]));
             for (int j = i + 1; j < c_values.length; j++) {
-                v = Double.max(v, computeH2Cost(c_values[i], c_values[j], table));
+                v = Math.max(v, table.get(new HashSet<>(Arrays.asList(c_values[i], c_values[j]))));
             }
         }
         return v;
-    }
-
-    private static double computeH2Cost(StateVariableValue value, Map<Object, Double> table) {
-        if (table.containsKey(value)) {
-            return table.get(value);
-        } else {
-            OptionalDouble min = value.getActions().stream().mapToDouble(action -> computeH2Cost(new HashSet<>(getTerms(action.getPrecondition())), table)).min();
-            double c_cost = 1 + min.orElse(Double.POSITIVE_INFINITY);
-            table.put(value, c_cost);
-            System.out.println(value + " = " + c_cost);
-            return c_cost;
-        }
-    }
-
-    private static double computeH2Cost(StateVariableValue v0, StateVariableValue v1, Map<Object, Double> table) {
-        HashSet<StateVariableValue> pair = new HashSet<>(Arrays.asList(v0, v1));
-        if (table.containsKey(pair)) {
-            return table.get(pair);
-        } else {
-            // The actions that generate both the values..
-            double v1_v2 = 1 + v0.getActions().stream().filter(t -> v1.getActions().contains(t)).mapToDouble(action -> computeH2Cost(new HashSet<>(getTerms(action.getPrecondition())), table)).min().orElse(Double.POSITIVE_INFINITY);
-            // The actions that generate the first value but not the second..
-            double v1_not_v2 = 1 + v0.getActions().stream().filter(t -> !v1.getStateVariable().getValues().values().stream().filter(value -> value != v1).anyMatch(value -> value.getActions().contains(t))).mapToDouble(action -> computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(v1)).collect(Collectors.toSet()), table)).min().orElse(Double.POSITIVE_INFINITY);
-            // The actions that generate the second value but not the first..
-            double not_v1_v2 = 1 + v1.getActions().stream().filter(t -> !v0.getStateVariable().getValues().values().stream().filter(value -> value != v0).anyMatch(value -> value.getActions().contains(t))).mapToDouble(action -> computeH2Cost(Stream.concat(getTerms(action.getPrecondition()).stream(), Stream.of(v0)).collect(Collectors.toSet()), table)).min().orElse(Double.POSITIVE_INFINITY);
-
-            double c_cost = Double.POSITIVE_INFINITY;
-            c_cost = Double.min(c_cost, v1_v2);
-            c_cost = Double.min(c_cost, v1_not_v2);
-            c_cost = Double.min(c_cost, not_v1_v2);
-            table.put(pair, c_cost);
-            System.out.println(pair + " = " + c_cost);
-            return c_cost;
-        }
     }
 
     private static List<StateVariableValue> getTerms(Env env) {

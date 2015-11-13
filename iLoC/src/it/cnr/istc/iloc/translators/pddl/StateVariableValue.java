@@ -31,7 +31,7 @@ class StateVariableValue {
     private final Collection<Action> actions = new ArrayList<>();
     private final Collection<DurativeAction> atStartDurativeActions = new ArrayList<>();
     private final Collection<DurativeAction> atEndDurativeActions = new ArrayList<>();
-    private double lb = 0;
+    private Double lb;
 
     StateVariableValue(StateVariable state_variable, String name) {
         this.stateVariable = state_variable;
@@ -90,11 +90,11 @@ class StateVariableValue {
         return getSize() == 0;
     }
 
-    public double getLb() {
+    public Double getLb() {
         return lb;
     }
 
-    public void setLb(double lb) {
+    public void setLb(Double lb) {
         this.lb = lb;
     }
 

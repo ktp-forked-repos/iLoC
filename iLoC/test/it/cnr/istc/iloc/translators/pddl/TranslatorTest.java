@@ -60,7 +60,6 @@ public class TranslatorTest {
     public void testLogisticsWorldTranslator() {
         try {
             String translation = PDDLTranslator.translate(new File(TranslatorTest.class.getResource("logistics-domain.pddl").getPath()), new File(TranslatorTest.class.getResource("logistics-problem.pddl").getPath()));
-            System.out.println(translation);
         } catch (IOException ex) {
             Assert.fail(ex.getMessage());
         }
