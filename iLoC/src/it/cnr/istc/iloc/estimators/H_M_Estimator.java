@@ -24,9 +24,11 @@ import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -52,10 +54,10 @@ public class H_M_Estimator implements IEstimator {
         IStaticCausalGraph cg = solver.getStaticCausalGraph();
         List<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toList());
         List<IFormula> active_formulas = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).collect(Collectors.toList());
+        List<IFormula> goal_formulas = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive)).collect(Collectors.toList());
 
         // Initialization..
         active_formulas.forEach(formula -> table.put(cg.getNode(formula.getType()), 0d));
-        nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
 
         // Main loop (repeat until no change)
         Collection<IStaticCausalGraph.INode> c_nodes = new LinkedList<>(nodes);
@@ -68,14 +70,14 @@ public class H_M_Estimator implements IEstimator {
             for (IStaticCausalGraph.INode c_node : c_nodes) {
                 double c1;
                 if (c_node instanceof IStaticCausalGraph.IDisjunctionNode) {
-                    c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.get(node)).min().orElse(Double.POSITIVE_INFINITY);
+                    c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.containsKey(node) ? table.get(node) : Double.POSITIVE_INFINITY).min().orElse(Double.POSITIVE_INFINITY);
                 } else if (c_node instanceof IStaticCausalGraph.IPreferenceNode) {
                     throw new UnsupportedOperationException("Preferences estimation is not supported yet..");
                 } else {
-                    c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.get(node)).max().orElse(Double.POSITIVE_INFINITY);
+                    c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.containsKey(node) ? table.get(node) : Double.POSITIVE_INFINITY).max().orElse(Double.POSITIVE_INFINITY);
                 }
                 // update single atoms added by action a
-                if (table.get(c_node) > c1) {
+                if (!table.containsKey(c_node) && Double.isFinite(c1)) {
                     table.put(c_node, c1);
                     to_remove.add(c_node);
                     changed = true;
@@ -87,6 +89,32 @@ public class H_M_Estimator implements IEstimator {
 
         // c_nodes contains nodes which are unreachable from the facts..
         // these nodes might still be reachable from the goals!
+        goal_formulas.forEach(goal -> estimate(cg.getNode(goal.getType()), new HashSet<>()));
+
+        // not stored nodes are now definitely unreachable..
+        c_nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
+    }
+
+    private double estimate(IStaticCausalGraph.INode node, Set<IStaticCausalGraph.INode> visited) {
+        if (table.containsKey(node)) {
+            return table.get(node);
+        }
+        if (!visited.contains(node)) {
+            visited.add(node);
+            double c1;
+            if (node instanceof IStaticCausalGraph.IDisjunctionNode) {
+                c1 = 1 + node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(c_node -> estimate(c_node, new HashSet<>(visited))).min().orElse(0);
+            } else if (node instanceof IStaticCausalGraph.IPreferenceNode) {
+                throw new UnsupportedOperationException("Preferences estimation is not supported yet..");
+            } else {
+                c1 = 1 + node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(c_node -> estimate(c_node, visited)).max().orElse(0);
+            }
+            // We can admit infinite values now..
+            table.put(node, c1);
+            return c1;
+        } else {
+            return 0;
+        }
     }
 
     @Override
