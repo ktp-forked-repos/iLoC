@@ -82,6 +82,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
         IPredicateNode node = new PredicateNode(predicate);
         predicates.put(predicate, node);
         nodes.put(node, predicate);
+        incoming_edges.put(node, new HashMap<>());
         outgoing_edges.put(node, new HashMap<>());
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
@@ -194,7 +195,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
         if (!incoming_edges.get(target).containsKey(source)) {
             incoming_edges.get(target).put(source, new ArrayList<>());
         }
-        outgoing_edges.get(target).get(source).add(edge);
+        incoming_edges.get(target).get(source).add(edge);
         if (!outgoing_edges.get(source).containsKey(target)) {
             outgoing_edges.get(source).put(target, new ArrayList<>());
         }

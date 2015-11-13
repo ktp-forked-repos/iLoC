@@ -85,9 +85,4 @@ public class AllMinReachableEstimator implements IEstimator {
     public double estimate(IStaticCausalGraph.INode node) {
         return all_min_reachable_nodes.get(node).size();
     }
-
-    @Override
-    public double estimate(Collection<IStaticCausalGraph.INode> nodes) {
-        return nodes.stream().mapToDouble(node -> estimate(node)).sum();
-    }
 }

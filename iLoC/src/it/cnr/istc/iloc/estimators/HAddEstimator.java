@@ -80,9 +80,4 @@ public class HAddEstimator implements IEstimator {
     public double estimate(IStaticCausalGraph.INode node) {
         return min_causal_distance.get(node);
     }
-
-    @Override
-    public double estimate(Collection<IStaticCausalGraph.INode> nodes) {
-        return nodes.stream().mapToDouble(node -> estimate(node)).sum();
-    }
 }

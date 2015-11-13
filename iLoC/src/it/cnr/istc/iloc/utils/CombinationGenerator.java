@@ -33,6 +33,8 @@ public class CombinationGenerator<T> implements Iterable<T[]> {
 
     @SuppressWarnings("unchecked")
     public CombinationGenerator(int length, T... elements) {
+        assert length > 0;
+        assert elements.length > 0;
         this.elements = elements;
         this.combinationIndices = new int[length];
         this.size = MathUtils.combinations(elements.length, length);

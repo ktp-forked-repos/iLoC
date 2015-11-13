@@ -16,8 +16,6 @@
  */
 package it.cnr.istc.iloc.api;
 
-import java.util.Collection;
-
 /**
  * Represents an heuristic estimator for estimating the cost for solving a flaw.
  *
@@ -39,14 +37,4 @@ public interface IEstimator {
      * associated to the given node.
      */
     public double estimate(IStaticCausalGraph.INode node);
-
-    /**
-     * Returns an estimated cost for the given collection of nodes according to
-     * this heuristic estimator.
-     *
-     * @param nodes the collection of nodes to be estimated.
-     * @return a value indicating an estimated cost for solving the flaws
-     * associated to the given collection of nodes.
-     */
-    public double estimate(Collection<IStaticCausalGraph.INode> nodes);
 }
