@@ -78,7 +78,6 @@ public class Environment implements IEnvironment {
     @Override
     public void set(String name, IObject object) {
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
             private IObject old_value = null;
 

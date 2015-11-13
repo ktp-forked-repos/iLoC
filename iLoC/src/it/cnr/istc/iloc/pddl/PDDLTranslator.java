@@ -76,7 +76,6 @@ public class PDDLTranslator {
              * We define all the types of the domain.
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterTyped_list_name(PDDLParser.Typed_list_nameContext ctx) {
                     Type c_superclass = null;
@@ -107,7 +106,6 @@ public class PDDLTranslator {
              * We define the constants.
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterTyped_list_name(PDDLParser.Typed_list_nameContext ctx) {
                     Type type = null;
@@ -134,7 +132,6 @@ public class PDDLTranslator {
              * We define the predicates.
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterAtomic_formula_skeleton(PDDLParser.Atomic_formula_skeletonContext ctx) {
                     Variable[] variables = new Variable[0];
@@ -154,7 +151,6 @@ public class PDDLTranslator {
              * We define the functions.
              */
             WALKER.walk(new PDDLBaseListener() {
-
                 Type type = null;
 
                 @Override
@@ -191,7 +187,6 @@ public class PDDLTranslator {
         domain_context.structure_def().forEach(structure_def -> {
             if (structure_def.action_def() != null) {
                 WALKER.walk(new PDDLBaseListener() {
-
                     @Override
                     public void enterAction_def(PDDLParser.Action_defContext ctx) {
                         Variable[] variables = new Variable[0];
@@ -206,7 +201,6 @@ public class PDDLTranslator {
                 }, structure_def.action_def());
             } else if (structure_def.durative_action_def() != null) {
                 WALKER.walk(new PDDLBaseListener() {
-
                     @Override
                     public void enterDurative_action_def(PDDLParser.Durative_action_defContext ctx) {
                         Variable[] variables = new Variable[0];
@@ -227,7 +221,6 @@ public class PDDLTranslator {
          */
         if (problem_context.object_declaration() != null) {
             WALKER.walk(new PDDLBaseListener() {
-
                 @Override
                 public void enterTyped_list_name(PDDLParser.Typed_list_nameContext ctx) {
                     Type type = null;

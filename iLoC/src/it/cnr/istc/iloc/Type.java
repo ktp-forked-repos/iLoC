@@ -127,7 +127,6 @@ public class Type extends Scope implements IType {
     @Override
     public void defineConstructor(IConstructor constructor) {
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -179,7 +178,6 @@ public class Type extends Scope implements IType {
     public IObject newInstance(IEnvironment enclosing_environment) {
         IObject instance = new SimpleObject(solver, enclosing_environment, this);
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -267,7 +265,6 @@ public class Type extends Scope implements IType {
     public void factCreated(IFormula fact) {
 //        solver.getCurrentNode().enqueue(new Fact(fact));
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override

@@ -236,7 +236,6 @@ class Node implements INode {
         @Override
         public Iterator<T> iterator() {
             return new Iterator<T>() {
-
                 int cursor = 0;
 
                 @Override

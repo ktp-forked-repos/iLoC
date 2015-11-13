@@ -21,7 +21,6 @@ public class ScopeJPanel extends JPanel {
     public ScopeJPanel() {
         initComponents();
         scopeJTree.addTreeWillExpandListener(new TreeWillExpandListener() {
-
             @Override
             public void treeWillExpand(TreeExpansionEvent tee) throws ExpandVetoException {
                 objectTreeModel.createChilds((DefaultMutableTreeNode) tee.getPath().getLastPathComponent());

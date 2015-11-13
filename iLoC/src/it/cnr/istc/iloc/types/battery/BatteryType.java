@@ -197,7 +197,6 @@ public class BatteryType extends Type {
             }).noneMatch(node -> causal_graph.existsPath(node, causal_graph.getNode(charge_predicate)) || causal_graph.existsPath(node, causal_graph.getNode(consume_predicate)))) {
                 // We need a resolver in order to re-open the resource when backtracking
                 solver.getCurrentNode().addResolver(new IResolver() {
-
                     private boolean resolved = false;
 
                     @Override
@@ -361,7 +360,6 @@ public class BatteryType extends Type {
             INumber final_amount = network.newReal();
             instance.set(FINAL_AMOUNT, final_amount);
             solver.getCurrentNode().addResolver(new IResolver() {
-
                 private boolean resolved = false;
 
                 @Override
@@ -412,7 +410,6 @@ public class BatteryType extends Type {
             instance.set(INITIAL_AMOUNT, expressions[1]);
             instance.set(FINAL_AMOUNT, expressions[2]);
             solver.getCurrentNode().addResolver(new IResolver() {
-
                 private boolean resolved = false;
 
                 @Override

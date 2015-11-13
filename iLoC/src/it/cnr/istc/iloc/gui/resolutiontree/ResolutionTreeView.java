@@ -154,7 +154,6 @@ public class ResolutionTreeView extends Display implements ISolverListener {
         addControlListener(new ZoomToFitControl());
         addControlListener(new WheelZoomControl());
         addControlListener(new ControlAdapter() {
-
             @Override
             public void itemEntered(VisualItem vi, MouseEvent me) {
                 Display d = (Display) me.getSource();
@@ -278,7 +277,6 @@ public class ResolutionTreeView extends Display implements ISolverListener {
     }
 
     public enum CostFunction {
-
         Default, HeuristicBased, FlawNumberBased;
     }
 

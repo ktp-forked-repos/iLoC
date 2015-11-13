@@ -143,7 +143,6 @@ public class DynamicCausalGraphViewer extends Display implements IDynamicCausalG
         addControlListener(new ZoomToFitControl());
         addControlListener(new WheelZoomControl());
         addControlListener(new ControlAdapter() {
-
             @Override
             public void itemEntered(VisualItem vi, MouseEvent me) {
                 Display d = (Display) me.getSource();

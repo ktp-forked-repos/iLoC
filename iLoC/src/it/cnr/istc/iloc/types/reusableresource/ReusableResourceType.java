@@ -191,7 +191,6 @@ public class ReusableResourceType extends Type {
             IConstraintNetwork network = solver.getConstraintNetwork();
             instance.set(CAPACITY, expressions[0]);
             solver.getCurrentNode().addResolver(new IResolver() {
-
                 private boolean resolved = false;
 
                 @Override

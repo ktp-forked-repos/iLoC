@@ -46,7 +46,8 @@ class StaticCausalGraph implements IStaticCausalGraph {
     private final Map<IDisjunct, IDisjunctNode> disjuncts = new IdentityHashMap<>();
     private final Map<IPreference, IPreferenceNode> preferences = new IdentityHashMap<>();
     private final Map<INode, IScope> nodes = new IdentityHashMap<>();
-    private final Map<INode, Map<INode, Collection<IEdge>>> links = new IdentityHashMap<>();
+    private final Map<INode, Map<INode, Collection<IEdge>>> incoming_edges = new IdentityHashMap<>();
+    private final Map<INode, Map<INode, Collection<IEdge>>> outgoing_edges = new IdentityHashMap<>();
     private final Map<INode, Set<INode>> all_reachable_nodes = new HashMap<>();
     private final Collection<IStaticCausalGraphListener> listeners = new ArrayList<>();
 
@@ -81,7 +82,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
         IPredicateNode node = new PredicateNode(predicate);
         predicates.put(predicate, node);
         nodes.put(node, predicate);
-        links.put(node, new HashMap<>());
+        outgoing_edges.put(node, new HashMap<>());
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
@@ -100,7 +101,8 @@ class StaticCausalGraph implements IStaticCausalGraph {
         IDisjunctionNode node = new DisjunctionNode(disjunction);
         disjunctions.put(disjunction, node);
         nodes.put(node, disjunction);
-        links.put(node, new HashMap<>());
+        incoming_edges.put(node, new HashMap<>());
+        outgoing_edges.put(node, new HashMap<>());
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
@@ -119,7 +121,8 @@ class StaticCausalGraph implements IStaticCausalGraph {
         IDisjunctNode node = new DisjunctNode(disjunct);
         disjuncts.put(disjunct, node);
         nodes.put(node, disjunct);
-        links.put(node, new HashMap<>());
+        incoming_edges.put(node, new HashMap<>());
+        outgoing_edges.put(node, new HashMap<>());
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
@@ -138,7 +141,8 @@ class StaticCausalGraph implements IStaticCausalGraph {
         IPreferenceNode node = new PreferenceNode(preference);
         preferences.put(preference, node);
         nodes.put(node, preference);
-        links.put(node, new HashMap<>());
+        incoming_edges.put(node, new HashMap<>());
+        outgoing_edges.put(node, new HashMap<>());
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
@@ -154,7 +158,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
     @Override
     public INoOpNode addNoOp() {
         INoOpNode node = new NoOpNode();
-        links.put(node, new HashMap<>());
+        outgoing_edges.put(node, new HashMap<>());
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
@@ -171,7 +175,8 @@ class StaticCausalGraph implements IStaticCausalGraph {
         disjunctions.remove(scope);
         disjuncts.remove(scope);
         preferences.remove(scope);
-        links.remove(node, new HashMap<>());
+        incoming_edges.remove(node);
+        outgoing_edges.remove(node);
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.nodeAdded(node);
@@ -180,16 +185,20 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
     @Override
     public Collection<INode> getNodes() {
-        return links.keySet();
+        return outgoing_edges.keySet();
     }
 
     @Override
     public IEdge addEdge(IEdge.Type type, INode source, INode target) {
         Edge edge = new Edge(type, source, target);
-        if (!links.get(source).containsKey(target)) {
-            links.get(source).put(target, new ArrayList<>());
+        if (!incoming_edges.get(target).containsKey(source)) {
+            incoming_edges.get(target).put(source, new ArrayList<>());
         }
-        links.get(source).get(target).add(edge);
+        outgoing_edges.get(target).get(source).add(edge);
+        if (!outgoing_edges.get(source).containsKey(target)) {
+            outgoing_edges.get(source).put(target, new ArrayList<>());
+        }
+        outgoing_edges.get(source).get(target).add(edge);
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
             listener.edgeAdded(edge);
@@ -199,9 +208,13 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
     @Override
     public void removeEdge(IEdge edge) {
-        links.get(edge.getSource()).get(edge.getTarget()).remove(edge);
-        if (links.get(edge.getSource()).get(edge.getTarget()).isEmpty()) {
-            links.get(edge.getSource()).remove(edge.getTarget());
+        incoming_edges.get(edge.getTarget()).get(edge.getSource()).remove(edge);
+        if (incoming_edges.get(edge.getTarget()).get(edge.getSource()).isEmpty()) {
+            incoming_edges.get(edge.getTarget()).remove(edge.getSource());
+        }
+        outgoing_edges.get(edge.getSource()).get(edge.getTarget()).remove(edge);
+        if (outgoing_edges.get(edge.getSource()).get(edge.getTarget()).isEmpty()) {
+            outgoing_edges.get(edge.getSource()).remove(edge.getTarget());
         }
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {
@@ -211,20 +224,20 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
     @Override
     public Collection<IEdge> getEdges() {
-        return links.values().stream().flatMap(t -> t.values().stream().flatMap(edges -> edges.stream())).collect(Collectors.toList());
+        return outgoing_edges.values().stream().flatMap(t -> t.values().stream().flatMap(edges -> edges.stream())).collect(Collectors.toList());
     }
 
     @Override
     public Set<INode> getAllReachableNodes(INode node) {
         if (!all_reachable_nodes.containsKey(node)) {
-            Set<INode> c_nodes = new HashSet<>(links.size());
+            Set<INode> c_nodes = new HashSet<>(outgoing_edges.size());
             Set<INode> next_nodes = new HashSet<>();
             next_nodes.add(node);
             while (!next_nodes.isEmpty()) {
                 INode c_node = next_nodes.iterator().next();
                 next_nodes.remove(c_node);
                 if (c_nodes.add(c_node)) {
-                    next_nodes.addAll(links.get(c_node).keySet());
+                    next_nodes.addAll(outgoing_edges.get(c_node).keySet());
                 }
             }
             all_reachable_nodes.put(node, c_nodes);
@@ -238,12 +251,12 @@ class StaticCausalGraph implements IStaticCausalGraph {
         types.forEach(type -> {
             listener.typeAdded(type);
         });
-        links.keySet().forEach(node -> {
+        outgoing_edges.keySet().forEach(node -> {
             listener.nodeAdded(node);
         });
-        links.keySet().forEach(source -> {
-            links.get(source).keySet().forEach(target -> {
-                links.get(source).get(target).forEach(edge -> {
+        outgoing_edges.keySet().forEach(source -> {
+            outgoing_edges.get(source).keySet().forEach(target -> {
+                outgoing_edges.get(source).get(target).forEach(edge -> {
                     listener.edgeAdded(edge);
                 });
             });
@@ -259,8 +272,13 @@ class StaticCausalGraph implements IStaticCausalGraph {
     private abstract class Node implements INode {
 
         @Override
-        public Collection<IEdge> getExitingEdges() {
-            return links.get(this).values().stream().flatMap(c_edges -> c_edges.stream()).collect(Collectors.toList());
+        public Collection<IEdge> getIncomingEdges() {
+            return incoming_edges.get(this).values().stream().flatMap(c_edges -> c_edges.stream()).collect(Collectors.toList());
+        }
+
+        @Override
+        public Collection<IEdge> getOutgoingEdges() {
+            return outgoing_edges.get(this).values().stream().flatMap(c_edges -> c_edges.stream()).collect(Collectors.toList());
         }
     }
 

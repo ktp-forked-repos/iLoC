@@ -94,7 +94,6 @@ class OpTerm implements Term {
     }
 
     enum Op {
-
         Add, Sub, Mul, Div
     }
 }

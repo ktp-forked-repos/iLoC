@@ -240,7 +240,6 @@ class ComparisonTerm implements Term {
     }
 
     enum Comp {
-
         Gt, Lt, Eq, GEq, LEq;
     }
 }

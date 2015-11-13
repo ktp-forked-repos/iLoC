@@ -103,7 +103,6 @@ public class Solver implements ISolver {
     public Solver(Properties properties) {
         this.properties = properties;
         this.parser = new LanguageParser(this, properties, new ANTLRErrorListener() {
-
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
                 LOG.log(Level.SEVERE, "[{0}, {1}] {2}", new Object[]{line, charPositionInLine, msg});
@@ -127,7 +126,6 @@ public class Solver implements ISolver {
 
         // We create primitive types ..
         IType boolType = new Type(this, this, Constants.BOOL) {
-
             @Override
             public boolean isPrimitive() {
                 return true;
@@ -139,7 +137,6 @@ public class Solver implements ISolver {
             }
         };
         IType numberType = new Type(this, this, Constants.NUMBER) {
-
             @Override
             public boolean isPrimitive() {
                 return true;
@@ -151,7 +148,6 @@ public class Solver implements ISolver {
             }
         };
         IType intType = new Type(this, this, Constants.INT) {
-
             @Override
             public boolean isPrimitive() {
                 return true;
@@ -164,7 +160,6 @@ public class Solver implements ISolver {
         };
         intType.setSuperclass(numberType);
         IType realType = new Type(this, this, Constants.REAL) {
-
             @Override
             public boolean isPrimitive() {
                 return true;
@@ -177,7 +172,6 @@ public class Solver implements ISolver {
         };
         realType.setSuperclass(numberType);
         IType stringType = new Type(this, this, Constants.STRING) {
-
             @Override
             public boolean isPrimitive() {
                 return true;
@@ -501,7 +495,6 @@ public class Solver implements ISolver {
     @Override
     public void defineField(IField field) {
         currentNode.addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -572,7 +565,6 @@ public class Solver implements ISolver {
     @Override
     public void defineMethod(IMethod method) {
         currentNode.addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -629,7 +621,6 @@ public class Solver implements ISolver {
     @Override
     public void definePredicate(IPredicate predicate) {
         currentNode.addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -686,7 +677,6 @@ public class Solver implements ISolver {
     @Override
     public void defineType(IType type) {
         currentNode.addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -748,7 +738,6 @@ public class Solver implements ISolver {
     @Override
     public void set(String name, IObject object) {
         currentNode.addResolver(new IResolver() {
-
             private boolean resolved = false;
             private IObject old_value = null;
 

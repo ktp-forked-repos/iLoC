@@ -178,7 +178,6 @@ public class ConsumableResourceType extends Type {
             }).noneMatch(node -> causal_graph.existsPath(node, causal_graph.getNode(produce_predicate)) || causal_graph.existsPath(node, causal_graph.getNode(consume_predicate)))) {
                 // We need a resolver in order to re-open the resource when backtracking
                 solver.getCurrentNode().addResolver(new IResolver() {
-
                     private boolean resolved = false;
 
                     @Override
@@ -344,7 +343,6 @@ public class ConsumableResourceType extends Type {
             INumber final_amount = network.newReal();
             instance.set(FINAL_AMOUNT, final_amount);
             solver.getCurrentNode().addResolver(new IResolver() {
-
                 private boolean resolved = false;
 
                 @Override
@@ -396,7 +394,6 @@ public class ConsumableResourceType extends Type {
             instance.set(INITIAL_AMOUNT, expressions[2]);
             instance.set(FINAL_AMOUNT, expressions[3]);
             solver.getCurrentNode().addResolver(new IResolver() {
-
                 private boolean resolved = false;
 
                 @Override

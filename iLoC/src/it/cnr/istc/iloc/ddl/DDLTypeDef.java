@@ -56,7 +56,6 @@ class DDLTypeDef extends Type {
         IConstraintNetwork network = solver.getConstraintNetwork();
         INumber var = createNumber(primitive_type, network);
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override

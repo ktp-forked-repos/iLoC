@@ -237,7 +237,6 @@ class AssignOpTerm implements Term {
     }
 
     enum AssignOp {
-
         Assign, ScaleUp, ScaleDown, Increase, Decrease
     }
 }

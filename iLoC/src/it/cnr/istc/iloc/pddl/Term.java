@@ -42,7 +42,6 @@ interface Term {
     String toString(STGroupFile file, Map<String, String> known_terms, Set<Term> to_skip, Mode mode);
 
     public enum Mode {
-
         Condition, Effect, AtStartCondition, OverAllCondition, AtEndCondition, AtStartEffect, AtEndEffect, InitEl, Goal
     }
 }

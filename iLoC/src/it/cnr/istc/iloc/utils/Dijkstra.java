@@ -63,7 +63,7 @@ public class Dijkstra<V> {
         if (!graph.containsKey(start)) {
             throw new AssertionError("Graph does not contain start vertex" + start);
         }
-        Queue<Vertex> q = new PriorityQueue<Vertex>();
+        Queue<Vertex> q = new PriorityQueue<>();
 
         graph.values().forEach(v -> {
             q.add(v);

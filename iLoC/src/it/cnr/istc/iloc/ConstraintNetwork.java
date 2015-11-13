@@ -159,7 +159,6 @@ class ConstraintNetwork implements IConstraintNetwork {
         IEnum c_enum = new Z3Enum(solver, solver, type, sel_var, values.toArray(new IObject[values.size()]));
         if (values.size() > 1) {
             solver.getCurrentNode().addResolver(new IResolver() {
-
                 private boolean resolved = false;
 
                 @Override

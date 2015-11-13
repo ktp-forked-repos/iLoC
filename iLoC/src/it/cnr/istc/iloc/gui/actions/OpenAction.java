@@ -43,7 +43,6 @@ public class OpenAction extends AbstractAction implements SolverManagerListener 
         final JFileChooser fc = new JFileChooser();
         fc.setMultiSelectionEnabled(true);
         fc.setFileFilter(new FileFilter() {
-
             @Override
             public boolean accept(File file) {
                 if (file.isDirectory()) {

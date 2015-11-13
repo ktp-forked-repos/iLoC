@@ -78,7 +78,7 @@ public class MinReachableEstimator implements IEstimator {
                 }
                 visited.addAll(min_nodes);
             } else if (!(node instanceof IStaticCausalGraph.INoOpNode)) {
-                visited.addAll(node.getExitingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).flatMap(edge -> estimate(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
+                visited.addAll(node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).flatMap(edge -> estimate(edge.getTarget(), visited).stream()).collect(Collectors.toSet()));
             }
             return visited;
         } else {

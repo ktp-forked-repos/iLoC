@@ -289,7 +289,6 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
     }
 
     public enum CostFunction {
-
         Default, Estimator
     }
 }

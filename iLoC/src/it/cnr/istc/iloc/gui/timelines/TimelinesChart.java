@@ -71,7 +71,6 @@ public class TimelinesChart extends ChartPanel {
         });
 
         addChartMouseListener(new ChartMouseListener() {
-
             private Object getDataItem(ChartEntity entity) {
                 XYItemEntity e = ((XYItemEntity) entity);
                 XYDataset ds = e.getDataset();

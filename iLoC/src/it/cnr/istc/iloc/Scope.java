@@ -92,7 +92,6 @@ class Scope implements IScope {
     @Override
     public void defineField(IField field) {
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -167,7 +166,6 @@ class Scope implements IScope {
     @Override
     public void defineMethod(IMethod method) {
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -228,7 +226,6 @@ class Scope implements IScope {
     @Override
     public void definePredicate(IPredicate predicate) {
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -289,7 +286,6 @@ class Scope implements IScope {
     @Override
     public void defineType(IType type) {
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override

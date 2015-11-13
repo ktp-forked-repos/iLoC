@@ -209,11 +209,22 @@ public interface IStaticCausalGraph {
     public interface INode {
 
         /**
-         * Returns a collection containing all the edges exiting from this node.
+         * Returns a collection containing all the edges incoming into this
+         * node.
          *
-         * @return a collection containing all the edges exiting from this node.
+         * @return a collection containing all the edges incoming into this
+         * node.
          */
-        public Collection<IEdge> getExitingEdges();
+        public Collection<IEdge> getIncomingEdges();
+
+        /**
+         * Returns a collection containing all the edges outgoing from this
+         * node.
+         *
+         * @return a collection containing all the edges outgoing from this
+         * node.
+         */
+        public Collection<IEdge> getOutgoingEdges();
     }
 
     public interface IEdge {
@@ -235,7 +246,6 @@ public interface IStaticCausalGraph {
         public INode getTarget();
 
         public enum Type {
-
             Goal, Fact
         }
     }
@@ -283,7 +293,7 @@ public interface IStaticCausalGraph {
     public interface INoOpNode extends INode {
 
         @Override
-        public default Collection<IEdge> getExitingEdges() {
+        public default Collection<IEdge> getOutgoingEdges() {
             throw new AssertionError("No-op nodes do not have exiting edges..");
         }
     }

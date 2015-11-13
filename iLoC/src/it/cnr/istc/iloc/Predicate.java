@@ -50,7 +50,6 @@ public abstract class Predicate extends Type implements IPredicate {
     public IFormula newFact(IFormula cause, Map<String, IObject> assignments) {
         IFormula fact = new Formula(solver, cause, this, assignments);
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override
@@ -87,7 +86,6 @@ public abstract class Predicate extends Type implements IPredicate {
     public IFormula newGoal(IFormula cause, Map<String, IObject> assignments) {
         IFormula goal = new Formula(solver, cause, this, assignments);
         solver.getCurrentNode().addResolver(new IResolver() {
-
             private boolean resolved = false;
 
             @Override

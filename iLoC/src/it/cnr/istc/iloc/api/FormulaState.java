@@ -26,7 +26,6 @@ package it.cnr.istc.iloc.api;
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
 public enum FormulaState {
-
     /**
      * The formula is inactive and, eventually, must be either activated or
      * unified with an already active formula.

@@ -59,7 +59,6 @@ public class PreferenceFlaw implements IPreferenceFlaw {
     public Collection<IResolver> getResolvers() {
         final Collection<IResolver> resolvers = new ArrayList<>(2);
         resolvers.add(new IResolver() {
-
             private boolean expanded = false;
             private boolean resolved = false;
 
@@ -90,7 +89,6 @@ public class PreferenceFlaw implements IPreferenceFlaw {
             }
         });
         resolvers.add(new IResolver() {
-
             private boolean resolved = false;
 
             @Override

@@ -65,7 +65,6 @@ public class DisjunctionFlaw implements IDisjunctionFlaw {
         List<IDisjunct> disjuncts = new ArrayList<>(disjunction.getDisjuncts());
         Collections.sort(disjuncts, (IDisjunct d0, IDisjunct d1) -> Double.compare(estimator.estimate(staticCausalGraph.getNode(d0)), estimator.estimate(staticCausalGraph.getNode(d1))));
         return disjuncts.stream().map(disjunct -> new IResolver() {
-
             private boolean expanded = false;
             private boolean resolved = false;
 
