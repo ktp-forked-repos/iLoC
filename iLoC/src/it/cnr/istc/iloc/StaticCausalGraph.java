@@ -317,7 +317,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
         @Override
         public String toString() {
-            return disjunction.toString();
+            return "(or " + getOutgoingEdges().stream().map(edge -> edge.getTarget().toString()).collect(Collectors.joining(" ")) + ")";
         }
     }
 
@@ -336,7 +336,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
         @Override
         public String toString() {
-            return disjunct.toString();
+            return "(and " + getOutgoingEdges().stream().map(edge -> edge.getTarget().toString()).collect(Collectors.joining(" ")) + ")";
         }
     }
 
