@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,17 +51,17 @@ public class HMaxEstimator implements IEstimator {
     public void recomputeCosts() {
         table.clear();
         IStaticCausalGraph cg = solver.getStaticCausalGraph();
-        List<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toList());
-        List<IFormula> active_formulas = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).collect(Collectors.toList());
-        List<IFormula> goal_formulas = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive)).collect(Collectors.toList());
+        Set<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toSet());
+        Set<IStaticCausalGraph.INode> init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active).map(formula -> cg.getNode(formula.getType()))).collect(Collectors.toSet());
+        Set<IStaticCausalGraph.INode> goal = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> cg.getNode(formula.getType()))).collect(Collectors.toSet());
 
         // Initialization..
-        active_formulas.forEach(formula -> table.put(cg.getNode(formula.getType()), 0d));
+        init_state.forEach(node -> table.put(node, 0d));
         nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
 
         // Main loop (repeat until no change)
         Collection<IStaticCausalGraph.INode> c_nodes = new LinkedList<>(nodes);
-        active_formulas.forEach(formula -> c_nodes.remove(cg.getNode(formula.getType())));
+        init_state.forEach(node -> c_nodes.remove(node));
 
         boolean changed;
         do {
@@ -92,7 +91,7 @@ public class HMaxEstimator implements IEstimator {
 
         // c_nodes contains nodes which are unreachable from the facts..
         // these nodes might still be reachable from the goals!
-        goal_formulas.forEach(goal -> estimate(cg.getNode(goal.getType()), new HashSet<>()));
+        goal.forEach(g -> estimate(g, new HashSet<>()));
 
         // not stored nodes are now definitely unreachable..
         c_nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
