@@ -229,10 +229,6 @@ public class Solver implements ISolver {
     public IModel read(String script) {
         parser.read(script);
         estimator.recomputeCosts();
-
-        LandmarkExtractor le = new LandmarkExtractor(this);
-        le.getLandmarks().forEach(landmark -> System.out.println(landmark));
-
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
@@ -253,10 +249,6 @@ public class Solver implements ISolver {
     public IModel read(File... files) throws IOException {
         parser.read(files);
         estimator.recomputeCosts();
-
-        LandmarkExtractor le = new LandmarkExtractor(this);
-        le.getLandmarks().forEach(landmark -> System.out.println(landmark));
-
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();

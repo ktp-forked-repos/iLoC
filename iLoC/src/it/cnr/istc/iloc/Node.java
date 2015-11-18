@@ -16,18 +16,26 @@
  */
 package it.cnr.istc.iloc;
 
+import it.cnr.istc.iloc.api.Constants;
 import it.cnr.istc.iloc.api.IBool;
 import it.cnr.istc.iloc.api.IDisjunctionFlaw;
 import it.cnr.istc.iloc.api.IFlaw;
 import it.cnr.istc.iloc.api.IModel;
 import it.cnr.istc.iloc.api.INode;
+import it.cnr.istc.iloc.api.IObject;
+import it.cnr.istc.iloc.api.IPredicate;
 import it.cnr.istc.iloc.api.IResolver;
 import it.cnr.istc.iloc.api.ISolver;
+import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
@@ -44,6 +52,7 @@ class Node implements INode {
     private double known_cost = 0;
     private final Collection<IResolver> resolvers = new ConcurrentArrayList<>();
     private final Collection<IFlaw> flaws;
+    private final Set<IStaticCausalGraph.INode> landmarks = new HashSet<>();
 
     Node(ISolver solver) {
         this.solver = solver;
@@ -104,12 +113,34 @@ class Node implements INode {
     @Override
     public Boolean propagate(int bound) {
         int c_level = level;
+        IStaticCausalGraph causal_graph = solver.getStaticCausalGraph();
         while (!flaws.isEmpty() && c_level < bound) {
             Collection<IFlaw> solved_flaws = new ArrayList<>(flaws.size());
+            Collection<IFlaw> deduced_flaws = new ArrayList<>(flaws.size());
             // We check for all the flaws having one resolver, we resolve it and we propagate the constraint network..
             for (IFlaw flaw : flaws) {
                 if (flaw instanceof IDisjunctionFlaw) {
-                    continue;
+                    IStaticCausalGraph.IDisjunctionNode disjunction_node = causal_graph.getNode(((IDisjunctionFlaw) flaw).getDisjunction());
+                    if (landmarks.contains(disjunction_node)) {
+                        continue;
+                    } else {
+                        List<Set<IStaticCausalGraph.INode>> achievers = disjunction_node.getDisjunction().getDisjuncts().stream().map(disjunct -> causal_graph.getNode(disjunct).getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).collect(Collectors.toSet())).collect(Collectors.toList());
+                        Set<IStaticCausalGraph.INode> intersection = achievers.stream().findAny().get();
+                        achievers.forEach(nodes -> {
+                            intersection.retainAll(nodes);
+                        });
+                        intersection.forEach(node -> {
+                            if (node instanceof IStaticCausalGraph.IPredicateNode) {
+                                Map<String, IObject> assignments = new HashMap<>();
+                                IPredicate predicate = ((IStaticCausalGraph.IPredicateNode) node).getPredicate();
+                                assignments.put(Constants.SCOPE, solver.getConstraintNetwork().newEnum(predicate, predicate.getInstances()));
+                                predicate.newGoal(null, assignments);
+                            } else {
+                                throw new UnsupportedOperationException(node.getClass().getName() + " is not supported yet..");
+                            }
+                        });
+                        landmarks.add(disjunction_node);
+                    }
                 }
                 Collection<IResolver> c_resolvers = flaw.getResolvers();
                 assert !c_resolvers.isEmpty() : "Flaws should have at least one resolver..";
