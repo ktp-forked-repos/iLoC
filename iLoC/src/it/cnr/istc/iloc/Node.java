@@ -27,6 +27,7 @@ import it.cnr.istc.iloc.api.IPredicate;
 import it.cnr.istc.iloc.api.IResolver;
 import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
+import it.cnr.istc.iloc.api.IType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,13 +53,14 @@ class Node implements INode {
     private double known_cost = 0;
     private final Collection<IResolver> resolvers = new ConcurrentArrayList<>();
     private final Collection<IFlaw> flaws;
-    private final Set<IStaticCausalGraph.INode> landmarks = new HashSet<>();
+    private final Set<IStaticCausalGraph.INode> landmarks;
 
     Node(ISolver solver) {
         this.solver = solver;
         this.level = 1;
         this.parent = null;
         this.flaws = new ConcurrentArrayList<>();
+        this.landmarks = new HashSet<>();
     }
 
     Node(INode parent) {
@@ -67,6 +69,7 @@ class Node implements INode {
         this.parent = parent;
         this.known_cost = parent.getKnownCost();
         this.flaws = new ConcurrentArrayList<>(parent.getFlaws());
+        this.landmarks = new HashSet<>(parent.getLandmarks());
     }
 
     @Override
@@ -116,7 +119,7 @@ class Node implements INode {
         IStaticCausalGraph causal_graph = solver.getStaticCausalGraph();
         while (!flaws.isEmpty() && c_level < bound) {
             Collection<IFlaw> solved_flaws = new ArrayList<>(flaws.size());
-            Collection<IFlaw> deduced_flaws = new ArrayList<>(flaws.size());
+            Collection<IStaticCausalGraph.INode> found_landmarks = new ArrayList<>(flaws.size());
             // We check for all the flaws having one resolver, we resolve it and we propagate the constraint network..
             for (IFlaw flaw : flaws) {
                 if (flaw instanceof IDisjunctionFlaw) {
@@ -124,22 +127,7 @@ class Node implements INode {
                     if (landmarks.contains(disjunction_node)) {
                         continue;
                     } else {
-                        List<Set<IStaticCausalGraph.INode>> achievers = disjunction_node.getDisjunction().getDisjuncts().stream().map(disjunct -> causal_graph.getNode(disjunct).getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).collect(Collectors.toSet())).collect(Collectors.toList());
-                        Set<IStaticCausalGraph.INode> intersection = achievers.stream().findAny().get();
-                        achievers.forEach(nodes -> {
-                            intersection.retainAll(nodes);
-                        });
-                        intersection.forEach(node -> {
-                            if (node instanceof IStaticCausalGraph.IPredicateNode) {
-                                Map<String, IObject> assignments = new HashMap<>();
-                                IPredicate predicate = ((IStaticCausalGraph.IPredicateNode) node).getPredicate();
-                                assignments.put(Constants.SCOPE, solver.getConstraintNetwork().newEnum(predicate, predicate.getInstances()));
-                                predicate.newGoal(null, assignments);
-                            } else {
-                                throw new UnsupportedOperationException(node.getClass().getName() + " is not supported yet..");
-                            }
-                        });
-                        landmarks.add(disjunction_node);
+                        found_landmarks.add(disjunction_node);
                     }
                 }
                 Collection<IResolver> c_resolvers = flaw.getResolvers();
@@ -158,12 +146,16 @@ class Node implements INode {
                     }
                 }
             }
-            if (solved_flaws.isEmpty()) {
+            if (solved_flaws.isEmpty() && found_landmarks.isEmpty()) {
                 // All the flaws having one resolver have been resolved and the constraint network is consistent..
+                // We do not have found new landmarks..
                 break;
             } else {
                 // We remove the solved flaws..
                 flaws.removeAll(solved_flaws);
+                found_landmarks.forEach(landmark -> {
+                    enqueue(landmark);
+                });
             }
         }
         if (c_level >= bound) {
@@ -176,6 +168,41 @@ class Node implements INode {
     @Override
     public void enqueue(IFlaw flaw) {
         flaws.add(flaw);
+    }
+
+    @Override
+    public void enqueue(IStaticCausalGraph.INode landmark) {
+        if (!landmarks.contains(landmark)) {
+            landmarks.add(landmark);
+            if (landmark instanceof IStaticCausalGraph.IPredicateNode) {
+                IPredicate predicate = ((IStaticCausalGraph.IPredicateNode) landmark).getPredicate();
+                if (predicate.getInstances().isEmpty()) {
+                    Map<String, IObject> assignments = new HashMap<>();
+                    assignments.put(Constants.SCOPE, solver.getConstraintNetwork().newEnum(predicate, ((IType) predicate.getEnclosingScope()).getInstances()));
+                    predicate.newGoal(null, assignments);
+                }
+            } else if (landmark instanceof IStaticCausalGraph.IDisjunctionNode) {
+                IStaticCausalGraph causal_graph = solver.getStaticCausalGraph();
+                // We try with a first step..
+                List<Set<IStaticCausalGraph.INode>> achievers = ((IStaticCausalGraph.IDisjunctionNode) landmark).getDisjunction().getDisjuncts().stream().map(disjunct -> causal_graph.getNode(disjunct).getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).collect(Collectors.toSet())).collect(Collectors.toList());
+                Set<IStaticCausalGraph.INode> intersection = new HashSet<>(achievers.stream().findAny().get());
+                achievers.forEach(nodes -> {
+                    intersection.retainAll(nodes);
+                });
+                if (intersection.isEmpty()) {
+                    List<Set<IStaticCausalGraph.INode>> sub_achievers = achievers.stream().map(nodes -> nodes.stream().flatMap(ns -> ns.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget())).collect(Collectors.toSet())).collect(Collectors.toList());
+                    intersection.addAll(sub_achievers.stream().findAny().get());
+                    sub_achievers.forEach(nodes -> {
+                        intersection.retainAll(nodes);
+                    });
+                }
+                intersection.forEach(lm -> {
+                    enqueue(lm);
+                });
+            } else {
+                throw new UnsupportedOperationException(landmark.getClass().getName() + " landmark is not supported yet..");
+            }
+        }
     }
 
     @Override
@@ -192,6 +219,11 @@ class Node implements INode {
     @Override
     public Collection<IFlaw> getFlaws() {
         return Collections.unmodifiableCollection(flaws);
+    }
+
+    @Override
+    public Collection<IStaticCausalGraph.INode> getLandmarks() {
+        return Collections.unmodifiableCollection(landmarks);
     }
 
     @Override

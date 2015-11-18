@@ -115,6 +115,23 @@ public interface INode {
     public Collection<IFlaw> getFlaws();
 
     /**
+     * Enqueues a landmark to this node object. iLoC represents landmarks
+     * through nodes of the static causal graph.
+     *
+     * @param landmark the landmark added to this node object.
+     */
+    public void enqueue(IStaticCausalGraph.INode landmark);
+
+    /**
+     * Returns a collection of landmarks. A landmark is a propositiona formula
+     * that must be true in every solution of the problem. iLoC represents
+     * landmarks through nodes of the static causal graph.
+     *
+     * @return a collection of nodes representing landmarks.
+     */
+    public Collection<IStaticCausalGraph.INode> getLandmarks();
+
+    /**
      * Checks the consistency of all the objects reachable from the current
      * search space node. This method returns a boolean representing the
      * possibility to make this node consistent. In case an unsolvable
