@@ -249,6 +249,10 @@ public class Solver implements ISolver {
     public IModel read(File... files) throws IOException {
         parser.read(files);
         estimator.recomputeCosts();
+
+        LandmarkGraph lm_graph = new LandmarkGraph(this);
+        lm_graph.getLandmarks().forEach(lm -> System.out.println(lm));
+
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
