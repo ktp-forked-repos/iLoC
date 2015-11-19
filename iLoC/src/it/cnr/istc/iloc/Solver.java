@@ -249,7 +249,6 @@ public class Solver implements ISolver {
     public IModel read(File... files) throws IOException {
         parser.read(files);
         estimator.recomputeCosts();
-
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
