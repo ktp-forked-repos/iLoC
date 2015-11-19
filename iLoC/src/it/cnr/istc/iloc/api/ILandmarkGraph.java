@@ -16,25 +16,38 @@
  */
 package it.cnr.istc.iloc.api;
 
+import java.util.Set;
+
 /**
- * Represents an heuristic estimator for estimating the cost for solving a flaw.
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public interface IEstimator {
+public interface ILandmarkGraph {
 
     /**
-     * Computes all the currently estimated costs.
+     * Extract the landmarks from the given problem.
      */
-    public void computeCosts();
+    public void extractLandmarks();
 
     /**
-     * Returns an estimated cost for the given node according to this heuristic
-     * estimator.
+     * Returns the computed (disjunctive) landmarks.
      *
-     * @param node the node to be estimated.
-     * @return a value indicating an estimated cost for solving the flaw
-     * associated to the given node.
+     * @return a set containing the computed (disjunctive) landmarks.
      */
-    public double estimate(IStaticCausalGraph.INode node);
+    public Set<ILandmark> getLandmarks();
+
+    /**
+     * Represents a (disjunctive) landmark.
+     */
+    public interface ILandmark {
+
+        /**
+         * Returns the static causal graph nodes which constitute this
+         * disjunctive landmark.
+         *
+         * @return a set of static causal graph nodes representing the
+         * disjunctive landmark.
+         */
+        public Set<IStaticCausalGraph.INode> getNodes();
+    }
 }

@@ -77,6 +77,13 @@ public interface ISolver extends IScope, IEnvironment {
     public IEstimator getEstimator();
 
     /**
+     * Returns the landmark graph associated to this solver.
+     *
+     * @return the landmark graph associated to this solver.
+     */
+    public ILandmarkGraph getLandmarkGraph();
+
+    /**
      * Traverse the search space till the given {@code INode} is reached. In
      * order to reach the given node, it might be required to backtrack to a
      * common ancestor node.

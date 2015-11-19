@@ -45,7 +45,7 @@ public class HAddEstimator implements IEstimator {
     }
 
     @Override
-    public void recomputeCosts() {
+    public void computeCosts() {
         min_causal_distance.clear();
         Collection<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes();
         nodes.forEach(node -> {

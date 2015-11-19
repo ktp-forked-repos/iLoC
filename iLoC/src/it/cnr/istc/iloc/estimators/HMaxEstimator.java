@@ -48,7 +48,7 @@ public class HMaxEstimator implements IEstimator {
     }
 
     @Override
-    public void recomputeCosts() {
+    public void computeCosts() {
         table.clear();
         IStaticCausalGraph cg = solver.getStaticCausalGraph();
         Set<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toSet());

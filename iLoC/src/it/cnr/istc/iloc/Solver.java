@@ -24,6 +24,7 @@ import it.cnr.istc.iloc.api.IEstimator;
 import it.cnr.istc.iloc.api.IField;
 import it.cnr.istc.iloc.api.IFlaw;
 import it.cnr.istc.iloc.api.IFormula;
+import it.cnr.istc.iloc.api.ILandmarkGraph;
 import it.cnr.istc.iloc.api.IMethod;
 import it.cnr.istc.iloc.api.IModel;
 import it.cnr.istc.iloc.api.INode;
@@ -95,7 +96,7 @@ public class Solver implements ISolver {
         private RelaxedPlanningGraph rpg;
 
         @Override
-        public void recomputeCosts() {
+        public void computeCosts() {
             rpg = new RelaxedPlanningGraph(Solver.this, new HashSet<>(getStaticCausalGraph().getNodes()));
         }
 
@@ -104,6 +105,7 @@ public class Solver implements ISolver {
             return rpg.estimate(node);
         }
     };
+    private final ILandmarkGraph lm_graph = new LandmarkGraph(this);
     private final Map<String, IField> fields = new LinkedHashMap<>();
     private final Map<String, Collection<IMethod>> methods = new HashMap<>();
     private final Map<String, IType> types = new LinkedHashMap<>(0);
@@ -239,7 +241,7 @@ public class Solver implements ISolver {
     @Override
     public IModel read(String script) {
         parser.read(script);
-        estimator.recomputeCosts();
+        estimator.computeCosts();
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
@@ -259,7 +261,7 @@ public class Solver implements ISolver {
     @Override
     public IModel read(File... files) throws IOException {
         parser.read(files);
-        estimator.recomputeCosts();
+        estimator.computeCosts();
         if (constraintNetwork.propagate()) {
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
@@ -294,6 +296,11 @@ public class Solver implements ISolver {
     @Override
     public IEstimator getEstimator() {
         return estimator;
+    }
+
+    @Override
+    public ILandmarkGraph getLandmarkGraph() {
+        return lm_graph;
     }
 
     @Override

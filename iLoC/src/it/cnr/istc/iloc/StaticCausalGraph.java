@@ -269,7 +269,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
         listeners.remove(listener);
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Nodes and edges.">
+    //<editor-fold defaultstate="collapsed" desc="Nodes and edges">
     private abstract class Node implements INode {
 
         @Override

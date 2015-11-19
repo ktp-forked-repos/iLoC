@@ -46,7 +46,7 @@ public class MinReachableEstimator implements IEstimator {
     }
 
     @Override
-    public void recomputeCosts() {
+    public void computeCosts() {
         min_reachable_nodes.clear();
         Collection<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes();
         nodes.forEach(node -> {

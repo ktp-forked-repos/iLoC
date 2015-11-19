@@ -18,6 +18,7 @@ package it.cnr.istc.iloc;
 
 import it.cnr.istc.iloc.api.FormulaState;
 import it.cnr.istc.iloc.api.IFormula;
+import it.cnr.istc.iloc.api.ILandmarkGraph;
 import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.Arrays;
@@ -38,8 +39,10 @@ import java.util.stream.Collectors;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class LandmarkGraph {
+class LandmarkGraph implements ILandmarkGraph {
 
+    private final ISolver solver;
+    private final IStaticCausalGraph causal_graph;
     /**
      * a set of landmark candidates
      */
@@ -55,7 +58,14 @@ class LandmarkGraph {
      * @param solver the solver for which landmarks are computed.
      */
     LandmarkGraph(ISolver solver) {
-        IStaticCausalGraph causal_graph = solver.getStaticCausalGraph();
+        this.solver = solver;
+        this.causal_graph = solver.getStaticCausalGraph();
+    }
+
+    @Override
+    public void extractLandmarks() {
+        candidates.clear();
+        landmarks.clear();
         Set<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toSet());
         Set<IStaticCausalGraph.INode> init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).map(formula -> causal_graph.getNode(formula.getType())).collect(Collectors.toSet());
         nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive)).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node)).forEach(node -> candidates.add(new Landmark(node)));
@@ -124,14 +134,15 @@ class LandmarkGraph {
      *
      * @return a set containing the computed (disjunctive) landmarks.
      */
-    Set<Landmark> getLandmarks() {
+    @Override
+    public Set<ILandmark> getLandmarks() {
         return Collections.unmodifiableSet(landmarks);
     }
 
     /**
      * This class is used to represent a disjunctive landmark.
      */
-    static class Landmark {
+    static class Landmark implements ILandmark {
 
         private final Set<IStaticCausalGraph.INode> nodes;
 
@@ -141,6 +152,11 @@ class LandmarkGraph {
 
         Landmark(Set<IStaticCausalGraph.INode> nodes) {
             this.nodes = nodes;
+        }
+
+        @Override
+        public Set<IStaticCausalGraph.INode> getNodes() {
+            return Collections.unmodifiableSet(nodes);
         }
 
         @Override
