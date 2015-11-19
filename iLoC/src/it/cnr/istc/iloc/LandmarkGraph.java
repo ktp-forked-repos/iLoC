@@ -40,9 +40,20 @@ import java.util.stream.Collectors;
  */
 class LandmarkGraph {
 
+    /**
+     * a set of landmark candidates
+     */
     private final Set<Landmark> candidates = new HashSet<>();
+    /**
+     * the final landmark set
+     */
     private final Set<Landmark> landmarks = new HashSet<>();
 
+    /**
+     * Landmark graph constructor.
+     *
+     * @param solver the solver for which landmarks are computed.
+     */
     LandmarkGraph(ISolver solver) {
         IStaticCausalGraph causal_graph = solver.getStaticCausalGraph();
         Set<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toSet());
@@ -58,14 +69,15 @@ class LandmarkGraph {
             // .. and we add it to the landmarks
             landmarks.add(candidate);
 
-            // these are the (disjunctive) preconditions of the first achievers..
+            // these are the (disjunctive) causal preconditions of the first achievers..
             Set<Set<IStaticCausalGraph.INode>> first_achievers_preconditions = new HashSet<>();
             candidate.nodes.forEach(node -> first_achievers_preconditions.addAll(getPreconditions(node)));
             if (candidate.nodes.stream().anyMatch(node -> node instanceof IStaticCausalGraph.IDisjunctionNode)) {
                 // we compute the relaxed planning graph excluding the candidate ..
-                RelaxedPlanningGraph c_rpg = new RelaxedPlanningGraph(solver, solver.getStaticCausalGraph().getNodes().stream().filter(node -> !candidate.nodes.contains(node)).collect(Collectors.toSet()));
-                // .. and extract the preconditions of the first achievers according to the relaxed planning graph
-                first_achievers_preconditions.removeIf(preconditions -> preconditions.stream().anyMatch(pre -> Double.isInfinite(c_rpg.estimate(pre))));
+                RelaxedPlanningGraph rpg = new RelaxedPlanningGraph(solver, solver.getStaticCausalGraph().getNodes().stream().filter(node -> !candidate.nodes.contains(node)).collect(Collectors.toSet()));
+                // .. and extract the causal preconditions of the first achievers according to the relaxed planning graph
+                // specifically, we remove thos causal preconditions which are not reachable according to the relaxed planning graph without the candidate
+                first_achievers_preconditions.removeIf(preconditions -> preconditions.stream().anyMatch(pre -> Double.isInfinite(rpg.estimate(pre))));
             }
 
             // we compute the intersection of the preconditions
@@ -88,6 +100,15 @@ class LandmarkGraph {
         }
     }
 
+    /**
+     * This method returns a disjunction of conjunctions. The returned nodes
+     * represent the causal preconditions of the given node.
+     *
+     * @param node the node of which we want to compute the causal
+     * preconditions.
+     * @return a disjunction of conjunctions representing the causal
+     * preconditions of the given node.
+     */
     private Set<Set<IStaticCausalGraph.INode>> getPreconditions(IStaticCausalGraph.INode node) {
         if (node instanceof IStaticCausalGraph.IPredicateNode || node instanceof IStaticCausalGraph.IDisjunctNode) {
             return new HashSet<>(Arrays.asList(new HashSet<>(node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).collect(Collectors.toSet()))));
@@ -98,12 +119,17 @@ class LandmarkGraph {
         }
     }
 
+    /**
+     * Returns the computed (disjunctive) landmarks.
+     *
+     * @return a set containing the computed (disjunctive) landmarks.
+     */
     Set<Landmark> getLandmarks() {
         return Collections.unmodifiableSet(landmarks);
     }
 
     /**
-     * This class is used to represent disjunctive landmarks.
+     * This class is used to represent a disjunctive landmark.
      */
     static class Landmark {
 

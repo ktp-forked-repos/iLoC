@@ -37,7 +37,6 @@ import it.cnr.istc.iloc.api.ISolverListener;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import it.cnr.istc.iloc.api.IType;
 import it.cnr.istc.iloc.ddl.LanguageParser;
-import it.cnr.istc.iloc.estimators.HMaxEstimator;
 import it.cnr.istc.iloc.utils.NativeUtils;
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +91,19 @@ public class Solver implements ISolver {
     private final IConstraintNetwork constraintNetwork;
     private final IStaticCausalGraph staticCausalGraph = new StaticCausalGraph();
     private final IDynamicCausalGraph dynamicCausalGraph = new DynamicCausalGraph();
-    private final IEstimator estimator = new HMaxEstimator(this);
+    private final IEstimator estimator = new IEstimator() {
+        private RelaxedPlanningGraph rpg;
+
+        @Override
+        public void recomputeCosts() {
+            rpg = new RelaxedPlanningGraph(Solver.this, new HashSet<>(getStaticCausalGraph().getNodes()));
+        }
+
+        @Override
+        public double estimate(IStaticCausalGraph.INode node) {
+            return rpg.estimate(node);
+        }
+    };
     private final Map<String, IField> fields = new LinkedHashMap<>();
     private final Map<String, Collection<IMethod>> methods = new HashMap<>();
     private final Map<String, IType> types = new LinkedHashMap<>(0);
