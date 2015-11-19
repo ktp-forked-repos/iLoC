@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
+ * Represents the stati causal graph associated to a solver.
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
@@ -206,6 +207,9 @@ public interface IStaticCausalGraph {
      */
     public void removeCausalGraphListener(IStaticCausalGraphListener listener);
 
+    /**
+     * A generic node of the static causal graph.
+     */
     public interface INode {
 
         /**
@@ -227,8 +231,16 @@ public interface IStaticCausalGraph {
         public Collection<IEdge> getOutgoingEdges();
     }
 
+    /**
+     * An directed edge connecting two nodes of the static casual graph.
+     */
     public interface IEdge {
 
+        /**
+         * Returns the type of this causal edge.
+         *
+         * @return the type of this causal edge.
+         */
         public Type getType();
 
         /**
@@ -245,11 +257,24 @@ public interface IStaticCausalGraph {
          */
         public INode getTarget();
 
+        /**
+         * The edge type.
+         */
         public enum Type {
-            Goal, Fact
+            /**
+             * A goal edge type.
+             */
+            Goal,
+            /**
+             * A fact edge type.
+             */
+            Fact
         }
     }
 
+    /**
+     * A predicate node.
+     */
     public interface IPredicateNode extends INode {
 
         /**
@@ -260,6 +285,9 @@ public interface IStaticCausalGraph {
         public IPredicate getPredicate();
     }
 
+    /**
+     * A disjunction node.
+     */
     public interface IDisjunctionNode extends INode {
 
         /**
@@ -270,6 +298,9 @@ public interface IStaticCausalGraph {
         public IDisjunction getDisjunction();
     }
 
+    /**
+     * A disjunct node associated to a disjunction.
+     */
     public interface IDisjunctNode extends INode {
 
         /**
@@ -280,6 +311,9 @@ public interface IStaticCausalGraph {
         public IDisjunct getDisjunct();
     }
 
+    /**
+     * A preference node.
+     */
     public interface IPreferenceNode extends INode {
 
         /**
@@ -290,6 +324,9 @@ public interface IStaticCausalGraph {
         public IPreference getPreference();
     }
 
+    /**
+     * A no-op node.
+     */
     public interface INoOpNode extends INode {
 
         @Override
