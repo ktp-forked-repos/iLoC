@@ -23,7 +23,6 @@ import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,10 +30,11 @@ import java.util.stream.Collectors;
 /**
  * Implementation of a landmark graph.
  * <p>
- * Landmarks are extracted according to "Extending landmarks analysis to reason
- * about resources and repetition", Julie Porteous & Stephen Cresswell,
- * Proceedings of the 21st Workshop of the UK Planning and Scheduling Special
- * Interest Group (PLANSIG'02), 2002
+ * The method used for extracting landmarks is an adaptation of the method
+ * described in "Extending landmarks analysis to reason about resources and
+ * repetition", Julie Porteous & Stephen Cresswell, Proceedings of the 21st
+ * Workshop of the UK Planning and Scheduling Special Interest Group
+ * (PLANSIG'02), 2002
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
@@ -49,53 +49,40 @@ class LandmarkGraph {
         Set<IStaticCausalGraph.INode> init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).map(formula -> causal_graph.getNode(formula.getType())).collect(Collectors.toSet());
         nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive)).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node)).forEach(node -> candidates.add(new Landmark(node)));
 
-        candidates.forEach(candidate -> System.out.println(candidate));
-
         while (!candidates.isEmpty()) {
+            // the landmark candidate to analyze
             Landmark candidate = candidates.stream().findAny().get();
-
-            System.out.println(candidate);
 
             // we remove the landmark candidate from the candidates..
             candidates.remove(candidate);
             // .. and we add it to the landmarks
             landmarks.add(candidate);
 
-            // we compute the relaxed planning graph excluding the candidate ..
-            RelaxedPlanningGraph rpg = new RelaxedPlanningGraph(solver, solver.getStaticCausalGraph().getNodes().stream().filter(node -> !candidate.nodes.contains(node)).collect(Collectors.toSet()));
-            // .. and extract the first achievers for the candidate
-            List<IStaticCausalGraph.INode> first_achievers = candidate.nodes.stream().filter(node -> node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).allMatch(target -> !Double.isInfinite(rpg.estimate(target)))).collect(Collectors.toList());
-
-            first_achievers.forEach(first_achiever -> System.out.println(first_achiever));
-
-            // we compute the preconditions of the achievers
-            Set<Set<IStaticCausalGraph.INode>> preconditions = new HashSet<>();
-            first_achievers.forEach(first_achiever -> preconditions.addAll(getPreconditions(first_achiever)));
-
-            preconditions.forEach(pre -> System.out.println(pre));
+            // these are the (disjunctive) preconditions of the first achievers..
+            Set<Set<IStaticCausalGraph.INode>> first_achievers_preconditions = new HashSet<>();
+            candidate.nodes.forEach(node -> first_achievers_preconditions.addAll(getPreconditions(node)));
+            if (candidate.nodes.stream().anyMatch(node -> node instanceof IStaticCausalGraph.IDisjunctionNode)) {
+                // we compute the relaxed planning graph excluding the candidate ..
+                RelaxedPlanningGraph c_rpg = new RelaxedPlanningGraph(solver, solver.getStaticCausalGraph().getNodes().stream().filter(node -> !candidate.nodes.contains(node)).collect(Collectors.toSet()));
+                // .. and extract the preconditions of the first achievers according to the relaxed planning graph
+                first_achievers_preconditions.removeIf(preconditions -> preconditions.stream().anyMatch(pre -> Double.isInfinite(c_rpg.estimate(pre))));
+            }
 
             // we compute the intersection of the preconditions
-            Set<IStaticCausalGraph.INode> intersection = new HashSet<>(preconditions.stream().findAny().get());
-            preconditions.forEach(conjunction -> {
+            Set<IStaticCausalGraph.INode> intersection = new HashSet<>(first_achievers_preconditions.stream().findAny().get());
+            first_achievers_preconditions.forEach(conjunction -> {
                 intersection.retainAll(conjunction);
             });
             intersection.removeIf(node -> init_state.contains(node) || landmarks.contains(new Landmark(node)));
-            System.out.println(intersection);
 
             // .. and add it to candidates
             intersection.forEach(node -> candidates.add(new Landmark(node)));
 
             // we compute a disjunctive landmark with what is left..
-            Set<IStaticCausalGraph.INode> symmetric_difference = preconditions.stream().filter(conjunction -> conjunction.stream().noneMatch(node -> init_state.contains(node) || intersection.contains(node))).flatMap(conjunction -> conjunction.stream()).collect(Collectors.toSet());
-
-            System.out.println(symmetric_difference);
+            Set<IStaticCausalGraph.INode> symmetric_difference = first_achievers_preconditions.stream().filter(conjunction -> conjunction.stream().noneMatch(node -> init_state.contains(node) || intersection.contains(node))).flatMap(conjunction -> conjunction.stream()).collect(Collectors.toSet());
 
             // .. and add it to the candidates
             if (!symmetric_difference.isEmpty() && !candidates.stream().anyMatch(c -> symmetric_difference.containsAll(c.nodes)) && !landmarks.stream().anyMatch(c -> symmetric_difference.containsAll(c.nodes))) {
-                System.out.println("to achieve");
-                System.out.println("    " + candidate);
-                System.out.println("  is required");
-                System.out.println("    " + symmetric_difference);
                 candidates.add(new Landmark(symmetric_difference));
             }
         }
@@ -115,6 +102,9 @@ class LandmarkGraph {
         return Collections.unmodifiableSet(landmarks);
     }
 
+    /**
+     * This class is used to represent disjunctive landmarks.
+     */
     static class Landmark {
 
         private final Set<IStaticCausalGraph.INode> nodes;

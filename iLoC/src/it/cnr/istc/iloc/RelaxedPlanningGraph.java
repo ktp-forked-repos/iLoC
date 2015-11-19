@@ -98,11 +98,11 @@ class RelaxedPlanningGraph {
             visited.add(node);
             double c1;
             if (node instanceof IStaticCausalGraph.IDisjunctionNode) {
-                c1 = 1 + node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(c_node -> estimate(c_node, new HashSet<>(visited))).min().orElse(0);
+                c1 = 1 + node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).filter(target -> nodes.contains(target)).mapToDouble(c_node -> estimate(c_node, new HashSet<>(visited))).min().orElse(0);
             } else if (node instanceof IStaticCausalGraph.IPreferenceNode) {
                 throw new UnsupportedOperationException("Preferences estimation is not supported yet..");
             } else {
-                c1 = 1 + node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(c_node -> estimate(c_node, visited)).max().orElse(0);
+                c1 = 1 + node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).filter(target -> nodes.contains(target)).mapToDouble(c_node -> estimate(c_node, visited)).max().orElse(0);
             }
             // We can admit infinite values now..
             table.put(node, c1);
