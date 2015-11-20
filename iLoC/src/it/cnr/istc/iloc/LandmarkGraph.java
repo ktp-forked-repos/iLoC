@@ -23,7 +23,9 @@ import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,6 +54,7 @@ class LandmarkGraph implements ILandmarkGraph {
      * the final landmark set
      */
     private final Set<ILandmark> landmarks = new HashSet<>();
+    private final Map<ILandmark, RelaxedPlanningGraph> rpgs = new HashMap<>();
 
     /**
      * Landmark graph constructor.
@@ -75,13 +78,12 @@ class LandmarkGraph implements ILandmarkGraph {
         nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive)).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node)).forEach(node -> candidates.add(new Landmark(node)));
 
         // We create a relaxed planning graph starting fron the initial state and the current goals
-        rpg = new RelaxedPlanningGraph(solver, nodes);
+        rpg = new RelaxedPlanningGraph(solver, nodes, true);
 
         // Main landmark extraction procedure loop
         while (!candidates.isEmpty()) {
             // the landmark candidate to analyze
             ILandmark candidate = candidates.stream().findAny().get();
-            System.out.println(candidate);
 
             // we remove the landmark candidate from the candidates..
             candidates.remove(candidate);
@@ -91,15 +93,12 @@ class LandmarkGraph implements ILandmarkGraph {
             // these are the (disjunctive) causal preconditions of the first achievers..
             Set<Set<IStaticCausalGraph.INode>> first_achievers_preconditions = new HashSet<>();
             candidate.getNodes().forEach(node -> first_achievers_preconditions.addAll(getPreconditions(node)));
-            if (candidate.getNodes().stream().anyMatch(node -> node instanceof IStaticCausalGraph.IDisjunctionNode)) {
-                // we compute the relaxed planning graph excluding the candidate ..
-                candidate.getNodes().forEach(node -> rpg.deactivate(node));
-                // .. and extract the causal preconditions of the first achievers according to the relaxed planning graph
-                // specifically, we remove those causal preconditions which are not reachable according to the relaxed planning graph without the candidate
-                first_achievers_preconditions.removeIf(preconditions -> preconditions.stream().anyMatch(pre -> Double.isInfinite(rpg.level(pre))));
-                rpg.restore();
-            }
-            first_achievers_preconditions.forEach(achievers -> System.out.println(achievers));
+            // we compute the relaxed planning graph excluding the candidate ..
+            RelaxedPlanningGraph c_rpg = new RelaxedPlanningGraph(solver, nodes.stream().filter(node -> !candidate.getNodes().contains(node)).collect(Collectors.toSet()), false);
+            rpgs.put(candidate, c_rpg);
+            // .. and extract the causal preconditions of the first achievers according to the relaxed planning graph
+            // specifically, we remove those causal preconditions which are not reachable according to the relaxed planning graph without the candidate
+            first_achievers_preconditions.removeIf(preconditions -> preconditions.stream().anyMatch(pre -> Double.isInfinite(c_rpg.level(pre))));
 
             // we compute the intersection of the preconditions
             Set<IStaticCausalGraph.INode> intersection = new HashSet<>(first_achievers_preconditions.stream().findAny().get());
@@ -123,15 +122,12 @@ class LandmarkGraph implements ILandmarkGraph {
         // we compute natural orders between landmarks..
         ILandmark[] lms = landmarks.stream().toArray(ILandmark[]::new);
         for (int i = 0; i < lms.length; i++) {
-            lms[i].getNodes().forEach(node -> rpg.deactivate(node));
+            RelaxedPlanningGraph c_rpg = rpgs.get(lms[i]);
             for (int j = i + 1; j < lms.length; j++) {
-                if (lms[j].getNodes().stream().allMatch(node -> Double.isInfinite(rpg.level(node)))) {
-                    System.out.println("there is a natural order between landmarks");
-                    System.out.println(lms[i]);
-                    System.out.println(lms[j]);
+                if (lms[j].getNodes().stream().allMatch(node -> Double.isInfinite(c_rpg.level(node)))) {
+                    // there is a natural order between landmarks lms[i] and lms[j]
                 }
             }
-            rpg.restore();
         }
     }
 

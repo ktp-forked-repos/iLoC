@@ -159,6 +159,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
     @Override
     public INoOpNode addNoOp() {
         INoOpNode node = new NoOpNode();
+        incoming_edges.put(node, new HashMap<>());
         outgoing_edges.put(node, new HashMap<>());
         all_reachable_nodes.clear();
         listeners.forEach(listener -> {

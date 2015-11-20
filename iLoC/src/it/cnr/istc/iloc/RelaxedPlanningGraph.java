@@ -42,9 +42,8 @@ class RelaxedPlanningGraph {
     private final Map<IStaticCausalGraph.INode, Double> table = new HashMap<>();
     private final Set<IStaticCausalGraph.INode> init_state;
     private final Set<IStaticCausalGraph.INode> goal;
-    private final Map<IStaticCausalGraph.INode, Double> old_table = new HashMap<>();
 
-    RelaxedPlanningGraph(ISolver solver, Set<IStaticCausalGraph.INode> nodes) {
+    RelaxedPlanningGraph(ISolver solver, Set<IStaticCausalGraph.INode> nodes, boolean consider_goals) {
         this.solver = solver;
         this.nodes = nodes;
         IStaticCausalGraph cg = solver.getStaticCausalGraph();
@@ -83,14 +82,16 @@ class RelaxedPlanningGraph {
             to_remove.clear();
         } while (changed);
 
-        table.values().removeIf(value -> Double.isInfinite(value));
+        if (consider_goals) {
+            table.values().removeIf(value -> Double.isInfinite(value));
 
-        // c_nodes contains nodes which are unreachable from the facts..
-        // these nodes might still be reachable from the goals!
-        goal.forEach(g -> estimate(g, new HashSet<>()));
+            // c_nodes contains nodes which are unreachable from the facts..
+            // these nodes might still be reachable from the goals!
+            goal.forEach(g -> estimate(g, new HashSet<>()));
 
-        // not stored nodes are now definitely unreachable..
-        c_nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
+            // not stored nodes are now definitely unreachable..
+            c_nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
+        }
     }
 
     private double estimate(IStaticCausalGraph.INode node, Set<IStaticCausalGraph.INode> visited) {
@@ -113,36 +114,6 @@ class RelaxedPlanningGraph {
         } else {
             return 0;
         }
-    }
-
-    /**
-     * Deactivates the given node setting its cost to infinite. Deactivation
-     * propagates to all the other reachable nosed.
-     *
-     * @param node the node to be deactivated.
-     */
-    void deactivate(IStaticCausalGraph.INode node) {
-        if (!Double.isInfinite(table.get(node))) {
-            old_table.put(node, table.get(node));
-            table.put(node, Double.POSITIVE_INFINITY);
-            node.getIncomingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getSource()).forEach(source -> {
-                if (source instanceof IStaticCausalGraph.IDisjunctionNode) {
-                    if (source.getOutgoingEdges().stream().filter(e -> e.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(e -> e.getTarget()).allMatch(n -> Double.isInfinite(table.get(n)))) {
-                        deactivate(source);
-                    }
-                } else {
-                    deactivate(source);
-                }
-            });
-        }
-    }
-
-    /**
-     * Restores the values of the table after deactivations.
-     */
-    void restore() {
-        table.putAll(old_table);
-        old_table.clear();
     }
 
     /**
