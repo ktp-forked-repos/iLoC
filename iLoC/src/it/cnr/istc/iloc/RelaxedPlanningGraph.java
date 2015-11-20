@@ -40,14 +40,16 @@ class RelaxedPlanningGraph {
     private final ISolver solver;
     private final Set<IStaticCausalGraph.INode> nodes;
     private final Map<IStaticCausalGraph.INode, Double> table = new HashMap<>();
+    private final Set<IStaticCausalGraph.INode> init_state;
+    private final Set<IStaticCausalGraph.INode> goal;
     private final Map<IStaticCausalGraph.INode, Double> old_table = new HashMap<>();
 
     RelaxedPlanningGraph(ISolver solver, Set<IStaticCausalGraph.INode> nodes) {
         this.solver = solver;
         this.nodes = nodes;
         IStaticCausalGraph cg = solver.getStaticCausalGraph();
-        Set<IStaticCausalGraph.INode> init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active).map(formula -> cg.getNode(formula.getType()))).collect(Collectors.toSet());
-        Set<IStaticCausalGraph.INode> goal = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> cg.getNode(formula.getType())).filter(node -> !init_state.contains(node))).collect(Collectors.toSet());
+        this.init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active).map(formula -> cg.getNode(formula.getType()))).collect(Collectors.toSet());
+        this.goal = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> cg.getNode(formula.getType())).filter(node -> !init_state.contains(node))).collect(Collectors.toSet());
 
         // Initialization..
         init_state.forEach(node -> table.put(node, 0d));
@@ -123,11 +125,14 @@ class RelaxedPlanningGraph {
         if (!Double.isInfinite(table.get(node))) {
             old_table.put(node, table.get(node));
             table.put(node, Double.POSITIVE_INFINITY);
-            node.getIncomingEdges().stream()
-                    .filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal)
-                    .map(edge -> edge.getSource())
-                    .filter(source -> !(source instanceof IStaticCausalGraph.IDisjunctionNode) || source.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).allMatch(n -> Double.isInfinite(table.get(n)))).forEach(source -> {
-                deactivate(source);
+            node.getIncomingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getSource()).forEach(source -> {
+                if (source instanceof IStaticCausalGraph.IDisjunctionNode) {
+                    if (source.getOutgoingEdges().stream().filter(e -> e.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(e -> e.getTarget()).allMatch(n -> Double.isInfinite(table.get(n)))) {
+                        deactivate(source);
+                    }
+                } else {
+                    deactivate(source);
+                }
             });
         }
     }
