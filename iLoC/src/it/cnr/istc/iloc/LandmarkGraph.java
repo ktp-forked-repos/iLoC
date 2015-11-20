@@ -129,6 +129,8 @@ class LandmarkGraph implements ILandmarkGraph {
                 }
             }
         }
+
+        rpgs.clear();
     }
 
     /**
