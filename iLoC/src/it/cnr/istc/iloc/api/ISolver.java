@@ -70,13 +70,6 @@ public interface ISolver extends IScope, IEnvironment {
     public IDynamicCausalGraph getDynamicCausalGraph();
 
     /**
-     * Returns the heuristic estimator associated to this solver.
-     *
-     * @return the heuristic estimator associated to this solver.
-     */
-    public IEstimator getEstimator();
-
-    /**
      * Returns the landmark graph associated to this solver.
      *
      * @return the landmark graph associated to this solver.

@@ -43,6 +43,7 @@ class LandmarkGraph implements ILandmarkGraph {
 
     private final ISolver solver;
     private final IStaticCausalGraph causal_graph;
+    private RelaxedPlanningGraph rpg;
     /**
      * a set of landmark candidates
      */
@@ -69,6 +70,7 @@ class LandmarkGraph implements ILandmarkGraph {
         Set<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toSet());
         Set<IStaticCausalGraph.INode> init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).map(formula -> causal_graph.getNode(formula.getType())).collect(Collectors.toSet());
         nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive)).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node)).forEach(node -> candidates.add(new Landmark(node)));
+        rpg = new RelaxedPlanningGraph(solver, nodes);
 
         while (!candidates.isEmpty()) {
             // the landmark candidate to analyze
@@ -84,10 +86,11 @@ class LandmarkGraph implements ILandmarkGraph {
             candidate.nodes.forEach(node -> first_achievers_preconditions.addAll(getPreconditions(node)));
             if (candidate.nodes.stream().anyMatch(node -> node instanceof IStaticCausalGraph.IDisjunctionNode)) {
                 // we compute the relaxed planning graph excluding the candidate ..
-                RelaxedPlanningGraph rpg = new RelaxedPlanningGraph(solver, solver.getStaticCausalGraph().getNodes().stream().filter(node -> !candidate.nodes.contains(node)).collect(Collectors.toSet()));
+                candidate.nodes.forEach(node -> rpg.deactivate(node));
                 // .. and extract the causal preconditions of the first achievers according to the relaxed planning graph
                 // specifically, we remove thos causal preconditions which are not reachable according to the relaxed planning graph without the candidate
-                first_achievers_preconditions.removeIf(preconditions -> preconditions.stream().anyMatch(pre -> Double.isInfinite(rpg.estimate(pre))));
+                first_achievers_preconditions.removeIf(preconditions -> preconditions.stream().anyMatch(pre -> Double.isInfinite(rpg.level(pre))));
+                rpg.restore();
             }
 
             // we compute the intersection of the preconditions
@@ -137,6 +140,11 @@ class LandmarkGraph implements ILandmarkGraph {
     @Override
     public Set<ILandmark> getLandmarks() {
         return Collections.unmodifiableSet(landmarks);
+    }
+
+    @Override
+    public double estimate(IStaticCausalGraph.INode node) {
+        return rpg.level(node);
     }
 
     /**

@@ -191,6 +191,7 @@ class StaticCausalGraph implements IStaticCausalGraph {
 
     @Override
     public IEdge addEdge(IEdge.Type type, INode source, INode target) {
+        assert source != target;
         Edge edge = new Edge(type, source, target);
         if (!incoming_edges.get(target).containsKey(source)) {
             incoming_edges.get(target).put(source, new ArrayList<>());
@@ -387,6 +388,11 @@ class StaticCausalGraph implements IStaticCausalGraph {
         @Override
         public INode getTarget() {
             return target;
+        }
+
+        @Override
+        public String toString() {
+            return source.toString() + "  -[" + type + "]->  " + target.toString();
         }
     }
     //</editor-fold>

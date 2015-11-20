@@ -39,7 +39,8 @@ class RelaxedPlanningGraph {
 
     private final ISolver solver;
     private final Set<IStaticCausalGraph.INode> nodes;
-    private final Map<Object, Double> table = new HashMap<>();
+    private final Map<IStaticCausalGraph.INode, Double> table = new HashMap<>();
+    private final Map<IStaticCausalGraph.INode, Double> old_table = new HashMap<>();
 
     RelaxedPlanningGraph(ISolver solver, Set<IStaticCausalGraph.INode> nodes) {
         this.solver = solver;
@@ -112,7 +113,46 @@ class RelaxedPlanningGraph {
         }
     }
 
-    double estimate(IStaticCausalGraph.INode node) {
+    /**
+     * Deactivates the given node setting its cost to infinite. Deactivation
+     * propagates to all the other reachable nosed.
+     *
+     * @param node the node to be deactivated.
+     */
+    void deactivate(IStaticCausalGraph.INode node) {
+        if (!Double.isInfinite(table.get(node))) {
+            old_table.put(node, table.get(node));
+            table.put(node, Double.POSITIVE_INFINITY);
+            node.getIncomingEdges().stream()
+                    .filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal)
+                    .map(edge -> edge.getSource())
+                    .filter(source -> !(source instanceof IStaticCausalGraph.IDisjunctionNode) || source.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).allMatch(n -> Double.isInfinite(table.get(n)))).forEach(source -> {
+                deactivate(source);
+            });
+        }
+    }
+
+    /**
+     * Restores the values of the table after deactivations.
+     */
+    void restore() {
+        table.putAll(old_table);
+        old_table.clear();
+    }
+
+    /**
+     * Returns the level of the given causal node inside the current relaxed
+     * planning graph.
+     *
+     * @param node the causal node whose level is requested.
+     * @return the level of the given causal node.
+     */
+    double level(IStaticCausalGraph.INode node) {
         return table.get(node);
+    }
+
+    @Override
+    public String toString() {
+        return table.keySet().stream().sorted((IStaticCausalGraph.INode n0, IStaticCausalGraph.INode n1) -> Double.compare(table.get(n0), table.get(n1))).map(node -> node.toString() + "   " + table.get(node)).collect(Collectors.joining("\n"));
     }
 }

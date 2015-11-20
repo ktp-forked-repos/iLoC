@@ -21,9 +21,9 @@ package it.cnr.istc.iloc;
 import it.cnr.istc.iloc.api.FormulaState;
 import it.cnr.istc.iloc.api.IBool;
 import it.cnr.istc.iloc.api.IConstraintNetwork;
-import it.cnr.istc.iloc.api.IEstimator;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.IGoal;
+import it.cnr.istc.iloc.api.ILandmarkGraph;
 import it.cnr.istc.iloc.api.IResolver;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,13 +39,13 @@ class Goal implements IGoal {
 
     private boolean skip_check = false;
     private final IFormula formula;
-    private final IEstimator estimator;
+    private final ILandmarkGraph lm_graph;
     private final IResolver activationResolver;
     private final IResolver unificationResolver;
 
     Goal(IFormula formula) {
         this.formula = formula;
-        this.estimator = formula.getSolver().getEstimator();
+        this.lm_graph = formula.getSolver().getLandmarkGraph();
         this.activationResolver = new ActivationResolver();
         this.unificationResolver = new UnificationResolver();
     }
@@ -57,7 +57,7 @@ class Goal implements IGoal {
 
     @Override
     public double getEstimatedCost() {
-        return estimator.estimate(formula.getSolver().getStaticCausalGraph().getNode(formula.getType()));
+        return lm_graph.estimate(formula.getSolver().getStaticCausalGraph().getNode(formula.getType()));
     }
 
     @Override
