@@ -89,4 +89,44 @@ public class APSPNetworkTest {
 
         System.out.println(network);
     }
+
+    @Test
+    public void testRPG() {
+        APSPNetwork network = new APSPNetwork();
+        assertNotNull(network);
+
+        int origin = network.newVariable();
+
+        int a0 = network.newVariable();
+        int a1 = network.newVariable();
+
+        int b0 = network.newVariable();
+        int b1 = network.newVariable();
+
+        int c0 = network.newVariable();
+        int c1 = network.newVariable();
+
+        int or0 = network.newVariable();
+        int or1 = network.newVariable();
+
+        network.addConstraint(origin, a0, 0, 0);
+        network.addConstraint(origin, a1, 0, 0);
+
+        network.addConstraint(a0, b0, Double.NEGATIVE_INFINITY, 1);
+        network.addConstraint(a1, b1, 1, Double.POSITIVE_INFINITY);
+
+        network.addConstraint(b0, or0, Double.NEGATIVE_INFINITY, 1);
+        network.addConstraint(b1, or1, 1, Double.POSITIVE_INFINITY);
+
+        network.addConstraint(origin, c0, 0, 0);
+        network.addConstraint(origin, c1, 0, 0);
+
+        network.addConstraint(c0, or0, Double.NEGATIVE_INFINITY, 1);
+        network.addConstraint(c1, or1, 1, Double.POSITIVE_INFINITY);
+
+        boolean propagate = network.propagate();
+        assertTrue(propagate);
+
+        System.out.println(network);
+    }
 }
