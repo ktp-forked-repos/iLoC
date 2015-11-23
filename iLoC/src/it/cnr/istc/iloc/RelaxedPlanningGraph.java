@@ -16,104 +16,96 @@
  */
 package it.cnr.istc.iloc;
 
+import com.microsoft.z3.ArithExpr;
+import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Context;
+import com.microsoft.z3.Expr;
+import com.microsoft.z3.Model;
+import com.microsoft.z3.Optimize;
+import com.microsoft.z3.RatNum;
+import com.microsoft.z3.Status;
 import it.cnr.istc.iloc.api.FormulaState;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Represents a relaxed planning graph (RPG) built using the given nodes of the
- * static causal graph.
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
 class RelaxedPlanningGraph {
 
     private final ISolver solver;
-    private final Set<IStaticCausalGraph.INode> nodes;
-    private final Map<IStaticCausalGraph.INode, Double> table = new HashMap<>();
+    private final IStaticCausalGraph causal_graph;
+    private final Context ctx;
+    private final Optimize opt;
+    private final Map<IStaticCausalGraph.INode, ArithExpr> nodes = new HashMap<>();
     private final Set<IStaticCausalGraph.INode> init_state;
     private final Set<IStaticCausalGraph.INode> goal;
+    private Model model;
+    private boolean dynamic = false;
 
-    RelaxedPlanningGraph(ISolver solver, Set<IStaticCausalGraph.INode> nodes, boolean consider_goals) {
+    RelaxedPlanningGraph(ISolver solver) {
         this.solver = solver;
-        this.nodes = nodes;
-        IStaticCausalGraph cg = solver.getStaticCausalGraph();
-        this.init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active).map(formula -> cg.getNode(formula.getType()))).collect(Collectors.toSet());
-        this.goal = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> cg.getNode(formula.getType())).filter(node -> !init_state.contains(node))).collect(Collectors.toSet());
+        this.causal_graph = solver.getStaticCausalGraph();
+
+        HashMap<String, String> cfg = new HashMap<>();
+        cfg.put("model", "true");
+        this.ctx = new Context(cfg);
+        this.opt = ctx.mkOptimize();
+
+        this.init_state = causal_graph.getNodes().stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active).map(formula -> causal_graph.getNode(formula.getType()))).collect(Collectors.toSet());
+        this.goal = causal_graph.getNodes().stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node))).collect(Collectors.toSet());
 
         // Initialization..
-        init_state.forEach(node -> table.put(node, 0d));
-        nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
-
-        // Main loop (repeat until no change)
-        Collection<IStaticCausalGraph.INode> c_nodes = new LinkedList<>(nodes);
-        init_state.forEach(node -> c_nodes.remove(node));
-
-        boolean changed;
-        do {
-            changed = false;
-            Collection<IStaticCausalGraph.INode> to_remove = new ArrayList<>();
-            for (IStaticCausalGraph.INode c_node : c_nodes) {
-                double c1;
-                if (c_node instanceof IStaticCausalGraph.IDisjunctionNode) {
-                    c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.containsKey(node) ? table.get(node) : Double.POSITIVE_INFINITY).min().orElse(Double.POSITIVE_INFINITY);
-                } else if (c_node instanceof IStaticCausalGraph.IPreferenceNode) {
-                    throw new UnsupportedOperationException("Preferences estimation is not supported yet..");
-                } else {
-                    c1 = 1 + c_node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).mapToDouble(node -> table.containsKey(node) ? table.get(node) : Double.POSITIVE_INFINITY).max().orElse(Double.POSITIVE_INFINITY);
-                }
-                // update single value by rule c_node
-                if (table.get(c_node) > c1) {
-                    table.put(c_node, c1);
-                    to_remove.add(c_node);
-                    changed = true;
-                }
+        causal_graph.getNodes().forEach(node -> {
+            if (init_state.contains(node)) {
+                nodes.put(node, ctx.mkReal("0"));
+            } else {
+                nodes.put(node, ctx.mkRealConst(node.toString()));
             }
-            c_nodes.removeAll(to_remove);
-            to_remove.clear();
-        } while (changed);
+        });
 
-        if (consider_goals) {
-            table.values().removeIf(value -> Double.isInfinite(value));
-
-            // c_nodes contains nodes which are unreachable from the facts..
-            // these nodes might still be reachable from the goals!
-            goal.forEach(g -> estimate(g, new HashSet<>()));
-
-            // not stored nodes are now definitely unreachable..
-            c_nodes.stream().filter(node -> !table.containsKey(node)).forEach(node -> table.put(node, Double.POSITIVE_INFINITY));
-        }
-    }
-
-    private double estimate(IStaticCausalGraph.INode node, Set<IStaticCausalGraph.INode> visited) {
-        if (table.containsKey(node)) {
-            return table.get(node);
-        }
-        if (!visited.contains(node)) {
-            visited.add(node);
-            double c1;
+        // We create the optimization problem..
+        causal_graph.getNodes().stream().filter(node -> !init_state.contains(node)).forEach(node -> {
             if (node instanceof IStaticCausalGraph.IDisjunctionNode) {
-                c1 = 1 + node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).filter(target -> nodes.contains(target)).mapToDouble(c_node -> estimate(c_node, new HashSet<>(visited))).min().orElse(0);
+                opt.Add(ctx.mkOr(node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).map(target -> ctx.mkGe(nodes.get(node), ctx.mkAdd(ctx.mkReal("1"), nodes.get(target)))).toArray(BoolExpr[]::new)));
             } else if (node instanceof IStaticCausalGraph.IPreferenceNode) {
                 throw new UnsupportedOperationException("Preferences estimation is not supported yet..");
             } else {
-                c1 = 1 + node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).filter(target -> nodes.contains(target)).mapToDouble(c_node -> estimate(c_node, visited)).max().orElse(0);
+                node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).forEach(target -> opt.Add(ctx.mkGe(nodes.get(node), ctx.mkAdd(ctx.mkReal("1"), nodes.get(target)))));
             }
-            // We can admit infinite values now..
-            table.put(node, c1);
-            return c1;
-        } else {
-            return 0;
-        }
+        });
+
+        opt.MkMinimize(ctx.mkAdd(causal_graph.getNodes().stream().filter(node -> !init_state.contains(node) && !goal.contains(node)).map(node -> nodes.get(node)).toArray(ArithExpr[]::new)));
+    }
+
+    void propagate() {
+        Status status = opt.Check();
+        assert status == Status.SATISFIABLE;
+
+        this.model = opt.getModel();
+    }
+
+    void disable(IStaticCausalGraph.INode node) {
+        opt.Add(ctx.mkGe(nodes.get(node), ctx.mkReal(Integer.toString(Integer.MAX_VALUE))));
+        Status status = opt.Check();
+        assert status == Status.SATISFIABLE;
+
+        this.model = opt.getModel();
+    }
+
+    void push() {
+        opt.Push();
+    }
+
+    void pop() {
+        opt.Pop();
     }
 
     /**
@@ -124,11 +116,13 @@ class RelaxedPlanningGraph {
      * @return the level of the given causal node.
      */
     double level(IStaticCausalGraph.INode node) {
-        return table.get(node);
+        Expr evaluate = model.evaluate(nodes.get(node), false);
+        RatNum c_real = (RatNum) evaluate;
+        return new BigDecimal(c_real.toDecimalString(1).replace("?", "")).doubleValue();
     }
 
     @Override
     public String toString() {
-        return table.keySet().stream().sorted((IStaticCausalGraph.INode n0, IStaticCausalGraph.INode n1) -> Double.compare(table.get(n0), table.get(n1))).map(node -> node.toString() + "   " + table.get(node)).collect(Collectors.joining("\n"));
+        return model.toString();
     }
 }

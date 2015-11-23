@@ -43,7 +43,7 @@ class LandmarkGraph implements ILandmarkGraph {
 
     private final ISolver solver;
     private final IStaticCausalGraph causal_graph;
-    private RPG rpg;
+    private RelaxedPlanningGraph rpg;
     /**
      * a set of landmark candidates
      */
@@ -75,7 +75,7 @@ class LandmarkGraph implements ILandmarkGraph {
         nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive)).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node)).forEach(node -> candidates.add(new Landmark(node)));
 
         // We create a relaxed planning graph starting fron the initial state and the current goals
-        rpg = new RPG(solver);
+        rpg = new RelaxedPlanningGraph(solver);
         rpg.propagate();
 
         // Main landmark extraction procedure loop

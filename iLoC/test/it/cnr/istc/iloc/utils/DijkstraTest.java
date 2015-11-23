@@ -65,4 +65,26 @@ public class DijkstraTest {
 
         assertEquals(1d, dijkstra.getDistance(or), 0);
     }
+
+    @Test
+    public void testCyclicNetwork() {
+        Dijkstra<String> dijkstra = new Dijkstra<>();
+        assertNotNull(dijkstra);
+
+        String origin = "origin";
+        String a = "a";
+        String b = "b";
+        String c = "c";
+
+        dijkstra.addVertex(origin, 0);
+        dijkstra.addVertex(a, 0);
+        dijkstra.addVertex(b, Double.POSITIVE_INFINITY);
+        dijkstra.addVertex(c, Double.POSITIVE_INFINITY);
+
+        dijkstra.addEdge(a, b, 1);
+        dijkstra.addEdge(b, c, 1);
+        dijkstra.addEdge(c, b, 1);
+
+        dijkstra.dijkstra(origin);
+    }
 }

@@ -17,10 +17,10 @@
 package it.cnr.istc.iloc.utils;
 
 import junit.framework.Assert;
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  *
@@ -126,7 +126,5 @@ public class APSPNetworkTest {
 
         boolean propagate = network.propagate();
         assertTrue(propagate);
-
-        System.out.println(network);
     }
 }
