@@ -27,99 +27,88 @@ import java.util.Collection;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class TemporalNetwork implements Cloneable {
+public class APSPNetwork implements Cloneable {
 
-    private int n_vars = 2;
+    private int n_vars = 0;
     private double[][] dist;
     private final Collection<DistanceConstraint> constraints = new ArrayList<>();
 
     /**
-     * Creates a new temporal network.
+     * Creates a new all-pairs-shorthest-path network.
      */
-    public TemporalNetwork() {
-        this(Double.POSITIVE_INFINITY);
+    public APSPNetwork() {
+        this(10);
     }
 
     /**
-     * Creates a new temporal network having the given horizon.
-     *
-     * @param horizon a {@code double} representing the horizon of the new
-     * temporal network.
-     */
-    public TemporalNetwork(double horizon) {
-        this(10, horizon);
-    }
-
-    /**
-     * Creates a new temporal network having the given initial capacity and the
-     * given horizon.
+     * Creates a new all-pairs-shorthest-path network having the given initial
+     * capacity.
      *
      * @param initialCapacity an {@code int} representing the initial capacity
-     * (i.e., the expected number of time-points).
-     * @param horizon a {@code double} representing the horizon of the new
-     * temporal network.
+     * (i.e., the expected number of variables).
      */
-    public TemporalNetwork(int initialCapacity, double horizon) {
+    public APSPNetwork(int initialCapacity) {
         assert initialCapacity >= 2;
         dist = new double[initialCapacity][initialCapacity];
         for (int i = 0; i < dist.length; i++) {
-            Arrays.fill(dist[i], horizon);
+            Arrays.fill(dist[i], Double.POSITIVE_INFINITY);
             dist[i][i] = 0;
         }
-        constraints.add(new DistanceConstraint(0, 1, 0, horizon));
     }
 
     /**
-     * Creates a new time-point and returns an integer for identifying it.
+     * Creates a new variable and returns an integer for identifying it.
      *
-     * @return an {@code int} representing the newly created time-point.
+     * @return an {@code int} representing the newly created variable.
      */
-    public int newTimePoint() {
+    public int newVariable() {
         ensureCapacity(n_vars + 1);
-        addConstraints(new DistanceConstraint(0, n_vars, 0, Double.POSITIVE_INFINITY), new DistanceConstraint(n_vars, 1, 0, Double.POSITIVE_INFINITY));
         return n_vars++;
     }
 
     /**
-     * Adds a temporal constraint to this temporal network without performing
-     * propagation.
+     * Adds a distance constraint to this all-pairs-shorthest-path network
+     * without performing propagation.
      *
-     * @param from the source of the temporal constraint.
-     * @param to the target of the temporal constraint.
-     * @param min the minimum distance of the temporal constraint.
-     * @param max the maximum distance of the temporal constraint.
+     * @param from the source variable of the distance constraint.
+     * @param to the target variable of the distance constraint.
+     * @param min the minimum distance of the distance constraint.
+     * @param max the maximum distance of the distance constraint.
      */
     public void addConstraint(int from, int to, double min, double max) {
         this.constraints.add(new DistanceConstraint(from, to, min, max));
     }
 
     /**
-     * Adds an array of temporal constraints to this temporal network without
-     * performing propagation.
+     * Adds an array of distance constraints to this all-pairs-shorthest-path
+     * network without performing propagation.
      *
-     * @param constraints an array of temporal constraints.
+     * @param constraints an array of distance constraints.
      */
     public void addConstraints(DistanceConstraint... constraints) {
         this.constraints.addAll(Arrays.asList(constraints));
     }
 
     /**
-     * Checks whether this temporal network requires propagation. A temporal
-     * network requires propagation if there is some constraint which has not
-     * yet propagated.
+     * Checks whether this all-pairs-shorthest-path network requires
+     * propagation. A all-pairs-shorthest-path network requires propagation if
+     * and only if there is some distance constraint which has not yet
+     * propagated.
      *
-     * @return
+     * @return {@code true} if this all-pairs-shorthest-path network requires
+     * propagation.
      */
     public boolean requiresPropagation() {
         return !constraints.isEmpty();
     }
 
     /**
-     * Performs propagation on this temporal network and returns {@code true} if
-     * the propagated temporal network is consistent.
+     * Performs propagation on this all-pairs-shorthest-path network and returns
+     * {@code true} if the propagated all-pairs-shorthest-path network is
+     * consistent.
      *
-     * @return {@code true} if the propagated temporal network is consistent and
-     * {@code false} otherwise.
+     * @return {@code true} if the propagated all-pairs-shorthest-path network
+     * is consistent and {@code false} otherwise.
      */
     public boolean propagate() {
         if (constraints.size() >= n_vars * 5) {
@@ -165,10 +154,9 @@ public class TemporalNetwork implements Cloneable {
 
     /**
      * Performs IFPC propagation in O(n^2) as described in "Incrementally
-     * Solving the STP by Enforcing Partial Path Consistency" by LÃ©on Planken.
+     * Solving the STP by Enforcing Partial Path Consistency" by Léon Planken.
      */
     private void propagate(final int a, final int b, final double w_ab) {
-        // they didn't, so we must propagate.
         setWeight(a, b, w_ab);
 
         final int[] set_i = new int[n_vars];
@@ -222,55 +210,19 @@ public class TemporalNetwork implements Cloneable {
     }
 
     /**
-     * Returns a bound representing the distance between the given time-points.
+     * Returns a bound representing the distance between the given variables.
      *
-     * @param from the source of the required distance.
-     * @param to the target of the required distance.
-     * @return a bound representing the distance between the given time-points.
+     * @param from the source variable of the required distance.
+     * @param to the target variable of the required distance.
+     * @return a bound representing the distance between the given variables.
      */
     public Bound distance(int from, int to) {
         return new Bound(-dist[to][from], dist[from][to]);
     }
 
-    /**
-     * Returns a bound representing the distance between the origin and the
-     * given time-point.
-     *
-     * @param tp the target of the required distance.
-     * @return a bound representing the distance between the origin and the
-     * given time-point.
-     */
-    public Bound bound(int tp) {
-        return new Bound(-dist[tp][0], dist[0][tp]);
-    }
-
-    /**
-     * Returns the minimum allowed value of the given time-point. The returned
-     * value is the same as if calling {@link #bound(int)} on the same
-     * time-point {@code tp} and getting the lower bound.
-     *
-     * @param tp the time-point whose minimum is required.
-     * @return the minimum allowed value of the given time-point.
-     */
-    public double min(int tp) {
-        return -dist[tp][0];
-    }
-
-    /**
-     * Returns the maximum allowed value of the given time-point. The returned
-     * value is the same as if calling {@link #bound(int)} on the same
-     * time-point {@code tp} and getting the upper bound.
-     *
-     * @param tp the time-point whose maximum is required.
-     * @return the maximum allowed value of the given time-point.
-     */
-    public double max(int tp) {
-        return dist[0][tp];
-    }
-
     @Override
-    public TemporalNetwork clone() throws CloneNotSupportedException {
-        TemporalNetwork temporalNetwork = (TemporalNetwork) super.clone();
+    public APSPNetwork clone() throws CloneNotSupportedException {
+        APSPNetwork temporalNetwork = (APSPNetwork) super.clone();
         temporalNetwork.dist = new double[dist.length][dist.length];
         for (int i = 0; i < dist.length; i++) {
             System.arraycopy(dist[i], 0, temporalNetwork.dist[i], 0, dist[i].length);
