@@ -25,12 +25,18 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.RatNum;
 import com.microsoft.z3.Status;
 import it.cnr.istc.iloc.api.FormulaState;
+import it.cnr.istc.iloc.api.IDisjunctionFlaw;
+import it.cnr.istc.iloc.api.IFact;
 import it.cnr.istc.iloc.api.IFormula;
+import it.cnr.istc.iloc.api.IGoal;
+import it.cnr.istc.iloc.api.IPreferenceFlaw;
 import it.cnr.istc.iloc.api.IRelaxedPlanningGraph;
 import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,8 +52,9 @@ class RelaxedPlanningGraph implements IRelaxedPlanningGraph {
     private Context ctx;
     private Optimize opt;
     private final Map<IStaticCausalGraph.INode, ArithExpr> nodes = new HashMap<>();
+    private final Set<IStaticCausalGraph.INode> init_state = new HashSet<>();
+    private final Set<IStaticCausalGraph.INode> goals = new HashSet<>();
     private Model model;
-    private boolean dynamic = false;
 
     RelaxedPlanningGraph(ISolver solver) {
         this.solver = solver;
@@ -57,6 +64,8 @@ class RelaxedPlanningGraph implements IRelaxedPlanningGraph {
     @Override
     public void extract() {
         this.nodes.clear();
+        this.init_state.clear();
+        this.goals.clear();
 
         HashMap<String, String> cfg = new HashMap<>();
         cfg.put("model", "true");
@@ -65,9 +74,21 @@ class RelaxedPlanningGraph implements IRelaxedPlanningGraph {
 
         Set<IStaticCausalGraph.INode> all_nodes = causal_graph.getNodes().stream().collect(Collectors.toSet());
         // We define the initial state ..
-        Set<IStaticCausalGraph.IPredicateNode> init_state = all_nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).map(formula -> causal_graph.getNode(formula.getType())).collect(Collectors.toSet());
+        init_state.addAll(all_nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).map(formula -> causal_graph.getNode(formula.getType())).collect(Collectors.toSet()));
         // .. and the goal state
-        Set<IStaticCausalGraph.IPredicateNode> goals = all_nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node))).collect(Collectors.toSet());
+        goals.addAll(solver.getCurrentNode().getFlaws().stream().map(flaw -> {
+            if (flaw instanceof IGoal) {
+                return causal_graph.getNode(((IGoal) flaw).getFormula().getType());
+            } else if (flaw instanceof IFact) {
+                return causal_graph.getNode(((IFact) flaw).getFormula().getType());
+            } else if (flaw instanceof IDisjunctionFlaw) {
+                return causal_graph.getNode(((IDisjunctionFlaw) flaw).getDisjunction());
+            } else if (flaw instanceof IPreferenceFlaw) {
+                return causal_graph.getNode(((IPreferenceFlaw) flaw).getPreference());
+            } else {
+                throw new AssertionError("Flaw " + flaw.getClass().getName() + " is supported yet..");
+            }
+        }).collect(Collectors.toSet()));
 
         // Initialization..
         all_nodes.forEach(node -> {
@@ -90,6 +111,16 @@ class RelaxedPlanningGraph implements IRelaxedPlanningGraph {
         });
 
         opt.MkMinimize(ctx.mkAdd(causal_graph.getNodes().stream().filter(node -> !init_state.contains(node) && !goals.contains(node)).map(node -> this.nodes.get(node)).toArray(ArithExpr[]::new)));
+    }
+
+    @Override
+    public Set<IStaticCausalGraph.INode> getInitState() {
+        return Collections.unmodifiableSet(init_state);
+    }
+
+    @Override
+    public Set<IStaticCausalGraph.INode> getGoals() {
+        return Collections.unmodifiableSet(goals);
     }
 
     @Override

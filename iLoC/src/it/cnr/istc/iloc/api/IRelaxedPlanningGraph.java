@@ -16,6 +16,8 @@
  */
 package it.cnr.istc.iloc.api;
 
+import java.util.Set;
+
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
@@ -26,6 +28,20 @@ public interface IRelaxedPlanningGraph {
      * Extracts the relaxed planning graph.
      */
     public void extract();
+
+    /**
+     * Returns a set of static causal nodes representing the initial state.
+     *
+     * @return a set of static causal nodes representing the initial state.
+     */
+    public Set<IStaticCausalGraph.INode> getInitState();
+
+    /**
+     * Returns a set of static causal nodes representing the current goals.
+     *
+     * @return a set of static causal nodes representing the current goals.
+     */
+    public Set<IStaticCausalGraph.INode> getGoals();
 
     /**
      * Propagates contraints for computing the extracted relaxed planning graph.

@@ -429,6 +429,14 @@ public class Solver implements ISolver {
         LOG.log(Level.INFO, "Landmarks extracted in {0}ms", (ending_lm_extraction_time - starting_lm_extraction_time) / 1000000);
 
         LOG.info("Solving problem..");
+        lm_graph.getLandmarks().stream().filter(lm -> lm.getNodes().size() == 1 && lm.getNodes().iterator().next() instanceof IStaticCausalGraph.IPredicateNode).map(lm -> (IStaticCausalGraph.IPredicateNode) lm.getNodes().iterator().next()).filter(lm_goal -> !rpg.getGoals().contains(lm_goal)).forEach(lm_goal -> {
+            Map<String, IObject> assignments = new HashMap<>();
+            if (lm_goal.getPredicate().getEnclosingScope() instanceof IType) {
+                IType type = (IType) lm_goal.getPredicate().getEnclosingScope();
+                assignments.put(Constants.SCOPE, constraintNetwork.newEnum(type, type.getInstances()));
+            }
+            lm_goal.getPredicate().newGoal(null, assignments);
+        });
         bound = (int) (properties.containsKey("Bound") ? Integer.parseInt(properties.getProperty("Bound")) : staticCausalGraph.getNodes().stream().filter(node -> !Double.isInfinite(rpg.level(node))).count());
         while (true) {
             while (!fringe.isEmpty()) {
