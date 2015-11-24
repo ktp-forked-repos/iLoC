@@ -28,11 +28,15 @@ public class StatisticsChart extends ChartPanel implements ISolverListener {
     private static final JFreeChart CHART = new JFreeChart(new XYPlot());
     private final XYSeriesCollection solver_collection = new XYSeriesCollection();
     private final XYSeriesCollection heuristics_collection = new XYSeriesCollection();
+    private final XYSeriesCollection memory_collection = new XYSeriesCollection();
     private final XYSeries fringe = new XYSeries("Fringe");
     private final XYSeries nodes = new XYSeries("Nodes");
     private final XYSeries flaws = new XYSeries("Flaws");
     private final XYSeries depth = new XYSeries("Depth");
     private final XYSeries heuristic = new XYSeries("Heuristic");
+    private final XYSeries max_memory = new XYSeries("Max memory");
+    private final XYSeries total_memory = new XYSeries("Total memory");
+    private final XYSeries used_memory = new XYSeries("Used memory");
     private int c_step = 0;
 
     public StatisticsChart() {
@@ -76,6 +80,24 @@ public class StatisticsChart extends ChartPanel implements ISolverListener {
         heuristics_plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
         combined_plot.add(heuristics_plot);
 
+        memory_collection.addSeries(max_memory);
+        memory_collection.addSeries(total_memory);
+        memory_collection.addSeries(used_memory);
+
+        XYLineAndShapeRenderer memory_renderer = new XYLineAndShapeRenderer();
+        memory_renderer.setSeriesShapesVisible(0, false);
+        memory_renderer.setSeriesStroke(0, new BasicStroke(1.5f));
+        memory_renderer.setSeriesShapesVisible(1, false);
+        memory_renderer.setSeriesStroke(1, new BasicStroke(1.5f));
+        memory_renderer.setSeriesShapesVisible(2, false);
+        memory_renderer.setSeriesStroke(2, new BasicStroke(1.5f));
+        memory_renderer.setSeriesShapesVisible(3, false);
+        memory_renderer.setSeriesStroke(3, new BasicStroke(1.5f));
+
+        XYPlot memory_plot = new XYPlot(memory_collection, null, new NumberAxis(""), memory_renderer);
+        memory_plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
+        combined_plot.add(memory_plot);
+
         setChart(new JFreeChart("", new Font("SansSerif", Font.BOLD, 14), combined_plot, true));
     }
 
@@ -105,6 +127,10 @@ public class StatisticsChart extends ChartPanel implements ISolverListener {
 
         flaws.add(c_step, n.getFlaws().size());
         heuristic.add(c_step, n.getKnownCost() + n.getFlaws().stream().mapToDouble(flaw -> flaw.getEstimatedCost()).sum());
+
+        max_memory.add(c_step, Runtime.getRuntime().maxMemory());
+        total_memory.add(c_step, Runtime.getRuntime().totalMemory());
+        used_memory.add(c_step, Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
 
         c_step++;
     }
