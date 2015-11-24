@@ -19,6 +19,8 @@ package it.cnr.istc.iloc;
 import it.cnr.istc.iloc.api.IBool;
 import it.cnr.istc.iloc.api.IDisjunctionFlaw;
 import it.cnr.istc.iloc.api.IFlaw;
+import it.cnr.istc.iloc.api.IFormula;
+import it.cnr.istc.iloc.api.IGoal;
 import it.cnr.istc.iloc.api.IModel;
 import it.cnr.istc.iloc.api.INode;
 import it.cnr.istc.iloc.api.IResolver;
@@ -103,13 +105,22 @@ class Node implements INode {
 
     @Override
     public Boolean propagate(int bound) {
-        int c_level = level;
-        while (!flaws.isEmpty() && c_level < bound) {
+        while (!flaws.isEmpty()) {
             Collection<IFlaw> solved_flaws = new ArrayList<>(flaws.size());
             // We check for all the flaws having one resolver, we resolve it and we propagate the constraint network..
             for (IFlaw flaw : flaws) {
                 if (flaw instanceof IDisjunctionFlaw) {
                     continue;
+                } else if (flaw instanceof IGoal) {
+                    int c_lvl = 1;
+                    IFormula cause = ((IGoal) flaw).getFormula().getCause();
+                    while (cause != null) {
+                        cause = cause.getCause();
+                        c_lvl++;
+                    }
+                    if (c_lvl > bound) {
+                        return null;
+                    }
                 }
                 Collection<IResolver> c_resolvers = flaw.getResolvers();
                 assert !c_resolvers.isEmpty() : "Flaws should have at least one resolver..";
@@ -122,9 +133,6 @@ class Node implements INode {
                         // We have found an inconsistency..
                         return false;
                     }
-                    if (c_level++ >= bound) {
-                        break;
-                    }
                 }
             }
             if (solved_flaws.isEmpty()) {
@@ -135,11 +143,7 @@ class Node implements INode {
                 flaws.removeAll(solved_flaws);
             }
         }
-        if (c_level >= bound) {
-            return null;
-        } else {
-            return true;
-        }
+        return true;
     }
 
     @Override

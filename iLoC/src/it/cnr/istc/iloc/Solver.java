@@ -428,7 +428,13 @@ public class Solver implements ISolver {
         long ending_lm_extraction_time = System.nanoTime();
         LOG.log(Level.INFO, "Landmarks extracted in {0}ms", (ending_lm_extraction_time - starting_lm_extraction_time) / 1000000);
 
-        LOG.info("Solving problem..");
+        if (properties.containsKey("Bound")) {
+            bound = Integer.parseInt(properties.getProperty("Bound"));
+            LOG.log(Level.INFO, "Solving problem with a predefined bound of ", bound);
+        } else {
+            bound = (int) rpg.getGoals().stream().filter(node -> !Double.isInfinite(rpg.level(node))).mapToDouble(node -> rpg.level(node)).max().getAsDouble();
+            LOG.log(Level.INFO, "Solving problem with a computed bound of {0}", bound);
+        }
         lm_graph.getLandmarks().stream().filter(lm -> lm.getNodes().size() == 1 && lm.getNodes().iterator().next() instanceof IStaticCausalGraph.IPredicateNode).map(lm -> (IStaticCausalGraph.IPredicateNode) lm.getNodes().iterator().next()).filter(lm_goal -> !rpg.getGoals().contains(lm_goal)).forEach(lm_goal -> {
             Map<String, IObject> assignments = new HashMap<>();
             if (lm_goal.getPredicate().getEnclosingScope() instanceof IType) {
@@ -437,7 +443,6 @@ public class Solver implements ISolver {
             }
             lm_goal.getPredicate().newGoal(null, assignments);
         });
-        bound = (int) (properties.containsKey("Bound") ? Integer.parseInt(properties.getProperty("Bound")) : staticCausalGraph.getNodes().stream().filter(node -> !Double.isInfinite(rpg.level(node))).count());
         while (true) {
             while (!fringe.isEmpty()) {
                 Boolean reached = goTo(fringe.pollFirst());
