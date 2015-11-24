@@ -184,7 +184,7 @@ public class StaticCausalGraphViewer extends Display implements IStaticCausalGra
                     break;
                 case Estimator:
                     nodes.keySet().forEach(node -> {
-                        nodes.get(node).set(NODE_COST, (int) -SolverManager.getInstance().getSolver().getLandmarkGraph().estimate(node));
+                        nodes.get(node).set(NODE_COST, (int) -SolverManager.getInstance().getSolver().getRelaxedPlanningGraph().level(node));
                     });
                     defaultNodeFill.setEnabled(false);
                     costNodeFill.setEnabled(true);

@@ -70,6 +70,13 @@ public interface ISolver extends IScope, IEnvironment {
     public IDynamicCausalGraph getDynamicCausalGraph();
 
     /**
+     * Returns the relaxed planning graph associated to this solver.
+     *
+     * @return the relaxed planning graph associated to this solver.
+     */
+    public IRelaxedPlanningGraph getRelaxedPlanningGraph();
+
+    /**
      * Returns the landmark graph associated to this solver.
      *
      * @return the landmark graph associated to this solver.

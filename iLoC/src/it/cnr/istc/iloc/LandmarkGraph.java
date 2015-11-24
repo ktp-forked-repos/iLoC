@@ -19,6 +19,7 @@ package it.cnr.istc.iloc;
 import it.cnr.istc.iloc.api.FormulaState;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.ILandmarkGraph;
+import it.cnr.istc.iloc.api.IRelaxedPlanningGraph;
 import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.Arrays;
@@ -45,7 +46,7 @@ class LandmarkGraph implements ILandmarkGraph {
 
     private final ISolver solver;
     private final IStaticCausalGraph causal_graph;
-    private RelaxedPlanningGraph rpg;
+    private final IRelaxedPlanningGraph rpg;
     /**
      * A set of landmark candidates.
      */
@@ -64,6 +65,7 @@ class LandmarkGraph implements ILandmarkGraph {
     LandmarkGraph(ISolver solver) {
         this.solver = solver;
         this.causal_graph = solver.getStaticCausalGraph();
+        this.rpg = solver.getRelaxedPlanningGraph();
     }
 
     @Override
@@ -71,15 +73,11 @@ class LandmarkGraph implements ILandmarkGraph {
         candidates.clear();
         landmarks.clear();
 
-        Set<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toSet());
+        Set<IStaticCausalGraph.INode> nodes = causal_graph.getNodes().stream().collect(Collectors.toSet());
         // We define the initial state ..
         Set<IStaticCausalGraph.IPredicateNode> init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).map(formula -> causal_graph.getNode(formula.getType())).collect(Collectors.toSet());
         // .. and the goal state
         Set<IStaticCausalGraph.IPredicateNode> goals = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node))).collect(Collectors.toSet());
-
-        // We create a relaxed planning graph starting fron the initial state and the current goals
-        rpg = new RelaxedPlanningGraph(solver, nodes, init_state, goals);
-        rpg.propagate();
 
         // We add high level goals to initial landmark candidates
         goals.stream().filter(node -> !init_state.contains(node)).forEach(node -> candidates.add(new Landmark(node)));
@@ -177,24 +175,6 @@ class LandmarkGraph implements ILandmarkGraph {
     @Override
     public Set<ILandmark> getLandmarksFringe() {
         return landmarks.keySet().stream().filter(lm -> lm.getNodes().size() == 1 && lm.getNodes().iterator().next() instanceof IStaticCausalGraph.IPredicateNode && landmarks.values().stream().noneMatch(successors -> successors.contains(lm))).collect(Collectors.toSet());
-    }
-
-    @Override
-    public void recomputeEstimatedCosts() {
-        Set<IStaticCausalGraph.INode> nodes = solver.getStaticCausalGraph().getNodes().stream().collect(Collectors.toSet());
-        // We define the initial state ..
-        Set<IStaticCausalGraph.IPredicateNode> init_state = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active)).map(formula -> causal_graph.getNode(formula.getType())).collect(Collectors.toSet());
-        // .. and the goal state
-        Set<IStaticCausalGraph.IPredicateNode> goals = nodes.stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node))).collect(Collectors.toSet());
-
-        // We create a relaxed planning graph starting fron the initial state and the current goals
-        rpg = new RelaxedPlanningGraph(solver, nodes, init_state, goals);
-        rpg.propagate();
-    }
-
-    @Override
-    public double estimate(IStaticCausalGraph.INode node) {
-        return rpg.level(node);
     }
 
     /**

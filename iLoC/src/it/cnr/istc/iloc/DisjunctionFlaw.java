@@ -22,7 +22,7 @@ import it.cnr.istc.iloc.api.IDisjunct;
 import it.cnr.istc.iloc.api.IDisjunction;
 import it.cnr.istc.iloc.api.IDisjunctionFlaw;
 import it.cnr.istc.iloc.api.IEnvironment;
-import it.cnr.istc.iloc.api.ILandmarkGraph;
+import it.cnr.istc.iloc.api.IRelaxedPlanningGraph;
 import it.cnr.istc.iloc.api.IResolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.ArrayList;
@@ -38,14 +38,14 @@ import java.util.stream.Collectors;
 public class DisjunctionFlaw implements IDisjunctionFlaw {
 
     private final IEnvironment environment;
-    private final ILandmarkGraph lm_graph;
+    private final IRelaxedPlanningGraph rpg;
     private final IDisjunction disjunction;
     private final IStaticCausalGraph staticCausalGraph;
 
     public DisjunctionFlaw(IEnvironment environment, IDisjunction disjunction) {
         assert !disjunction.getDisjuncts().isEmpty();
         this.environment = environment;
-        this.lm_graph = environment.getSolver().getLandmarkGraph();
+        this.rpg = environment.getSolver().getRelaxedPlanningGraph();
         this.disjunction = disjunction;
         this.staticCausalGraph = environment.getSolver().getStaticCausalGraph();
     }
@@ -57,13 +57,13 @@ public class DisjunctionFlaw implements IDisjunctionFlaw {
 
     @Override
     public double getEstimatedCost() {
-        return lm_graph.estimate(staticCausalGraph.getNode(disjunction));
+        return rpg.level(staticCausalGraph.getNode(disjunction));
     }
 
     @Override
     public Collection<IResolver> getResolvers() {
         List<IDisjunct> disjuncts = new ArrayList<>(disjunction.getDisjuncts());
-        Collections.sort(disjuncts, (IDisjunct d0, IDisjunct d1) -> Double.compare(lm_graph.estimate(staticCausalGraph.getNode(d0)), lm_graph.estimate(staticCausalGraph.getNode(d1))));
+        Collections.sort(disjuncts, (IDisjunct d0, IDisjunct d1) -> Double.compare(rpg.level(staticCausalGraph.getNode(d0)), rpg.level(staticCausalGraph.getNode(d1))));
         return disjuncts.stream().map(disjunct -> new IResolver() {
             private boolean expanded = false;
             private boolean resolved = false;

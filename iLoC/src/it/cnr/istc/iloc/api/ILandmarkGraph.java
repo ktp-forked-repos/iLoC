@@ -45,21 +45,6 @@ public interface ILandmarkGraph {
     public Set<ILandmark> getLandmarksFringe();
 
     /**
-     * Recomputes the estimated costs of the heuristic estimator.
-     */
-    public void recomputeEstimatedCosts();
-
-    /**
-     * Returns an estimated cost for the given node according to this landmark
-     * graph.
-     *
-     * @param node the node to be estimated.
-     * @return a value indicating an estimated cost for solving the flaw
-     * associated to the given causal node.
-     */
-    public double estimate(IStaticCausalGraph.INode node);
-
-    /**
      * Represents a (disjunctive) landmark.
      */
     public interface ILandmark {

@@ -30,6 +30,7 @@ import it.cnr.istc.iloc.api.INode;
 import it.cnr.istc.iloc.api.INumber;
 import it.cnr.istc.iloc.api.IObject;
 import it.cnr.istc.iloc.api.IPredicate;
+import it.cnr.istc.iloc.api.IRelaxedPlanningGraph;
 import it.cnr.istc.iloc.api.IResolver;
 import it.cnr.istc.iloc.api.IScope;
 import it.cnr.istc.iloc.api.ISolver;
@@ -91,6 +92,7 @@ public class Solver implements ISolver {
     private final IConstraintNetwork constraintNetwork;
     private final IStaticCausalGraph staticCausalGraph = new StaticCausalGraph();
     private final IDynamicCausalGraph dynamicCausalGraph = new DynamicCausalGraph();
+    private final IRelaxedPlanningGraph rpg = new RelaxedPlanningGraph(this);
     private final ILandmarkGraph lm_graph = new LandmarkGraph(this);
     private final Map<String, IField> fields = new LinkedHashMap<>();
     private final Map<String, Collection<IMethod>> methods = new HashMap<>();
@@ -226,9 +228,24 @@ public class Solver implements ISolver {
 
     @Override
     public IModel read(String script) {
+        LOG.info("Parsing script..");
+        long starting_parsing_time = System.nanoTime();
         parser.read(script);
-        lm_graph.extractLandmarks();
+        long ending_parsing_time = System.nanoTime();
+        LOG.log(Level.INFO, "Script parsed in {0}ms", (ending_parsing_time - starting_parsing_time) / 1000000);
+
+        LOG.info("Computing relaxed planning graph..");
+        long starting_rpg_time = System.nanoTime();
+        rpg.extract();
+        rpg.propagate();
+        long ending_rpg_time = System.nanoTime();
+        LOG.log(Level.INFO, "Relaxed planning graph computed in {0}ms", (ending_rpg_time - starting_rpg_time) / 1000000);
+
+        LOG.info("Performing initial propagation..");
+        long starting_propagation_time = System.nanoTime();
         if (constraintNetwork.propagate()) {
+            long ending_propagation_time = System.nanoTime();
+            LOG.log(Level.INFO, "Initial propagation performed in {0}ms", (ending_propagation_time - starting_propagation_time) / 1000000);
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
             listeners.forEach(listener -> {
@@ -236,6 +253,8 @@ public class Solver implements ISolver {
             });
             return model;
         } else {
+            long ending_propagation_time = System.nanoTime();
+            LOG.log(Level.INFO, "Initial propagation performed in {0}ms", (ending_propagation_time - starting_propagation_time) / 1000000);
             // We have found an inconsistent node as a consequence of a constraint propagation on the current node
             listeners.forEach(listener -> {
                 listener.inconsistentNode(currentNode);
@@ -246,9 +265,24 @@ public class Solver implements ISolver {
 
     @Override
     public IModel read(File... files) throws IOException {
+        LOG.log(Level.INFO, "Parsing {0} files..", files.length);
+        long starting_parsing_time = System.nanoTime();
         parser.read(files);
-        lm_graph.extractLandmarks();
+        long ending_parsing_time = System.nanoTime();
+        LOG.log(Level.INFO, "Files parsed in {0}ms", (ending_parsing_time - starting_parsing_time) / 1000000);
+
+        LOG.info("Computing relaxed planning graph..");
+        long starting_rpg_time = System.nanoTime();
+        rpg.extract();
+        rpg.propagate();
+        long ending_rpg_time = System.nanoTime();
+        LOG.log(Level.INFO, "Relaxed planning graph computed in {0}ms", (ending_rpg_time - starting_rpg_time) / 1000000);
+
+        LOG.info("Performing initial propagation..");
+        long starting_propagation_time = System.nanoTime();
         if (constraintNetwork.propagate()) {
+            long ending_propagation_time = System.nanoTime();
+            LOG.log(Level.INFO, "Initial propagation performed in {0}ms", (ending_propagation_time - starting_propagation_time) / 1000000);
             // Current node is propagated and is consistent
             IModel model = constraintNetwork.getModel();
             listeners.forEach(listener -> {
@@ -256,6 +290,8 @@ public class Solver implements ISolver {
             });
             return model;
         } else {
+            long ending_propagation_time = System.nanoTime();
+            LOG.log(Level.INFO, "Initial propagation performed in {0}ms", (ending_propagation_time - starting_propagation_time) / 1000000);
             // We have found an inconsistent node as a consequence of a constraint propagation on the current node
             listeners.forEach(listener -> {
                 listener.inconsistentNode(currentNode);
@@ -277,6 +313,11 @@ public class Solver implements ISolver {
     @Override
     public IDynamicCausalGraph getDynamicCausalGraph() {
         return dynamicCausalGraph;
+    }
+
+    @Override
+    public IRelaxedPlanningGraph getRelaxedPlanningGraph() {
+        return rpg;
     }
 
     @Override
@@ -381,7 +422,14 @@ public class Solver implements ISolver {
 
     @Override
     public boolean solve() {
-        bound = (int) (properties.containsKey("Bound") ? Integer.parseInt(properties.getProperty("Bound")) : staticCausalGraph.getNodes().stream().filter(node -> !Double.isInfinite(lm_graph.estimate(node))).count());
+        LOG.info("Extracting landmarks..");
+        long starting_lm_extraction_time = System.nanoTime();
+        lm_graph.extractLandmarks();
+        long ending_lm_extraction_time = System.nanoTime();
+        LOG.log(Level.INFO, "Landmarks extracted in {0}ms", (ending_lm_extraction_time - starting_lm_extraction_time) / 1000000);
+
+        LOG.info("Solving problem..");
+        bound = (int) (properties.containsKey("Bound") ? Integer.parseInt(properties.getProperty("Bound")) : staticCausalGraph.getNodes().stream().filter(node -> !Double.isInfinite(rpg.level(node))).count());
         while (true) {
             while (!fringe.isEmpty()) {
                 Boolean reached = goTo(fringe.pollFirst());

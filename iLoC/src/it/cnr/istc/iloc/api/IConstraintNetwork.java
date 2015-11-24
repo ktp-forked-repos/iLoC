@@ -354,7 +354,7 @@ public interface IConstraintNetwork {
     public void push();
 
     /**
-     * Pops the constraint network removing the topmost layer removing added
+     * Pops the constraint network removing the topmost layer, removing added
      * variables and retracting constraints.
      */
     public void pop();

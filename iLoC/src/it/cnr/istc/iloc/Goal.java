@@ -23,7 +23,7 @@ import it.cnr.istc.iloc.api.IBool;
 import it.cnr.istc.iloc.api.IConstraintNetwork;
 import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.IGoal;
-import it.cnr.istc.iloc.api.ILandmarkGraph;
+import it.cnr.istc.iloc.api.IRelaxedPlanningGraph;
 import it.cnr.istc.iloc.api.IResolver;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,13 +39,13 @@ class Goal implements IGoal {
 
     private boolean skip_check = false;
     private final IFormula formula;
-    private final ILandmarkGraph lm_graph;
+    private final IRelaxedPlanningGraph rpg;
     private final IResolver activationResolver;
     private final IResolver unificationResolver;
 
     Goal(IFormula formula) {
         this.formula = formula;
-        this.lm_graph = formula.getSolver().getLandmarkGraph();
+        this.rpg = formula.getSolver().getRelaxedPlanningGraph();
         this.activationResolver = new ActivationResolver();
         this.unificationResolver = new UnificationResolver();
     }
@@ -57,7 +57,7 @@ class Goal implements IGoal {
 
     @Override
     public double getEstimatedCost() {
-        return lm_graph.estimate(formula.getSolver().getStaticCausalGraph().getNode(formula.getType()));
+        return rpg.level(formula.getSolver().getStaticCausalGraph().getNode(formula.getType()));
     }
 
     @Override

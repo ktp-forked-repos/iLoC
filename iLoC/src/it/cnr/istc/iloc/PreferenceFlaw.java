@@ -19,9 +19,9 @@
 package it.cnr.istc.iloc;
 
 import it.cnr.istc.iloc.api.IEnvironment;
-import it.cnr.istc.iloc.api.ILandmarkGraph;
 import it.cnr.istc.iloc.api.IPreference;
 import it.cnr.istc.iloc.api.IPreferenceFlaw;
+import it.cnr.istc.iloc.api.IRelaxedPlanningGraph;
 import it.cnr.istc.iloc.api.IResolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.util.ArrayList;
@@ -34,13 +34,13 @@ import java.util.Collection;
 public class PreferenceFlaw implements IPreferenceFlaw {
 
     private final IEnvironment environment;
-    private final ILandmarkGraph lm_graph;
+    private final IRelaxedPlanningGraph rpg;
     private final IPreference preference;
     private final IStaticCausalGraph staticCausalGraph;
 
     public PreferenceFlaw(IEnvironment environment, IPreference preference) {
         this.environment = environment;
-        this.lm_graph = environment.getSolver().getLandmarkGraph();
+        this.rpg = environment.getSolver().getRelaxedPlanningGraph();
         this.preference = preference;
         this.staticCausalGraph = environment.getSolver().getStaticCausalGraph();
     }
@@ -52,7 +52,7 @@ public class PreferenceFlaw implements IPreferenceFlaw {
 
     @Override
     public double getEstimatedCost() {
-        return lm_graph.estimate(staticCausalGraph.getNode(preference));
+        return rpg.level(staticCausalGraph.getNode(preference));
     }
 
     @Override
