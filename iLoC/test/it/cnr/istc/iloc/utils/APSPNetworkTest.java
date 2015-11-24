@@ -86,8 +86,6 @@ public class APSPNetworkTest {
 
         boolean propagate = network.propagate();
         assertTrue(propagate);
-
-        System.out.println(network);
     }
 
     @Test

@@ -37,6 +37,19 @@ public interface ILandmarkGraph {
     public Set<ILandmark> getLandmarks();
 
     /**
+     * Gets the landmark fringe. This set represents all those landmarks which
+     * are not dependent from other landmarks.
+     *
+     * @return a set of landmarks which are not dependent from other landmarks.
+     */
+    public Set<ILandmark> getLandmarksFringe();
+
+    /**
+     * Recomputes the estimated costs of the heuristic estimator.
+     */
+    public void recomputeEstimatedCosts();
+
+    /**
      * Returns an estimated cost for the given node according to this landmark
      * graph.
      *

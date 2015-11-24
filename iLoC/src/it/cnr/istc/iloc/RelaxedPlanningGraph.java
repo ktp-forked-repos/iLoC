@@ -24,15 +24,13 @@ import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.RatNum;
 import com.microsoft.z3.Status;
-import it.cnr.istc.iloc.api.FormulaState;
-import it.cnr.istc.iloc.api.IFormula;
 import it.cnr.istc.iloc.api.ISolver;
 import it.cnr.istc.iloc.api.IStaticCausalGraph;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -45,12 +43,12 @@ class RelaxedPlanningGraph {
     private final Context ctx;
     private final Optimize opt;
     private final Map<IStaticCausalGraph.INode, ArithExpr> nodes = new HashMap<>();
-    private final Set<IStaticCausalGraph.INode> init_state;
-    private final Set<IStaticCausalGraph.INode> goal;
+    private final Set<IStaticCausalGraph.IPredicateNode> init_state;
+    private final Set<IStaticCausalGraph.IPredicateNode> goals;
     private Model model;
     private boolean dynamic = false;
 
-    RelaxedPlanningGraph(ISolver solver) {
+    RelaxedPlanningGraph(ISolver solver, Set<IStaticCausalGraph.INode> nodes, Set<IStaticCausalGraph.IPredicateNode> init_state, Set<IStaticCausalGraph.IPredicateNode> goals) {
         this.solver = solver;
         this.causal_graph = solver.getStaticCausalGraph();
 
@@ -59,30 +57,38 @@ class RelaxedPlanningGraph {
         this.ctx = new Context(cfg);
         this.opt = ctx.mkOptimize();
 
-        this.init_state = causal_graph.getNodes().stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Active).map(formula -> causal_graph.getNode(formula.getType()))).collect(Collectors.toSet());
-        this.goal = causal_graph.getNodes().stream().filter(node -> node instanceof IStaticCausalGraph.IPredicateNode).map(node -> (IStaticCausalGraph.IPredicateNode) node).flatMap(predicate -> predicate.getPredicate().getInstances().stream().map(instance -> (IFormula) instance).filter(formula -> formula.getFormulaState() == FormulaState.Inactive).map(formula -> causal_graph.getNode(formula.getType())).filter(node -> !init_state.contains(node))).collect(Collectors.toSet());
+        this.init_state = init_state;
+        this.goals = goals;
 
         // Initialization..
-        causal_graph.getNodes().forEach(node -> {
+        nodes.forEach(node -> {
             if (init_state.contains(node)) {
-                nodes.put(node, ctx.mkReal("0"));
+                this.nodes.put(node, ctx.mkReal("0"));
             } else {
-                nodes.put(node, ctx.mkRealConst(node.toString()));
+                this.nodes.put(node, ctx.mkRealConst(node.toString()));
             }
         });
 
         // We create the optimization problem..
-        causal_graph.getNodes().stream().filter(node -> !init_state.contains(node)).forEach(node -> {
+        nodes.stream().filter(node -> !init_state.contains(node)).forEach(node -> {
             if (node instanceof IStaticCausalGraph.IDisjunctionNode) {
-                opt.Add(ctx.mkOr(node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).map(target -> ctx.mkGe(nodes.get(node), ctx.mkAdd(ctx.mkReal("1"), nodes.get(target)))).toArray(BoolExpr[]::new)));
+                opt.Add(ctx.mkOr(node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).map(target -> ctx.mkGe(this.nodes.get(node), ctx.mkAdd(ctx.mkReal("1"), this.nodes.get(target)))).toArray(BoolExpr[]::new)));
             } else if (node instanceof IStaticCausalGraph.IPreferenceNode) {
                 throw new UnsupportedOperationException("Preferences estimation is not supported yet..");
             } else {
-                node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).forEach(target -> opt.Add(ctx.mkGe(nodes.get(node), ctx.mkAdd(ctx.mkReal("1"), nodes.get(target)))));
+                node.getOutgoingEdges().stream().filter(edge -> edge.getType() == IStaticCausalGraph.IEdge.Type.Goal).map(edge -> edge.getTarget()).forEach(target -> opt.Add(ctx.mkGe(this.nodes.get(node), ctx.mkAdd(ctx.mkReal("1"), this.nodes.get(target)))));
             }
         });
 
-        opt.MkMinimize(ctx.mkAdd(causal_graph.getNodes().stream().filter(node -> !init_state.contains(node) && !goal.contains(node)).map(node -> nodes.get(node)).toArray(ArithExpr[]::new)));
+        opt.MkMinimize(ctx.mkAdd(causal_graph.getNodes().stream().filter(node -> !init_state.contains(node) && !goals.contains(node)).map(node -> this.nodes.get(node)).toArray(ArithExpr[]::new)));
+    }
+
+    Set<IStaticCausalGraph.IPredicateNode> getInitState() {
+        return Collections.unmodifiableSet(init_state);
+    }
+
+    Set<IStaticCausalGraph.IPredicateNode> getGoals() {
+        return Collections.unmodifiableSet(goals);
     }
 
     void propagate() {
@@ -118,7 +124,12 @@ class RelaxedPlanningGraph {
     double level(IStaticCausalGraph.INode node) {
         Expr evaluate = model.evaluate(nodes.get(node), false);
         RatNum c_real = (RatNum) evaluate;
-        return new BigDecimal(c_real.toDecimalString(1).replace("?", "")).doubleValue();
+        double value = new BigDecimal(c_real.toDecimalString(1).replace("?", "")).doubleValue();
+        if (value >= Integer.MAX_VALUE) {
+            return Double.POSITIVE_INFINITY;
+        } else {
+            return value;
+        }
     }
 
     @Override
