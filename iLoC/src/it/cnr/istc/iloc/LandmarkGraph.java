@@ -102,24 +102,35 @@ class LandmarkGraph implements ILandmarkGraph {
             // .. and extract the causal preconditions of the first achievers according to the relaxed planning graph
             // specifically, we remove those causal preconditions which are not reachable according to the relaxed planning graph without the candidate
             first_achievers_preconditions.removeIf(preconditions -> preconditions.stream().anyMatch(pre -> Double.isInfinite(rpg.level(pre))));
-
             rpg.pop();
-            // We compute the intersection of the preconditions
+
+            // We compute the intersection of the preconditions (all of them must be true..)
             Set<IStaticCausalGraph.INode> intersection = new HashSet<>(first_achievers_preconditions.stream().findAny().get());
             first_achievers_preconditions.forEach(conjunction -> {
                 intersection.retainAll(conjunction);
             });
-            intersection.removeIf(node -> init_state.contains(node) || landmarks.containsKey(new Landmark(node)));
+            intersection.removeIf(node -> init_state.contains(node));
+            if (!intersection.isEmpty()) {
+                // We remove from candidates those which are strictly worst than the current ones..
+                candidates.removeIf(c -> c.getNodes().size() > 1 && intersection.stream().anyMatch(lm -> c.getNodes().contains(lm)));
+                // We remove from landmarks those which are strictly worst than the current ones..
+                landmarks.entrySet().removeIf(c -> c.getKey().getNodes().size() > 1 && intersection.stream().anyMatch(lm -> c.getKey().getNodes().contains(lm)));
+                // We add new candidates to candidates (if they are not already in candidates nor in landmarks..)
+                intersection.stream().filter(node -> candidates.stream().noneMatch(c -> c.getNodes().contains(node)) && landmarks.entrySet().stream().noneMatch(c -> c.getKey().getNodes().contains(node))).forEach(node -> candidates.add(new Landmark(node)));
+            }
 
-            // .. and add it to candidates
-            intersection.forEach(node -> candidates.add(new Landmark(node)));
-
-            // We compute a disjunctive landmark with what is left..
-            Set<IStaticCausalGraph.INode> symmetric_difference = first_achievers_preconditions.stream().filter(conjunction -> conjunction.stream().noneMatch(node -> init_state.contains(node) || intersection.contains(node))).flatMap(conjunction -> conjunction.stream()).collect(Collectors.toSet());
-
-            // .. and add it to the candidates
-            if (!symmetric_difference.isEmpty() && symmetric_difference.size() <= 4 && !candidates.stream().anyMatch(c -> symmetric_difference.containsAll(c.getNodes())) && !landmarks.keySet().stream().anyMatch(c -> symmetric_difference.containsAll(c.getNodes()))) {
-                candidates.add(new Landmark(symmetric_difference));
+            // We compute a disjunctive landmark with oddments.. (at least one of them must be true..)
+            Set<IStaticCausalGraph.INode> symmetric_difference = first_achievers_preconditions.stream().flatMap(conjunction -> conjunction.stream().filter(node -> !intersection.contains(node))).collect(Collectors.toSet());
+            if (!symmetric_difference.isEmpty() && symmetric_difference.stream().noneMatch(node -> init_state.contains(node))) {
+                // We remove from candidates those which are strictly worst than the current disjunctive landmark..
+                candidates.removeIf(c -> c.getNodes().containsAll(symmetric_difference) && c.getNodes().size() > symmetric_difference.size());
+                // We remove from landmarks those which are strictly worst than the current disjunctive landmark..
+                landmarks.entrySet().removeIf(c -> c.getKey().getNodes().containsAll(symmetric_difference) && c.getKey().getNodes().size() > symmetric_difference.size());
+                // We consider the current disjunctive landmark only if there are not better candidates nor better landmarks..
+                if (candidates.stream().noneMatch(c -> symmetric_difference.containsAll(c.getNodes())) && landmarks.entrySet().stream().noneMatch(c -> symmetric_difference.containsAll(c.getKey().getNodes()))) {
+                    // We can add the disjunctive landmark to candidates
+                    candidates.add(new Landmark(symmetric_difference));
+                }
             }
         }
 
