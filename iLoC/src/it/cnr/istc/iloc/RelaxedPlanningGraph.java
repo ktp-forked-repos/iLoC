@@ -54,11 +54,19 @@ class RelaxedPlanningGraph implements IRelaxedPlanningGraph {
     private final Map<IStaticCausalGraph.INode, ArithExpr> nodes = new HashMap<>();
     private final Set<IStaticCausalGraph.INode> init_state = new HashSet<>();
     private final Set<IStaticCausalGraph.INode> goals = new HashSet<>();
+    private final Set<IStaticCausalGraph.INode> disabled;
     private Model model;
 
     RelaxedPlanningGraph(ISolver solver) {
         this.solver = solver;
         this.causal_graph = solver.getStaticCausalGraph();
+        this.disabled = Collections.emptySet();
+    }
+
+    RelaxedPlanningGraph(ISolver solver, Set<IStaticCausalGraph.INode> disabled) {
+        this.solver = solver;
+        this.causal_graph = solver.getStaticCausalGraph();
+        this.disabled = disabled;
     }
 
     @Override
@@ -94,6 +102,8 @@ class RelaxedPlanningGraph implements IRelaxedPlanningGraph {
         all_nodes.forEach(node -> {
             if (init_state.contains(node)) {
                 this.nodes.put(node, ctx.mkReal("0"));
+            } else if (disabled.contains(node)) {
+                this.nodes.put(node, ctx.mkReal(Integer.toString(Integer.MAX_VALUE)));
             } else {
                 this.nodes.put(node, ctx.mkRealConst(node.toString()));
             }
@@ -110,7 +120,7 @@ class RelaxedPlanningGraph implements IRelaxedPlanningGraph {
             }
         });
 
-        opt.MkMinimize(ctx.mkAdd(causal_graph.getNodes().stream().filter(node -> !init_state.contains(node) && !goals.contains(node)).map(node -> this.nodes.get(node)).toArray(ArithExpr[]::new)));
+        opt.MkMinimize(ctx.mkAdd(causal_graph.getNodes().stream().filter(node -> !init_state.contains(node) && !goals.contains(node) && !disabled.contains(node)).map(node -> this.nodes.get(node)).toArray(ArithExpr[]::new)));
     }
 
     @Override
@@ -128,25 +138,6 @@ class RelaxedPlanningGraph implements IRelaxedPlanningGraph {
         Status status = opt.Check();
         this.model = opt.getModel();
         return status == Status.SATISFIABLE;
-    }
-
-    @Override
-    public void disable(IStaticCausalGraph.INode node) {
-        opt.Add(ctx.mkGe(nodes.get(node), ctx.mkReal(Integer.toString(Integer.MAX_VALUE))));
-        Status status = opt.Check();
-        assert status == Status.SATISFIABLE;
-
-        this.model = opt.getModel();
-    }
-
-    @Override
-    public void push() {
-        opt.Push();
-    }
-
-    @Override
-    public void pop() {
-        opt.Pop();
     }
 
     @Override

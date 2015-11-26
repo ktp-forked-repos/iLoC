@@ -51,26 +51,6 @@ public interface IRelaxedPlanningGraph {
     public boolean propagate();
 
     /**
-     * Disables the given node inside this relaxed planning graph. Disabling a
-     * node will result in disabling dependant nodes.
-     *
-     * @param node the node to be disabled inside this relaxed planning graph.
-     */
-    public void disable(IStaticCausalGraph.INode node);
-
-    /**
-     * Pushes the relaxed planning graph by adding a new layer to the constraint
-     * network containing new variables and new constraints.
-     */
-    public void push();
-
-    /**
-     * Pops the relaxed planning graph removing the topmost layer, removing
-     * added variables and retracting constraints.
-     */
-    public void pop();
-
-    /**
      * Returns the level of the given node inside this relaxed planning graph.
      *
      * @param node the node whose level is required.
