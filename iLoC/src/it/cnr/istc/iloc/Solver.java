@@ -93,7 +93,8 @@ public class Solver implements ISolver {
     private final IStaticCausalGraph staticCausalGraph = new StaticCausalGraph();
     private final IDynamicCausalGraph dynamicCausalGraph = new DynamicCausalGraph();
     private final IRelaxedPlanningGraph rpg = new RelaxedPlanningGraph(this);
-    private final ILandmarkGraph lm_graph = new LandmarkGraph(this);
+    private final boolean exploit_landmarks;
+    private final ILandmarkGraph lm_graph;
     private final Map<String, IField> fields = new LinkedHashMap<>();
     private final Map<String, Collection<IMethod>> methods = new HashMap<>();
     private final Map<String, IType> types = new LinkedHashMap<>(0);
@@ -211,6 +212,12 @@ public class Solver implements ISolver {
         }
 
         this.constraintNetwork = new ConstraintNetwork(this, properties);
+        this.exploit_landmarks = Boolean.valueOf(properties.getProperty("Landmarks", "False"));
+        if (exploit_landmarks) {
+            this.lm_graph = new LandmarkGraph(this);
+        } else {
+            this.lm_graph = null;
+        }
 
         INumber origin = constraintNetwork.newReal();
         INumber horizon = constraintNetwork.newReal();
@@ -422,27 +429,34 @@ public class Solver implements ISolver {
 
     @Override
     public boolean solve() {
-        LOG.info("Extracting landmarks..");
-        long starting_lm_extraction_time = System.nanoTime();
-        lm_graph.extractLandmarks();
-        long ending_lm_extraction_time = System.nanoTime();
-        LOG.log(Level.INFO, "Landmarks extracted in {0}ms", (ending_lm_extraction_time - starting_lm_extraction_time) / 1000000);
+        if (exploit_landmarks) {
+            LOG.info("Extracting landmarks..");
+            long starting_lm_extraction_time = System.nanoTime();
+            lm_graph.extractLandmarks();
+            long ending_lm_extraction_time = System.nanoTime();
+            LOG.log(Level.INFO, "Landmarks extracted in {0}ms", (ending_lm_extraction_time - starting_lm_extraction_time) / 1000000);
+        }
 
         if (properties.containsKey("Bound")) {
             bound = Integer.parseInt(properties.getProperty("Bound"));
             LOG.log(Level.INFO, "Solving problem with a predefined bound of ", bound);
         } else {
             bound = (int) rpg.getGoals().stream().filter(node -> !Double.isInfinite(rpg.level(node))).mapToDouble(node -> rpg.level(node)).max().getAsDouble();
-            LOG.log(Level.INFO, "Solving problem with a computed bound of {0}", bound);
+            LOG.log(Level.INFO, "Solving problem with an estimated bound of {0}", bound);
         }
-        lm_graph.getLandmarks().stream().filter(lm -> lm.getNodes().size() == 1 && lm.getNodes().iterator().next() instanceof IStaticCausalGraph.IPredicateNode).map(lm -> (IStaticCausalGraph.IPredicateNode) lm.getNodes().iterator().next()).filter(lm_goal -> !rpg.getGoals().contains(lm_goal)).forEach(lm_goal -> {
-            Map<String, IObject> assignments = new HashMap<>();
-            if (lm_goal.getPredicate().getEnclosingScope() instanceof IType) {
-                IType type = (IType) lm_goal.getPredicate().getEnclosingScope();
-                assignments.put(Constants.SCOPE, constraintNetwork.newEnum(type, type.getInstances()));
-            }
-            lm_goal.getPredicate().newGoal(null, assignments);
-        });
+
+        if (exploit_landmarks) {
+            lm_graph.getLandmarks().stream().filter(lm -> lm.getNodes().size() == 1 && lm.getNodes().iterator().next() instanceof IStaticCausalGraph.IPredicateNode).map(lm -> (IStaticCausalGraph.IPredicateNode) lm.getNodes().iterator().next()).filter(lm_goal -> !rpg.getGoals().contains(lm_goal)).forEach(lm_goal -> {
+                Map<String, IObject> assignments = new HashMap<>();
+                if (lm_goal.getPredicate().getEnclosingScope() instanceof IType) {
+                    IType type = (IType) lm_goal.getPredicate().getEnclosingScope();
+                    assignments.put(Constants.SCOPE, constraintNetwork.newEnum(type, type.getInstances()));
+                }
+                lm_goal.getPredicate().newGoal(null, assignments);
+            });
+        }
+
+        // Main loop..
         while (true) {
             while (!fringe.isEmpty()) {
                 Boolean reached = goTo(fringe.pollFirst());
