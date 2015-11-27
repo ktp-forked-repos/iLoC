@@ -63,6 +63,7 @@ public class DisjunctionFlaw implements IDisjunctionFlaw {
     @Override
     public Collection<IResolver> getResolvers() {
         List<IDisjunct> disjuncts = new ArrayList<>(disjunction.getDisjuncts());
+        // We choose disjuncts which are more likely to unify with the intial facts..
         Collections.sort(disjuncts, (IDisjunct d0, IDisjunct d1) -> Double.compare(rpg.level(staticCausalGraph.getNode(d0)), rpg.level(staticCausalGraph.getNode(d1))));
         return disjuncts.stream().map(disjunct -> new IResolver() {
             private boolean expanded = false;
