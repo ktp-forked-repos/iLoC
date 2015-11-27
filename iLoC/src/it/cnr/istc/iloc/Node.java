@@ -156,7 +156,8 @@ class Node implements INode {
         if (flaws.isEmpty()) {
             return null;
         } else {
-            IFlaw flaw = Collections.min(flaws, (IFlaw f0, IFlaw f1) -> Double.compare(f0.getEstimatedCost(), f1.getEstimatedCost()));
+            // We select the flow which is more near to the goals..
+            IFlaw flaw = Collections.max(flaws, (IFlaw f0, IFlaw f1) -> Double.compare(f0.getEstimatedCost(), f1.getEstimatedCost()));
             flaws.remove(flaw);
             return flaw;
         }
