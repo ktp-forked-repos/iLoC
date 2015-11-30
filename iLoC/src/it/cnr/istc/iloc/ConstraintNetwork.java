@@ -80,7 +80,7 @@ class ConstraintNetwork implements IConstraintNetwork {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ConstraintNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.loadLibrary("libz3");
+//        System.loadLibrary("libz3");
         Global.setParameter("pp.decimal", "true");
         Global.setParameter("pp.max_depth", "4294967295");
         HashMap<String, String> cfg = new HashMap<>();

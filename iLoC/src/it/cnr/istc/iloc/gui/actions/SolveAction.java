@@ -28,8 +28,8 @@ public class SolveAction extends AbstractAction implements SolverManagerListener
 
     public SolveAction() {
         super("Solve Problem");
-        putValue(AbstractAction.SMALL_ICON, new ImageIcon(SolveAction.class.getResource("../resources/play16.png")));
-        putValue(AbstractAction.LARGE_ICON_KEY, new ImageIcon(SolveAction.class.getResource("../resources/play32.png")));
+        putValue(AbstractAction.SMALL_ICON, new ImageIcon(SolveAction.class.getResource("/it/cnr/istc/iloc/gui/resources/play16.png")));
+        putValue(AbstractAction.LARGE_ICON_KEY, new ImageIcon(SolveAction.class.getResource("/it/cnr/istc/iloc/gui/resources/play32.png")));
         if (!Beans.isDesignTime()) {
             SolverManager.getInstance().addSolverManagerListener(this);
         }

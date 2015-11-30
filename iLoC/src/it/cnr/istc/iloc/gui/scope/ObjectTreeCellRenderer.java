@@ -21,14 +21,14 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  */
 public class ObjectTreeCellRenderer extends DefaultTreeCellRenderer {
 
-    private static final ImageIcon OBJECT_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("../resources/object.png"));
-    private static final ImageIcon ACTIVE_FORMULA_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("../resources/formula.png"));
-    private static final ImageIcon INACTIVE_FORMULA_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("../resources/inactive_formula.png"));
-    private static final ImageIcon UNIFIED_FORMULA_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("../resources/unified_formula.png"));
-    private static final ImageIcon ENUM_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("../resources/enum.png"));
-    private static final ImageIcon BOOL_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("../resources/bool.png"));
-    private static final ImageIcon NUMBER_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("../resources/number.png"));
-    private static final ImageIcon STRING_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("../resources/enum.png"));
+    private static final ImageIcon OBJECT_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("/it/cnr/istc/iloc/gui/resources/object.png"));
+    private static final ImageIcon ACTIVE_FORMULA_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("/it/cnr/istc/iloc/gui/resources/formula.png"));
+    private static final ImageIcon INACTIVE_FORMULA_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("/it/cnr/istc/iloc/gui/resources/inactive_formula.png"));
+    private static final ImageIcon UNIFIED_FORMULA_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("/it/cnr/istc/iloc/gui/resources/unified_formula.png"));
+    private static final ImageIcon ENUM_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("/it/cnr/istc/iloc/gui/resources/enum.png"));
+    private static final ImageIcon BOOL_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("/it/cnr/istc/iloc/gui/resources/bool.png"));
+    private static final ImageIcon NUMBER_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("/it/cnr/istc/iloc/gui/resources/number.png"));
+    private static final ImageIcon STRING_ICON = new ImageIcon(ObjectTreeCellRenderer.class.getResource("/it/cnr/istc/iloc/gui/resources/enum.png"));
     private IModel model;
 
     public void setModel(IModel model) {

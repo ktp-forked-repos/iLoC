@@ -75,13 +75,13 @@ public class Solver implements ISolver {
 
     private static final Logger LOG = Logger.getLogger(Solver.class.getName());
 
-    static {
-        try {
-            NativeUtils.addLibraryPath();
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        }
-    }
+//    static {
+//        try {
+//            NativeUtils.addLibraryPath();
+//        } catch (Exception ex) {
+//            LOG.log(Level.SEVERE, null, ex);
+//        }
+//    }
     private final Properties properties;
     private final LanguageParser parser;
     private final Deque<INode> fringe = new LinkedList<>();

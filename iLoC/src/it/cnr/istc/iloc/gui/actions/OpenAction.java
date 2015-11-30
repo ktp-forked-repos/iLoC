@@ -27,8 +27,8 @@ public class OpenAction extends AbstractAction implements SolverManagerListener 
 
     public OpenAction() {
         super("Open Project");
-        putValue(AbstractAction.SMALL_ICON, new ImageIcon(getClass().getResource("../resources/open-file16.png")));
-        putValue(AbstractAction.LARGE_ICON_KEY, new ImageIcon(getClass().getResource("../resources/open-file32.png")));
+        putValue(AbstractAction.SMALL_ICON, new ImageIcon(getClass().getResource("/it/cnr/istc/iloc/gui/resources/open-file16.png").getFile()));
+        putValue(AbstractAction.LARGE_ICON_KEY, new ImageIcon(getClass().getResource("/it/cnr/istc/iloc/gui/resources/open-file32.png").getFile()));
         if (!Beans.isDesignTime()) {
             SolverManager.getInstance().addSolverManagerListener(this);
         }

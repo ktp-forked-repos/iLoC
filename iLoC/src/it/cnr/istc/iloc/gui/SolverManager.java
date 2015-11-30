@@ -2,7 +2,6 @@ package it.cnr.istc.iloc.gui;
 
 import it.cnr.istc.iloc.Solver;
 import it.cnr.istc.iloc.api.ISolver;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +29,7 @@ public class SolverManager {
     private SolverManager() {
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream(getClass().getResource("iloc.properties").getFile()));
+            properties.load(getClass().getResourceAsStream("/it/cnr/istc/iloc/gui/iloc.properties"));
         } catch (IOException ex) {
             Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -43,7 +42,7 @@ public class SolverManager {
     public void resetEnvironment() {
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream(getClass().getResource("iloc.properties").getFile()));
+            properties.load(getClass().getResourceAsStream("/it/cnr/istc/iloc/gui/iloc.properties"));
         } catch (IOException ex) {
             Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
