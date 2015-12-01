@@ -25,6 +25,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Instances of the class {@code IType} represent classes in a running iLoC
+ * environment.
+ * <p>
+ * The primitive iLoC types ({@code bool}, {@code number}, {@code int},
+ * {@code real} and {@code string}) are also represented as {@code IType}
+ * objects.
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */

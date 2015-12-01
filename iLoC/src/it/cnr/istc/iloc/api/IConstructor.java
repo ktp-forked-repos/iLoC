@@ -19,6 +19,8 @@
 package it.cnr.istc.iloc.api;
 
 /**
+ * Instances of the class {@code IConstructor} provide information about, and access to,
+ * a single constructor for a class.
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */

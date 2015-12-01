@@ -21,6 +21,13 @@ package it.cnr.istc.iloc.api;
 import java.util.Map;
 
 /**
+ * Instances of the class {@code IPredicate} are used for representing
+ * first-order predicates (relations).
+ * <p>
+ * Predicate symbols (or relation symbols) have some valence (or arity, number
+ * of arguments) greater than or equal to 0.
+ * <p>
+ * Predicate symbols are often denoted by uppercase letters P, Q, R, ...
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */

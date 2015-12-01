@@ -19,6 +19,8 @@
 package it.cnr.istc.iloc.api;
 
 /**
+ * Instances of the class {@code IField} provides information about, and dynamic
+ * access to, a single field of a class.
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
