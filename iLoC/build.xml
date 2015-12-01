@@ -11,17 +11,23 @@
     <description>Builds, tests, and runs the project iLoC.</description>
     <import file="nbproject/build-impl.xml"/>
     <target name="-post-jar">
-        <copy todir="dist/lib/linux" >
-            <fileset dir="lib/linux" includes="**"/>
-        </copy>
-        <copy todir="dist/lib/osx" >
-            <fileset dir="lib/osx" includes="**"/>
-        </copy>
-        <copy todir="dist/lib/solaris" >
-            <fileset dir="lib/solaris" includes="**"/>
-        </copy>
+        <condition property="isWindows">
+            <os family="windows"/>
+        </condition>
+        <condition property="isUnix">
+            <os family="unix"/>
+        </condition>
+        <antcall target="Windows"/>
+        <antcall target="Unix"/>
+    </target>
+    <target name="Windows" if="isWindows">
         <copy todir="dist/lib/windows" >
             <fileset dir="lib/windows" includes="**"/>
+        </copy>
+    </target>
+    <target name="Unix" if="isUnix">
+        <copy todir="dist/lib/linux" >
+            <fileset dir="lib/linux" includes="**"/>
         </copy>
     </target>
     <!--
