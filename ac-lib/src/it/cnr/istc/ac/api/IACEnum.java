@@ -26,7 +26,7 @@ import java.util.Set;
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  * @param <T> the type of the allowed values.
  */
-public interface IEnumVar<T> extends IVar {
+public interface IACEnum<T> extends IVar {
 
     /**
      * Returns the set of current allowed values.
@@ -71,7 +71,7 @@ public interface IEnumVar<T> extends IVar {
      * @return {@code true} if this domain is intersecting with the given
      * domain.
      */
-    public default boolean isIntersecting(IEnumVar<T> var) {
+    public default boolean isIntersecting(IACEnum<T> var) {
         Set<T> allowed_values = var.getAllowedValues();
         return this.getAllowedValues().stream().anyMatch(v -> allowed_values.contains(v));
     }

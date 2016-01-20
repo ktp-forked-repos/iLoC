@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACInt;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IIntVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Int;
 import java.util.Arrays;
@@ -32,10 +32,10 @@ import java.util.List;
  */
 class INot extends IntVar implements IConstraint {
 
-    private final IIntVar v;
-    private final List<IIntVar> arguments;
+    private final IACInt v;
+    private final List<IACInt> arguments;
 
-    INot(ACNetwork network, IIntVar v) {
+    INot(ACNetwork network, IACInt v) {
         super(network, "(- " + (v.isSingleton() ? v.toString() : v.getName()) + ")", Int.NEGATIVE_INFINITY, Int.POSITIVE_INFINITY);
         this.v = v;
         this.lb = Int.negate(v.getUB());

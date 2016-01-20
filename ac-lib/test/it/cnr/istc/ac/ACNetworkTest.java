@@ -18,18 +18,16 @@
  */
 package it.cnr.istc.ac;
 
-import it.cnr.istc.ac.api.IBoolVar;
-import it.cnr.istc.ac.api.IEnumVar;
-import it.cnr.istc.ac.api.IIntVar;
-import it.cnr.istc.ac.api.IRealVar;
+import it.cnr.istc.ac.api.IACBool;
+import it.cnr.istc.ac.api.IACEnum;
+import it.cnr.istc.ac.api.IACInt;
+import it.cnr.istc.ac.api.IACReal;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -40,14 +38,6 @@ public class ACNetworkTest {
 
     private static final Logger LOG = Logger.getLogger(ACNetworkTest.class.getName());
     private ACNetwork instance = null;
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @Before
     public void setUp() {
@@ -68,7 +58,7 @@ public class ACNetworkTest {
         int result = instance.getNbVars();
         assertEquals(0, result);
 
-        IBoolVar bool = instance.newBool();
+        IACBool bool = instance.newBool();
         assertNotNull(bool);
         result = instance.getNbVars();
         assertEquals(1, result);
@@ -83,10 +73,10 @@ public class ACNetworkTest {
         int result = instance.getNbConstraints();
         assertEquals(0, result);
 
-        IBoolVar bool_0 = instance.newBool();
-        IBoolVar bool_1 = instance.newBool();
+        IACBool bool_0 = instance.newBool();
+        IACBool bool_1 = instance.newBool();
 
-        IBoolVar eq = instance.eq(bool_0, bool_1);
+        IACBool eq = instance.eq(bool_0, bool_1);
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -101,7 +91,7 @@ public class ACNetworkTest {
     @Test
     public void testNewBool_0args() {
         LOG.info("newBool");
-        IBoolVar result = instance.newBool();
+        IACBool result = instance.newBool();
         assertNotNull(result);
 
         assertTrue(result.getAllowedValues().contains(Boolean.TRUE));
@@ -114,13 +104,13 @@ public class ACNetworkTest {
     @Test
     public void testNewBool_String() {
         LOG.info("newBool");
-        IBoolVar bool_0 = instance.newBool("true");
+        IACBool bool_0 = instance.newBool("true");
         assertNotNull(bool_0);
 
         assertTrue(bool_0.getAllowedValues().contains(Boolean.TRUE));
         assertFalse(bool_0.getAllowedValues().contains(Boolean.FALSE));
 
-        IBoolVar bool_1 = instance.newBool("false");
+        IACBool bool_1 = instance.newBool("false");
         assertNotNull(bool_1);
 
         assertTrue(bool_1.getAllowedValues().contains(Boolean.FALSE));
@@ -133,25 +123,25 @@ public class ACNetworkTest {
     @Test
     public void testNot() {
         LOG.info("not");
-        IBoolVar bool_0 = instance.newBool();
+        IACBool bool_0 = instance.newBool();
         assertNotNull(bool_0);
 
         assertTrue(bool_0.getAllowedValues().contains(Boolean.TRUE));
         assertTrue(bool_0.getAllowedValues().contains(Boolean.FALSE));
 
-        IBoolVar not_0 = instance.not(bool_0);
+        IACBool not_0 = instance.not(bool_0);
         assertNotNull(not_0);
 
         assertTrue(not_0.getAllowedValues().contains(Boolean.TRUE));
         assertTrue(not_0.getAllowedValues().contains(Boolean.FALSE));
 
-        IBoolVar bool_1 = instance.newBool("true");
+        IACBool bool_1 = instance.newBool("true");
         assertNotNull(bool_1);
 
         assertTrue(bool_1.getAllowedValues().contains(Boolean.TRUE));
         assertFalse(bool_1.getAllowedValues().contains(Boolean.FALSE));
 
-        IBoolVar not_1 = instance.not(bool_1);
+        IACBool not_1 = instance.not(bool_1);
         assertNotNull(not_1);
 
         assertTrue(not_1.getAllowedValues().contains(Boolean.FALSE));
@@ -170,10 +160,10 @@ public class ACNetworkTest {
         int result = instance.getNbConstraints();
         assertEquals(0, result);
 
-        IBoolVar bool_0 = instance.newBool();
-        IBoolVar bool_1 = instance.newBool();
+        IACBool bool_0 = instance.newBool();
+        IACBool bool_1 = instance.newBool();
 
-        IBoolVar eq_0 = instance.eq(bool_0, bool_1);
+        IACBool eq_0 = instance.eq(bool_0, bool_1);
         assertNotNull(eq_0);
 
         instance.assertFacts(eq_0);
@@ -181,10 +171,10 @@ public class ACNetworkTest {
         result = instance.getNbConstraints();
         assertEquals(1, result);
 
-        IBoolVar bool_2 = instance.newBool("true");
-        IBoolVar bool_3 = instance.newBool();
+        IACBool bool_2 = instance.newBool("true");
+        IACBool bool_3 = instance.newBool();
 
-        IBoolVar eq_1 = instance.eq(bool_2, bool_3);
+        IACBool eq_1 = instance.eq(bool_2, bool_3);
         assertNotNull(eq_1);
 
         instance.assertFacts(eq_1);
@@ -214,11 +204,11 @@ public class ACNetworkTest {
         int result = instance.getNbConstraints();
         assertEquals(0, result);
 
-        IBoolVar bool_0 = instance.newBool();
-        IBoolVar bool_1 = instance.newBool();
-        IBoolVar bool_2 = instance.newBool();
+        IACBool bool_0 = instance.newBool();
+        IACBool bool_1 = instance.newBool();
+        IACBool bool_2 = instance.newBool();
 
-        IBoolVar and = instance.and(bool_0, bool_1, bool_2);
+        IACBool and = instance.and(bool_0, bool_1, bool_2);
         assertNotNull(and);
 
         instance.assertFacts(and);
@@ -253,11 +243,11 @@ public class ACNetworkTest {
         int result = instance.getNbConstraints();
         assertEquals(0, result);
 
-        IBoolVar bool_0 = instance.newBool();
-        IBoolVar bool_1 = instance.newBool();
-        IBoolVar bool_2 = instance.newBool();
+        IACBool bool_0 = instance.newBool();
+        IACBool bool_1 = instance.newBool();
+        IACBool bool_2 = instance.newBool();
 
-        IBoolVar or = instance.or(bool_0, bool_1, bool_2);
+        IACBool or = instance.or(bool_0, bool_1, bool_2);
         assertNotNull(or);
 
         instance.assertFacts(or);
@@ -314,10 +304,10 @@ public class ACNetworkTest {
         int result = instance.getNbConstraints();
         assertEquals(0, result);
 
-        IBoolVar bool_0 = instance.newBool();
-        IBoolVar bool_1 = instance.newBool();
+        IACBool bool_0 = instance.newBool();
+        IACBool bool_1 = instance.newBool();
 
-        IBoolVar xor = instance.xor(bool_0, bool_1);
+        IACBool xor = instance.xor(bool_0, bool_1);
         assertNotNull(xor);
 
         instance.assertFacts(xor);
@@ -362,9 +352,9 @@ public class ACNetworkTest {
     @Test
     public void testNewInt_0args() {
         LOG.info("newInt");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
         assertFalse(int_0.isEmpty());
@@ -388,9 +378,9 @@ public class ACNetworkTest {
     @Test
     public void testNewInt_String() {
         LOG.info("newInt");
-        IIntVar int_0 = instance.newInt("0");
+        IACInt int_0 = instance.newInt("0");
         assertNotNull(int_0);
-        IIntVar int_1 = instance.newInt("10");
+        IACInt int_1 = instance.newInt("10");
         assertNotNull(int_1);
 
         assertFalse(int_0.isEmpty());
@@ -416,12 +406,12 @@ public class ACNetworkTest {
     @Test
     public void testAdd_IIntVarArr() {
         LOG.info("add");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
-        IIntVar add_0 = instance.add(int_0, int_1);
+        IACInt add_0 = instance.add(int_0, int_1);
         assertNotNull(add_0);
 
         assertFalse(add_0.isEmpty());
@@ -431,12 +421,12 @@ public class ACNetworkTest {
         assertFalse(add_0.getLB().isPositiveInifinity());
         assertFalse(add_0.getUB().isNegativeInifinity());
 
-        IIntVar int_2 = instance.newInt("2");
+        IACInt int_2 = instance.newInt("2");
         assertNotNull(int_2);
-        IIntVar int_3 = instance.newInt("3");
+        IACInt int_3 = instance.newInt("3");
         assertNotNull(int_3);
 
-        IIntVar add_1 = instance.add(int_2, int_3);
+        IACInt add_1 = instance.add(int_2, int_3);
         assertNotNull(add_1);
 
         assertFalse(add_1.isEmpty());
@@ -447,7 +437,7 @@ public class ACNetworkTest {
         assertFalse(add_1.getUB().isNegativeInifinity());
         assertEquals(5, add_1.getLB().longValue());
 
-        IIntVar add_2 = instance.add(add_0, add_1);
+        IACInt add_2 = instance.add(add_0, add_1);
         assertNotNull(add_2);
 
         assertFalse(add_2.isEmpty());
@@ -464,12 +454,12 @@ public class ACNetworkTest {
     @Test
     public void testDivide_IIntVar_IIntVar() {
         LOG.info("divide");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
-        IIntVar divide_0 = instance.divide(instance.newInt("2"), int_0);
+        IACInt divide_0 = instance.divide(instance.newInt("2"), int_0);
         assertNotNull(divide_0);
 
         assertFalse(divide_0.isEmpty());
@@ -515,12 +505,12 @@ public class ACNetworkTest {
     @Test
     public void testMultiply_IIntVarArr() {
         LOG.info("multiply");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
-        IIntVar multiply_0 = instance.multiply(instance.newInt("2"), int_0);
+        IACInt multiply_0 = instance.multiply(instance.newInt("2"), int_0);
         assertNotNull(multiply_0);
 
         assertFalse(multiply_0.isEmpty());
@@ -566,7 +556,7 @@ public class ACNetworkTest {
     @Test
     public void testSubtract_IIntVar_IIntVar() {
         LOG.info("subtract");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
 
         assertFalse(int_0.isEmpty());
@@ -576,7 +566,7 @@ public class ACNetworkTest {
         assertFalse(int_0.getLB().isPositiveInifinity());
         assertFalse(int_0.getUB().isNegativeInifinity());
 
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
         assertFalse(int_1.isEmpty());
@@ -586,7 +576,7 @@ public class ACNetworkTest {
         assertFalse(int_1.getLB().isPositiveInifinity());
         assertFalse(int_1.getUB().isNegativeInifinity());
 
-        IIntVar sub = instance.subtract(int_0, int_1);
+        IACInt sub = instance.subtract(int_0, int_1);
         assertNotNull(sub);
         assertFalse(sub.isEmpty());
         assertFalse(sub.isSingleton());
@@ -595,7 +585,7 @@ public class ACNetworkTest {
         assertFalse(sub.getLB().isPositiveInifinity());
         assertFalse(sub.getUB().isNegativeInifinity());
 
-        IBoolVar eq = instance.eq(sub, instance.newInt("10"));
+        IACBool eq = instance.eq(sub, instance.newInt("10"));
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -622,12 +612,12 @@ public class ACNetworkTest {
     @Test
     public void testNegate_IIntVar() {
         LOG.info("negate");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
-        IIntVar int_1 = instance.newInt("-10");
+        IACInt int_1 = instance.newInt("-10");
         assertNotNull(int_1);
 
-        IIntVar negated_val0 = instance.negate(int_0);
+        IACInt negated_val0 = instance.negate(int_0);
         assertNotNull(negated_val0);
         assertFalse(negated_val0.isEmpty());
         assertFalse(negated_val0.isSingleton());
@@ -636,7 +626,7 @@ public class ACNetworkTest {
         assertFalse(negated_val0.getLB().isPositiveInifinity());
         assertFalse(negated_val0.getUB().isNegativeInifinity());
 
-        IBoolVar eq = instance.eq(negated_val0, int_1);
+        IACBool eq = instance.eq(negated_val0, int_1);
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -667,7 +657,7 @@ public class ACNetworkTest {
     @Test
     public void testLeq_IIntVar_IIntVar() {
         LOG.info("leq");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
 
         assertFalse(int_0.isEmpty());
@@ -677,7 +667,7 @@ public class ACNetworkTest {
         assertFalse(int_0.getLB().isPositiveInifinity());
         assertFalse(int_0.getUB().isNegativeInifinity());
 
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
         assertFalse(int_1.isEmpty());
@@ -687,7 +677,7 @@ public class ACNetworkTest {
         assertFalse(int_1.getLB().isPositiveInifinity());
         assertFalse(int_1.getUB().isNegativeInifinity());
 
-        IBoolVar leq = instance.leq(int_0, instance.newInt("10"));
+        IACBool leq = instance.leq(int_0, instance.newInt("10"));
         assertNotNull(leq);
 
         instance.assertFacts(leq);
@@ -726,7 +716,7 @@ public class ACNetworkTest {
     @Test
     public void testGeq_IIntVar_IIntVar() {
         LOG.info("geq");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
 
         assertFalse(int_0.isEmpty());
@@ -736,7 +726,7 @@ public class ACNetworkTest {
         assertFalse(int_0.getLB().isPositiveInifinity());
         assertFalse(int_0.getUB().isNegativeInifinity());
 
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
         assertFalse(int_1.isEmpty());
@@ -746,7 +736,7 @@ public class ACNetworkTest {
         assertFalse(int_1.getLB().isPositiveInifinity());
         assertFalse(int_1.getUB().isNegativeInifinity());
 
-        IBoolVar geq = instance.geq(int_0, instance.newInt("10"));
+        IACBool geq = instance.geq(int_0, instance.newInt("10"));
         assertNotNull(geq);
 
         instance.assertFacts(geq);
@@ -785,7 +775,7 @@ public class ACNetworkTest {
     @Test
     public void testLt_IIntVar_IIntVar() {
         LOG.info("lt");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
 
         assertFalse(int_0.isEmpty());
@@ -795,7 +785,7 @@ public class ACNetworkTest {
         assertFalse(int_0.getLB().isPositiveInifinity());
         assertFalse(int_0.getUB().isNegativeInifinity());
 
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
         assertFalse(int_1.isEmpty());
@@ -805,7 +795,7 @@ public class ACNetworkTest {
         assertFalse(int_1.getLB().isPositiveInifinity());
         assertFalse(int_1.getUB().isNegativeInifinity());
 
-        IBoolVar lt = instance.lt(int_0, instance.newInt("10"));
+        IACBool lt = instance.lt(int_0, instance.newInt("10"));
         assertNotNull(lt);
 
         instance.assertFacts(lt);
@@ -844,7 +834,7 @@ public class ACNetworkTest {
     @Test
     public void testGt_IIntVar_IIntVar() {
         LOG.info("gt");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
 
         assertFalse(int_0.isEmpty());
@@ -854,7 +844,7 @@ public class ACNetworkTest {
         assertFalse(int_0.getLB().isPositiveInifinity());
         assertFalse(int_0.getUB().isNegativeInifinity());
 
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
         assertFalse(int_1.isEmpty());
@@ -864,7 +854,7 @@ public class ACNetworkTest {
         assertFalse(int_1.getLB().isPositiveInifinity());
         assertFalse(int_1.getUB().isNegativeInifinity());
 
-        IBoolVar geq = instance.gt(int_0, instance.newInt("10"));
+        IACBool geq = instance.gt(int_0, instance.newInt("10"));
         assertNotNull(geq);
 
         instance.assertFacts(geq);
@@ -903,7 +893,7 @@ public class ACNetworkTest {
     @Test
     public void testEq_IIntVar_IIntVar() {
         LOG.info("eq");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
 
         assertFalse(int_0.isEmpty());
@@ -913,7 +903,7 @@ public class ACNetworkTest {
         assertFalse(int_0.getLB().isPositiveInifinity());
         assertFalse(int_0.getUB().isNegativeInifinity());
 
-        IIntVar int_1 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         assertNotNull(int_1);
 
         assertFalse(int_1.isEmpty());
@@ -923,7 +913,7 @@ public class ACNetworkTest {
         assertFalse(int_1.getLB().isPositiveInifinity());
         assertFalse(int_1.getUB().isNegativeInifinity());
 
-        IBoolVar eq = instance.eq(int_0, instance.newInt("10"));
+        IACBool eq = instance.eq(int_0, instance.newInt("10"));
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -962,9 +952,9 @@ public class ACNetworkTest {
     @Test
     public void testNewReal_0args() {
         LOG.info("newReal");
-        IRealVar int_0 = instance.newReal();
+        IACReal int_0 = instance.newReal();
         assertNotNull(int_0);
-        IRealVar int_1 = instance.newReal();
+        IACReal int_1 = instance.newReal();
         assertNotNull(int_1);
 
         assertFalse(int_0.isEmpty());
@@ -988,9 +978,9 @@ public class ACNetworkTest {
     @Test
     public void testNewReal_String() {
         LOG.info("newReal");
-        IRealVar int_0 = instance.newReal("0");
+        IACReal int_0 = instance.newReal("0");
         assertNotNull(int_0);
-        IRealVar int_1 = instance.newReal("10");
+        IACReal int_1 = instance.newReal("10");
         assertNotNull(int_1);
 
         assertFalse(int_0.isEmpty());
@@ -1016,12 +1006,12 @@ public class ACNetworkTest {
     @Test
     public void testAdd_IRealVarArr() {
         LOG.info("add");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
-        IRealVar add_0 = instance.add(real_0, real_1);
+        IACReal add_0 = instance.add(real_0, real_1);
         assertNotNull(add_0);
 
         assertFalse(add_0.isEmpty());
@@ -1031,12 +1021,12 @@ public class ACNetworkTest {
         assertFalse(add_0.getLB().isPositiveInifinity());
         assertFalse(add_0.getUB().isNegativeInifinity());
 
-        IRealVar int_2 = instance.newReal("2");
+        IACReal int_2 = instance.newReal("2");
         assertNotNull(int_2);
-        IRealVar int_3 = instance.newReal("3");
+        IACReal int_3 = instance.newReal("3");
         assertNotNull(int_3);
 
-        IRealVar add_1 = instance.add(int_2, int_3);
+        IACReal add_1 = instance.add(int_2, int_3);
         assertNotNull(add_1);
 
         assertFalse(add_1.isEmpty());
@@ -1047,7 +1037,7 @@ public class ACNetworkTest {
         assertFalse(add_1.getUB().isNegativeInifinity());
         assertEquals(5, add_1.getLB().longValue());
 
-        IRealVar add_2 = instance.add(add_0, add_1);
+        IACReal add_2 = instance.add(add_0, add_1);
         assertNotNull(add_2);
 
         assertFalse(add_2.isEmpty());
@@ -1064,12 +1054,12 @@ public class ACNetworkTest {
     @Test
     public void testDivide_IRealVar_IRealVar() {
         LOG.info("divide");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
-        IRealVar divide_0 = instance.divide(instance.newReal("2"), real_0);
+        IACReal divide_0 = instance.divide(instance.newReal("2"), real_0);
         assertNotNull(divide_0);
 
         assertFalse(divide_0.isEmpty());
@@ -1115,12 +1105,12 @@ public class ACNetworkTest {
     @Test
     public void testMultiply_IRealVarArr() {
         LOG.info("multiply");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
-        IRealVar multiply_0 = instance.multiply(instance.newReal("2"), real_0);
+        IACReal multiply_0 = instance.multiply(instance.newReal("2"), real_0);
         assertNotNull(multiply_0);
 
         assertFalse(multiply_0.isEmpty());
@@ -1166,7 +1156,7 @@ public class ACNetworkTest {
     @Test
     public void testSubtract_IRealVar_IRealVar() {
         LOG.info("subtract");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
 
         assertFalse(real_0.isEmpty());
@@ -1176,7 +1166,7 @@ public class ACNetworkTest {
         assertFalse(real_0.getLB().isPositiveInifinity());
         assertFalse(real_0.getUB().isNegativeInifinity());
 
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
         assertFalse(real_1.isEmpty());
@@ -1186,7 +1176,7 @@ public class ACNetworkTest {
         assertFalse(real_1.getLB().isPositiveInifinity());
         assertFalse(real_1.getUB().isNegativeInifinity());
 
-        IRealVar sub = instance.subtract(real_0, real_1);
+        IACReal sub = instance.subtract(real_0, real_1);
         assertNotNull(sub);
         assertFalse(sub.isEmpty());
         assertFalse(sub.isSingleton());
@@ -1195,7 +1185,7 @@ public class ACNetworkTest {
         assertFalse(sub.getLB().isPositiveInifinity());
         assertFalse(sub.getUB().isNegativeInifinity());
 
-        IBoolVar eq = instance.eq(sub, instance.newReal("10"));
+        IACBool eq = instance.eq(sub, instance.newReal("10"));
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -1222,12 +1212,12 @@ public class ACNetworkTest {
     @Test
     public void testNegate_IRealVar() {
         LOG.info("negate");
-        IRealVar int_0 = instance.newReal();
+        IACReal int_0 = instance.newReal();
         assertNotNull(int_0);
-        IRealVar int_1 = instance.newReal("-10");
+        IACReal int_1 = instance.newReal("-10");
         assertNotNull(int_1);
 
-        IRealVar negated_val0 = instance.negate(int_0);
+        IACReal negated_val0 = instance.negate(int_0);
         assertNotNull(negated_val0);
         assertFalse(negated_val0.isEmpty());
         assertFalse(negated_val0.isSingleton());
@@ -1236,7 +1226,7 @@ public class ACNetworkTest {
         assertFalse(negated_val0.getLB().isPositiveInifinity());
         assertFalse(negated_val0.getUB().isNegativeInifinity());
 
-        IBoolVar eq = instance.eq(negated_val0, int_1);
+        IACBool eq = instance.eq(negated_val0, int_1);
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -1267,7 +1257,7 @@ public class ACNetworkTest {
     @Test
     public void testLeq_IRealVar_IRealVar() {
         LOG.info("leq");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
 
         assertFalse(real_0.isEmpty());
@@ -1277,7 +1267,7 @@ public class ACNetworkTest {
         assertFalse(real_0.getLB().isPositiveInifinity());
         assertFalse(real_0.getUB().isNegativeInifinity());
 
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
         assertFalse(real_1.isEmpty());
@@ -1287,7 +1277,7 @@ public class ACNetworkTest {
         assertFalse(real_1.getLB().isPositiveInifinity());
         assertFalse(real_1.getUB().isNegativeInifinity());
 
-        IBoolVar leq = instance.leq(real_0, instance.newReal("10"));
+        IACBool leq = instance.leq(real_0, instance.newReal("10"));
         assertNotNull(leq);
 
         instance.assertFacts(leq);
@@ -1326,7 +1316,7 @@ public class ACNetworkTest {
     @Test
     public void testGeq_IRealVar_IRealVar() {
         LOG.info("geq");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
 
         assertFalse(real_0.isEmpty());
@@ -1336,7 +1326,7 @@ public class ACNetworkTest {
         assertFalse(real_0.getLB().isPositiveInifinity());
         assertFalse(real_0.getUB().isNegativeInifinity());
 
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
         assertFalse(real_1.isEmpty());
@@ -1346,7 +1336,7 @@ public class ACNetworkTest {
         assertFalse(real_1.getLB().isPositiveInifinity());
         assertFalse(real_1.getUB().isNegativeInifinity());
 
-        IBoolVar geq = instance.geq(real_0, instance.newReal("10"));
+        IACBool geq = instance.geq(real_0, instance.newReal("10"));
         assertNotNull(geq);
 
         instance.assertFacts(geq);
@@ -1385,7 +1375,7 @@ public class ACNetworkTest {
     @Test
     public void testLt_IRealVar_IRealVar() {
         LOG.info("lt");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
 
         assertFalse(real_0.isEmpty());
@@ -1395,7 +1385,7 @@ public class ACNetworkTest {
         assertFalse(real_0.getLB().isPositiveInifinity());
         assertFalse(real_0.getUB().isNegativeInifinity());
 
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
         assertFalse(real_1.isEmpty());
@@ -1405,7 +1395,7 @@ public class ACNetworkTest {
         assertFalse(real_1.getLB().isPositiveInifinity());
         assertFalse(real_1.getUB().isNegativeInifinity());
 
-        IBoolVar lt = instance.lt(real_0, instance.newReal("10"));
+        IACBool lt = instance.lt(real_0, instance.newReal("10"));
         assertNotNull(lt);
 
         instance.assertFacts(lt);
@@ -1444,7 +1434,7 @@ public class ACNetworkTest {
     @Test
     public void testGt_IRealVar_IRealVar() {
         LOG.info("gt");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
 
         assertFalse(real_0.isEmpty());
@@ -1454,7 +1444,7 @@ public class ACNetworkTest {
         assertFalse(real_0.getLB().isPositiveInifinity());
         assertFalse(real_0.getUB().isNegativeInifinity());
 
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
         assertFalse(real_1.isEmpty());
@@ -1464,7 +1454,7 @@ public class ACNetworkTest {
         assertFalse(real_1.getLB().isPositiveInifinity());
         assertFalse(real_1.getUB().isNegativeInifinity());
 
-        IBoolVar geq = instance.gt(real_0, instance.newReal("10"));
+        IACBool geq = instance.gt(real_0, instance.newReal("10"));
         assertNotNull(geq);
 
         instance.assertFacts(geq);
@@ -1503,7 +1493,7 @@ public class ACNetworkTest {
     @Test
     public void testEq_IRealVar_IRealVar() {
         LOG.info("eq");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
 
         assertFalse(real_0.isEmpty());
@@ -1513,7 +1503,7 @@ public class ACNetworkTest {
         assertFalse(real_0.getLB().isPositiveInifinity());
         assertFalse(real_0.getUB().isNegativeInifinity());
 
-        IRealVar real_1 = instance.newReal();
+        IACReal real_1 = instance.newReal();
         assertNotNull(real_1);
 
         assertFalse(real_1.isEmpty());
@@ -1523,7 +1513,7 @@ public class ACNetworkTest {
         assertFalse(real_1.getLB().isPositiveInifinity());
         assertFalse(real_1.getUB().isNegativeInifinity());
 
-        IBoolVar eq = instance.eq(real_0, instance.newReal("10"));
+        IACBool eq = instance.eq(real_0, instance.newReal("10"));
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -1562,12 +1552,12 @@ public class ACNetworkTest {
     @Test
     public void testToReal() {
         LOG.info("toReal");
-        IIntVar int_0 = instance.newInt();
+        IACInt int_0 = instance.newInt();
         assertNotNull(int_0);
-        IRealVar real_0 = instance.newReal("-10");
+        IACReal real_0 = instance.newReal("-10");
         assertNotNull(real_0);
 
-        IRealVar to_real = instance.toReal(int_0);
+        IACReal to_real = instance.toReal(int_0);
         assertNotNull(to_real);
         assertFalse(to_real.isEmpty());
         assertFalse(to_real.isSingleton());
@@ -1576,7 +1566,7 @@ public class ACNetworkTest {
         assertFalse(to_real.getLB().isPositiveInifinity());
         assertFalse(to_real.getUB().isNegativeInifinity());
 
-        IBoolVar eq = instance.eq(to_real, real_0);
+        IACBool eq = instance.eq(to_real, real_0);
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -1607,12 +1597,12 @@ public class ACNetworkTest {
     @Test
     public void testToInt() {
         LOG.info("toInt");
-        IRealVar real_0 = instance.newReal();
+        IACReal real_0 = instance.newReal();
         assertNotNull(real_0);
-        IIntVar int_0 = instance.newInt("-10");
+        IACInt int_0 = instance.newInt("-10");
         assertNotNull(int_0);
 
-        IIntVar to_int = instance.toInt(real_0);
+        IACInt to_int = instance.toInt(real_0);
         assertNotNull(to_int);
         assertFalse(to_int.isEmpty());
         assertFalse(to_int.isSingleton());
@@ -1621,7 +1611,7 @@ public class ACNetworkTest {
         assertFalse(to_int.getLB().isPositiveInifinity());
         assertFalse(to_int.getUB().isNegativeInifinity());
 
-        IBoolVar eq = instance.eq(to_int, int_0);
+        IACBool eq = instance.eq(to_int, int_0);
         assertNotNull(eq);
 
         instance.assertFacts(eq);
@@ -1655,7 +1645,7 @@ public class ACNetworkTest {
         String a = new String("a");
         String b = new String("b");
         String c = new String("c");
-        IEnumVar<Object> enum_0 = instance.newEnum(Arrays.asList(a, b, c));
+        IACEnum<Object> enum_0 = instance.newEnum(Arrays.asList(a, b, c));
         assertNotNull(enum_0);
         assertTrue(enum_0.getAllowedValues().contains(a));
         assertTrue(enum_0.getAllowedValues().contains(b));
@@ -1671,10 +1661,10 @@ public class ACNetworkTest {
         String a = new String("a");
         String b = new String("b");
         String c = new String("c");
-        IEnumVar<Object> enum_0 = instance.newEnum(Arrays.asList(a, b, c));
-        IEnumVar<Object> enum_1 = instance.newEnum(Arrays.asList(a, b, c));
+        IACEnum<Object> enum_0 = instance.newEnum(Arrays.asList(a, b, c));
+        IACEnum<Object> enum_1 = instance.newEnum(Arrays.asList(a, b, c));
 
-        IBoolVar eq_0 = instance.eq(enum_0, enum_1);
+        IACBool eq_0 = instance.eq(enum_0, enum_1);
         assertNotNull(eq_0);
 
         instance.assertFacts(eq_0);
@@ -1690,9 +1680,9 @@ public class ACNetworkTest {
         assertTrue(enum_1.getAllowedValues().contains(b));
         assertTrue(enum_1.getAllowedValues().contains(c));
 
-        IEnumVar<Object> enum_2 = instance.newEnum(Arrays.asList(a));
+        IACEnum<Object> enum_2 = instance.newEnum(Arrays.asList(a));
 
-        IBoolVar eq_1 = instance.eq(enum_1, enum_2);
+        IACBool eq_1 = instance.eq(enum_1, enum_2);
         assertNotNull(eq_1);
 
         instance.assertFacts(eq_1);
@@ -1708,8 +1698,8 @@ public class ACNetworkTest {
         assertFalse(enum_1.getAllowedValues().contains(b));
         assertFalse(enum_1.getAllowedValues().contains(c));
 
-        IEnumVar<Object> enum_3 = instance.newEnum(Arrays.asList(a, b));
-        IEnumVar<Object> enum_4 = instance.newEnum(Arrays.asList(b, c));
+        IACEnum<Object> enum_3 = instance.newEnum(Arrays.asList(a, b));
+        IACEnum<Object> enum_4 = instance.newEnum(Arrays.asList(b, c));
 
         instance.assertFacts(instance.not(instance.eq(enum_3, enum_4)));
 
@@ -1728,8 +1718,8 @@ public class ACNetworkTest {
     @Test
     public void testIncrementalNetwork() {
         LOG.info("incremental");
-        IIntVar int_0 = instance.newInt();
-        IIntVar int_1 = instance.newInt();
+        IACInt int_0 = instance.newInt();
+        IACInt int_1 = instance.newInt();
         instance.assertFacts(
                 instance.geq(int_0, instance.newInt("-10")),
                 instance.leq(int_0, instance.newInt("10"))

@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACReal;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IRealVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Real;
 import java.util.Arrays;
@@ -32,10 +32,10 @@ import java.util.List;
  */
 class RDiv extends RealVar implements IConstraint {
 
-    private final IRealVar v0, v1;
-    private final List<IRealVar> arguments;
+    private final IACReal v0, v1;
+    private final List<IACReal> arguments;
 
-    RDiv(ACNetwork network, IRealVar v0, IRealVar v1) {
+    RDiv(ACNetwork network, IACReal v0, IACReal v1) {
         super(network, "(/ " + (v0.isSingleton() ? v0.toString() : v0.getName()) + " " + (v1.isSingleton() ? v1.toString() : v1.getName()) + ")", Real.NEGATIVE_INFINITY, Real.POSITIVE_INFINITY);
         this.v0 = v0;
         this.v1 = v1;

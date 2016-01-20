@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACReal;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IRealVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Real;
 import java.util.ArrayList;
@@ -34,15 +34,15 @@ import java.util.stream.Collectors;
  */
 class RSum extends RealVar implements IConstraint {
 
-    private final Collection<IRealVar> vars;
-    private final List<IRealVar> arguments;
+    private final Collection<IACReal> vars;
+    private final List<IACReal> arguments;
 
-    RSum(ACNetwork network, Collection<IRealVar> vars) {
+    RSum(ACNetwork network, Collection<IACReal> vars) {
         super(network, "(+ " + vars.stream().map(var -> var.isSingleton() ? var.toString() : var.getName()).collect(Collectors.joining(" ")) + ")", Real.NEGATIVE_INFINITY, Real.POSITIVE_INFINITY);
         this.vars = vars;
         Real c_lb = Real.ZERO;
         Real c_ub = Real.ZERO;
-        for (IRealVar v : vars) {
+        for (IACReal v : vars) {
             c_lb = c_lb.add(v.getLB());
             c_ub = c_ub.add(v.getUB());
         }
@@ -64,7 +64,7 @@ class RSum extends RealVar implements IConstraint {
         Real c_ub = Real.ZERO;
         if (var != this) {
             // we update the current bounds..
-            for (IRealVar v : vars) {
+            for (IACReal v : vars) {
                 c_lb = c_lb.add(v.getLB());
                 c_ub = c_ub.add(v.getUB());
             }
@@ -72,12 +72,12 @@ class RSum extends RealVar implements IConstraint {
                 return false;
             }
         }
-        for (IRealVar v0 : vars) {
+        for (IACReal v0 : vars) {
             if (var != v0) {
                 // we update other variables bounds..
                 c_lb = lb;
                 c_ub = ub;
-                for (IRealVar v1 : vars) {
+                for (IACReal v1 : vars) {
                     if (v0 != v1) {
                         c_lb = c_lb.subtract(v1.getUB());
                         c_ub = c_ub.subtract(v1.getLB());

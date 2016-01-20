@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACInt;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IIntVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Int;
 import java.util.ArrayList;
@@ -34,14 +34,14 @@ import java.util.stream.Collectors;
  */
 class IMul extends IntVar implements IConstraint {
 
-    private final Collection<IIntVar> vars;
-    private final List<IIntVar> arguments;
+    private final Collection<IACInt> vars;
+    private final List<IACInt> arguments;
 
-    IMul(ACNetwork network, Collection<IIntVar> vars) {
+    IMul(ACNetwork network, Collection<IACInt> vars) {
         super(network, "(* " + vars.stream().map(var -> var.isSingleton() ? var.toString() : var.getName()).collect(Collectors.joining(" ")) + ")", Int.NEGATIVE_INFINITY, Int.POSITIVE_INFINITY);
         this.vars = vars;
         Int[] c_domain = new Int[]{Int.ONE, Int.ONE};
-        for (IIntVar v : vars) {
+        for (IACInt v : vars) {
             c_domain = Int.multiply(c_domain[0], c_domain[1], v.getLB(), v.getUB());
         }
         this.lb = c_domain[0];
@@ -61,18 +61,18 @@ class IMul extends IntVar implements IConstraint {
         Int[] c_domain = new Int[]{Int.ONE, Int.ONE};
         if (var != this) {
             // we update the current bounds..
-            for (IIntVar v : vars) {
+            for (IACInt v : vars) {
                 c_domain = Int.multiply(c_domain[0], c_domain[1], v.getLB(), v.getUB());
             }
             if (!intersect(c_domain[0], c_domain[1])) {
                 return false;
             }
         }
-        for (IIntVar v0 : vars) {
+        for (IACInt v0 : vars) {
             if (var != v0) {
                 // we update other variables bounds..
                 c_domain = new Int[]{lb, ub};
-                for (IIntVar v1 : vars) {
+                for (IACInt v1 : vars) {
                     if (v0 != v1) {
                         c_domain = Int.divide(c_domain[0], c_domain[1], v1.getLB(), v1.getUB());
                     }

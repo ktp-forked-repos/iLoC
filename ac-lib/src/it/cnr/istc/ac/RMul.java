@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACReal;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IRealVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Real;
 import java.util.ArrayList;
@@ -34,14 +34,14 @@ import java.util.stream.Collectors;
  */
 class RMul extends RealVar implements IConstraint {
 
-    private final Collection<IRealVar> vars;
-    private final List<IRealVar> arguments;
+    private final Collection<IACReal> vars;
+    private final List<IACReal> arguments;
 
-    RMul(ACNetwork network, Collection<IRealVar> vars) {
+    RMul(ACNetwork network, Collection<IACReal> vars) {
         super(network, "(* " + vars.stream().map(var -> var.isSingleton() ? var.toString() : var.getName()).collect(Collectors.joining(" ")) + ")", Real.NEGATIVE_INFINITY, Real.POSITIVE_INFINITY);
         this.vars = vars;
         Real[] c_domain = new Real[]{new Real("1"), new Real("1")};
-        for (IRealVar v : vars) {
+        for (IACReal v : vars) {
             c_domain = Real.multiply(c_domain[0], c_domain[1], v.getLB(), v.getUB());
         }
         this.lb = c_domain[0];
@@ -61,18 +61,18 @@ class RMul extends RealVar implements IConstraint {
         Real[] c_domain = new Real[]{new Real("1"), new Real("1")};
         if (var != this) {
             // we update the current bounds..
-            for (IRealVar v : vars) {
+            for (IACReal v : vars) {
                 c_domain = Real.multiply(c_domain[0], c_domain[1], v.getLB(), v.getUB());
             }
             if (!intersect(c_domain[0], c_domain[1])) {
                 return false;
             }
         }
-        for (IRealVar v0 : vars) {
+        for (IACReal v0 : vars) {
             if (var != v0) {
                 // we update other variables bounds..
                 c_domain = new Real[]{lb, ub};
-                for (IRealVar v1 : vars) {
+                for (IACReal v1 : vars) {
                     if (v0 != v1) {
                         c_domain = Real.divide(c_domain[0], c_domain[1], v1.getLB(), v1.getUB());
                     }

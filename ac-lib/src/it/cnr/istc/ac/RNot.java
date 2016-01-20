@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACReal;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IRealVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Real;
 import java.util.Arrays;
@@ -32,10 +32,10 @@ import java.util.List;
  */
 class RNot extends RealVar implements IConstraint {
 
-    private final IRealVar v;
-    private final List<IRealVar> arguments;
+    private final IACReal v;
+    private final List<IACReal> arguments;
 
-    RNot(ACNetwork network, IRealVar v) {
+    RNot(ACNetwork network, IACReal v) {
         super(network, "(- " + (v.isSingleton() ? v.toString() : v.getName()) + ")", Real.NEGATIVE_INFINITY, Real.POSITIVE_INFINITY);
         this.v = v;
         this.lb = Real.negate(v.getUB());

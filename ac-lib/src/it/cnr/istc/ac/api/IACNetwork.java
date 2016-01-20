@@ -24,7 +24,7 @@ import java.util.Collection;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public interface IConstraintNetwork {
+public interface IACNetwork {
 
     /**
      * Returns the number of variables.
@@ -45,7 +45,7 @@ public interface IConstraintNetwork {
      *
      * @return a new boolean variable.
      */
-    public IBoolVar newBool();
+    public IACBool newBool();
 
     /**
      * Creates and returns a new boolean variable having a {@code constant}
@@ -54,7 +54,7 @@ public interface IConstraintNetwork {
      * @param constant the constant value of the variable.
      * @return a new boolean variable.
      */
-    public IBoolVar newBool(String constant);
+    public IACBool newBool(String constant);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -64,7 +64,7 @@ public interface IConstraintNetwork {
      * @return a new boolean variable which represents the negation of the
      * {@code val} variable.
      */
-    public IBoolVar not(IBoolVar var);
+    public IACBool not(IACBool var);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -75,7 +75,7 @@ public interface IConstraintNetwork {
      * @return a new boolean variable which represents the equality of the two
      * boolean variables.
      */
-    public IBoolVar eq(IBoolVar var0, IBoolVar var1);
+    public IACBool eq(IACBool var0, IACBool var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -85,7 +85,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a boolean variable which represents the
      * propositional conjunction of the given boolean variables.
      */
-    public IBoolVar and(IBoolVar... vars);
+    public IACBool and(IACBool... vars);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -95,7 +95,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a boolean variable which represents the
      * propositional disjunction of the given boolean variables.
      */
-    public IBoolVar or(IBoolVar... vars);
+    public IACBool or(IACBool... vars);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -106,14 +106,14 @@ public interface IConstraintNetwork {
      * @return a new instance of a boolean variable which represents the
      * propositional exclusive disjunction of the given boolean variables.
      */
-    public IBoolVar xor(IBoolVar var0, IBoolVar var1);
+    public IACBool xor(IACBool var0, IACBool var1);
 
     /**
      * Creates and returns a new integer variable .
      *
      * @return a new integer variable.
      */
-    public IIntVar newInt();
+    public IACInt newInt();
 
     /**
      * Creates and returns a new integer variable having a {@code constant}.
@@ -121,7 +121,7 @@ public interface IConstraintNetwork {
      * @param constant the constant value of the variable.
      * @return a new integer variable.
      */
-    public IIntVar newInt(String constant);
+    public IACInt newInt(String constant);
 
     /**
      * Creates and returns a new instance of a numerical variable which
@@ -131,7 +131,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a numerical variable which represents the sum
      * of the given numerical variables.
      */
-    public IIntVar add(IIntVar... vars);
+    public IACInt add(IACInt... vars);
 
     /**
      * Creates and returns a new instance of a numerical variable which
@@ -142,7 +142,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a numerical variable which represents the
      * division of the given numerical variables.
      */
-    public IIntVar divide(IIntVar var0, IIntVar var1);
+    public IACInt divide(IACInt var0, IACInt var1);
 
     /**
      * Creates and returns a new instance of a numerical variable which
@@ -152,7 +152,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a numerical variable which represents the
      * product of the given numerical variables.
      */
-    public IIntVar multiply(IIntVar... vars);
+    public IACInt multiply(IACInt... vars);
 
     /**
      * Creates and returns a new instance of a numerical variable which
@@ -163,7 +163,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a numerical variable which represents the
      * subtraction of the given numerical variables.
      */
-    public IIntVar subtract(IIntVar var0, IIntVar var1);
+    public IACInt subtract(IACInt var0, IACInt var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -173,7 +173,7 @@ public interface IConstraintNetwork {
      * @return a new numeric variable which represents the negation of the
      * {@code val} variable.
      */
-    public IIntVar negate(IIntVar var);
+    public IACInt negate(IACInt var);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -184,7 +184,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar leq(IIntVar var0, IIntVar var1);
+    public IACBool leq(IACInt var0, IACInt var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -195,7 +195,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar geq(IIntVar var0, IIntVar var1);
+    public IACBool geq(IACInt var0, IACInt var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -206,7 +206,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar lt(IIntVar var0, IIntVar var1);
+    public IACBool lt(IACInt var0, IACInt var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -217,7 +217,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar gt(IIntVar var0, IIntVar var1);
+    public IACBool gt(IACInt var0, IACInt var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -228,14 +228,14 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar eq(IIntVar var0, IIntVar var1);
+    public IACBool eq(IACInt var0, IACInt var1);
 
     /**
      * Creates and returns a new real variable .
      *
      * @return a new real variable.
      */
-    public IRealVar newReal();
+    public IACReal newReal();
 
     /**
      * Creates and returns a new real variable having a {@code constant} value.
@@ -243,7 +243,7 @@ public interface IConstraintNetwork {
      * @param constant the constant value of the variable.
      * @return a new real variable.
      */
-    public IRealVar newReal(String constant);
+    public IACReal newReal(String constant);
 
     /**
      * Creates and returns a new instance of a numerical variable which
@@ -253,7 +253,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a numerical variable which represents the sum
      * of the given numerical variables.
      */
-    public IRealVar add(IRealVar... vars);
+    public IACReal add(IACReal... vars);
 
     /**
      * Creates and returns a new instance of a numerical variable which
@@ -264,7 +264,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a numerical variable which represents the
      * division of the given numerical variables.
      */
-    public IRealVar divide(IRealVar var0, IRealVar var1);
+    public IACReal divide(IACReal var0, IACReal var1);
 
     /**
      * Creates and returns a new instance of a numerical variable which
@@ -274,7 +274,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a numerical variable which represents the
      * product of the given numerical variables.
      */
-    public IRealVar multiply(IRealVar... vars);
+    public IACReal multiply(IACReal... vars);
 
     /**
      * Creates and returns a new instance of a numerical variable which
@@ -285,7 +285,7 @@ public interface IConstraintNetwork {
      * @return a new instance of a numerical variable which represents the
      * subtraction of the given numerical variables.
      */
-    public IRealVar subtract(IRealVar var0, IRealVar var1);
+    public IACReal subtract(IACReal var0, IACReal var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -295,7 +295,7 @@ public interface IConstraintNetwork {
      * @return a new numeric variable which represents the negation of the
      * {@code val} variable.
      */
-    public IRealVar negate(IRealVar var);
+    public IACReal negate(IACReal var);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -306,7 +306,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar leq(IRealVar var0, IRealVar var1);
+    public IACBool leq(IACReal var0, IACReal var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -317,7 +317,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar geq(IRealVar var0, IRealVar var1);
+    public IACBool geq(IACReal var0, IACReal var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -328,7 +328,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar lt(IRealVar var0, IRealVar var1);
+    public IACBool lt(IACReal var0, IACReal var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -339,7 +339,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar gt(IRealVar var0, IRealVar var1);
+    public IACBool gt(IACReal var0, IACReal var1);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -350,7 +350,7 @@ public interface IConstraintNetwork {
      * @return a boolean variable which represents the satisfaction of the
      * constraint.
      */
-    public IBoolVar eq(IRealVar var0, IRealVar var1);
+    public IACBool eq(IACReal var0, IACReal var1);
 
     /**
      * Casts an integer variable to a real variable .
@@ -358,7 +358,7 @@ public interface IConstraintNetwork {
      * @param var the integer variable to cast.
      * @return the casted real variable.
      */
-    public IRealVar toReal(IIntVar var);
+    public IACReal toReal(IACInt var);
 
     /**
      * Casts a real variable to an integer variable .
@@ -366,7 +366,7 @@ public interface IConstraintNetwork {
      * @param var the real variable to cast.
      * @return the casted integer variable.
      */
-    public IIntVar toInt(IRealVar var);
+    public IACInt toInt(IACReal var);
 
     /**
      * Creates and returns a new enumerative variable having the given allowed
@@ -376,7 +376,7 @@ public interface IConstraintNetwork {
      * @param vals the allowed values of the new enumerative variable.
      * @return a new enumerative variable.
      */
-    public <T> IEnumVar<T> newEnum(Collection<T> vals);
+    public <T> IACEnum<T> newEnum(Collection<T> vals);
 
     /**
      * Creates and returns a new instance of a boolean variable which represents
@@ -388,7 +388,7 @@ public interface IConstraintNetwork {
      * @return a new boolean variable which represents the equality of the two
      * enumerative variables.
      */
-    public <T> IBoolVar eq(IEnumVar<T> var0, IEnumVar<T> var1);
+    public <T> IACBool eq(IACEnum<T> var0, IACEnum<T> var1);
 
     /**
      * Adds the given variable to the propagation queue.
@@ -403,7 +403,7 @@ public interface IConstraintNetwork {
      *
      * @param facts the facts to be asserted.
      */
-    public void assertFacts(IBoolVar... facts);
+    public void assertFacts(IACBool... facts);
 
     /**
      * Checks the facts in the current constraint network and returns
@@ -412,7 +412,7 @@ public interface IConstraintNetwork {
      * @param facts the facts to be checked.
      * @return {@code false} if some inconsistency has been detected.
      */
-    public boolean checkFacts(IBoolVar... facts);
+    public boolean checkFacts(IACBool... facts);
 
     /**
      * Propagates all constraint of the constraint network returning a boolean

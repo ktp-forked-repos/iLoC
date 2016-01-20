@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACInt;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IIntVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Int;
 import java.util.ArrayList;
@@ -34,15 +34,15 @@ import java.util.stream.Collectors;
  */
 class ISum extends IntVar implements IConstraint {
 
-    private final Collection<IIntVar> vars;
-    private final List<IIntVar> arguments;
+    private final Collection<IACInt> vars;
+    private final List<IACInt> arguments;
 
-    ISum(ACNetwork network, Collection<IIntVar> vars) {
+    ISum(ACNetwork network, Collection<IACInt> vars) {
         super(network, "(+ " + vars.stream().map(var -> var.isSingleton() ? var.toString() : var.getName()).collect(Collectors.joining(" ")) + ")", Int.NEGATIVE_INFINITY, Int.POSITIVE_INFINITY);
         this.vars = vars;
         Int c_lb = Int.ZERO;
         Int c_ub = Int.ZERO;
-        for (IIntVar v : vars) {
+        for (IACInt v : vars) {
             c_lb = c_lb.add(v.getLB());
             c_ub = c_ub.add(v.getUB());
         }
@@ -64,7 +64,7 @@ class ISum extends IntVar implements IConstraint {
         Int c_ub = Int.ZERO;
         if (var != this) {
             // we update the current bounds..
-            for (IIntVar v : vars) {
+            for (IACInt v : vars) {
                 c_lb = c_lb.add(v.getLB());
                 c_ub = c_ub.add(v.getUB());
             }
@@ -72,12 +72,12 @@ class ISum extends IntVar implements IConstraint {
                 return false;
             }
         }
-        for (IIntVar v0 : vars) {
+        for (IACInt v0 : vars) {
             if (var != v0) {
                 // we update other variables bounds..
                 c_lb = lb;
                 c_ub = ub;
-                for (IIntVar v1 : vars) {
+                for (IACInt v1 : vars) {
                     if (v0 != v1) {
                         c_lb = c_lb.subtract(v1.getUB());
                         c_ub = c_ub.subtract(v1.getLB());

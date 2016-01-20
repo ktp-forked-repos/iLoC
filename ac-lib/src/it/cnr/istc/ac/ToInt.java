@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACReal;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IRealVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Int;
 import it.cnr.istc.ac.api.Real;
@@ -34,10 +34,10 @@ import java.util.List;
  */
 class ToInt extends IntVar implements IConstraint {
 
-    private final IRealVar v;
+    private final IACReal v;
     private final List<IVar> arguments;
 
-    ToInt(ACNetwork network, IRealVar v) {
+    ToInt(ACNetwork network, IACReal v) {
         super(network, "(to_int " + (v.isSingleton() ? v.toString() : v.getName()) + ")", Int.NEGATIVE_INFINITY, Int.POSITIVE_INFINITY);
         this.v = v;
         if (v.getLB().isNegativeInifinity()) {

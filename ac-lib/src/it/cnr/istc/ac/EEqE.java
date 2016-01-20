@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACEnum;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IEnumVar;
 import it.cnr.istc.ac.api.IVar;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,11 +34,11 @@ import java.util.Set;
  */
 class EEqE<T> extends BoolVar implements IConstraint {
 
-    private final IEnumVar<T> v0;
-    private final IEnumVar<T> v1;
+    private final IACEnum<T> v0;
+    private final IACEnum<T> v1;
     private final List<IVar> arguments;
 
-    EEqE(ACNetwork network, IEnumVar<T> v0, IEnumVar<T> v1) {
+    EEqE(ACNetwork network, IACEnum<T> v0, IACEnum<T> v1) {
         super(network, "(== " + (v0.isSingleton() ? v0.toString() : v0.getName()) + " " + (v1.isSingleton() ? v1.toString() : v1.getName()) + ")", Arrays.asList(Boolean.TRUE, Boolean.FALSE));
         this.v0 = v0;
         this.v1 = v1;

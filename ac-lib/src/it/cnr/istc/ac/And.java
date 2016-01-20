@@ -18,7 +18,7 @@
  */
 package it.cnr.istc.ac;
 
-import it.cnr.istc.ac.api.IBoolVar;
+import it.cnr.istc.ac.api.IACBool;
 import it.cnr.istc.ac.api.IConstraint;
 import it.cnr.istc.ac.api.IVar;
 import java.util.ArrayList;
@@ -35,10 +35,10 @@ import java.util.stream.Collectors;
  */
 class And extends BoolVar implements IConstraint {
 
-    private final Collection<IBoolVar> vars;
-    private final List<IBoolVar> arguments;
+    private final Collection<IACBool> vars;
+    private final List<IACBool> arguments;
 
-    And(ACNetwork network, Collection<IBoolVar> vars) {
+    And(ACNetwork network, Collection<IACBool> vars) {
         super(network, "(and " + vars.stream().map(var -> var.isSingleton() ? var.toString() : var.getName()).collect(Collectors.joining(" ")) + ")", Arrays.asList(Boolean.TRUE, Boolean.FALSE));
         this.vars = vars;
         this.arguments = new ArrayList<>(vars.size() + 1);
@@ -63,7 +63,7 @@ class And extends BoolVar implements IConstraint {
             } else {
                 // The constraint must be not satisfied..
                 assert c_allowed_values.contains(Boolean.FALSE);
-                Set<IBoolVar> false_or_free_vars = vars.stream().filter(v -> v.getAllowedValues().contains(Boolean.FALSE)).collect(Collectors.toSet());
+                Set<IACBool> false_or_free_vars = vars.stream().filter(v -> v.getAllowedValues().contains(Boolean.FALSE)).collect(Collectors.toSet());
                 if (false_or_free_vars.size() == 1 && !false_or_free_vars.iterator().next().remove(Boolean.TRUE)) {
                     return false;
                 }

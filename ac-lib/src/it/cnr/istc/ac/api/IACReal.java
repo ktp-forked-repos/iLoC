@@ -22,7 +22,7 @@ package it.cnr.istc.ac.api;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public interface IRealVar extends IVar {
+public interface IACReal extends IVar {
 
     /**
      * Returns the minimum value in a domain.
@@ -68,7 +68,7 @@ public interface IRealVar extends IVar {
      * @return {@code true} if this domain is intersecting with the given
      * domain.
      */
-    public default boolean isIntersecting(IRealVar var) {
+    public default boolean isIntersecting(IACReal var) {
         return getUB().geq(var.getLB()) && getLB().leq(var.getUB());
     }
 

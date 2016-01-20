@@ -18,70 +18,80 @@
  */
 package it.cnr.istc.ac.api;
 
-import java.util.Collection;
-import java.util.Set;
-
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public interface IBoolVar extends IVar {
+public interface IACInt extends IVar {
 
     /**
-     * Returns the set of current allowed values.
+     * Returns the minimum value in a domain.
      *
-     * @return the set of current allowed values.
+     * @return the smallest value present in the domain.
      */
-    public Set<Boolean> getAllowedValues();
+    public Int getLB();
+
+    /**
+     * Returns the maximum value in a domain.
+     *
+     * @return the largest value present in the domain.
+     */
+    public Int getUB();
 
     /**
      * Updates the domain of this variable by removing all the values which are
      * not allowed in the given domain returning {@code true} if the resulting
      * domain is not empty.
      *
-     * @param vals the intersection values.
+     * @param lb the lower bound with which intersection is performed.
+     * @param ub the upper bound with which intersection is performed.
      * @return {@code true} if the resulting domain is not empty.
      */
-    public boolean intersect(Collection<Boolean> vals);
+    public boolean intersect(Int lb, Int ub);
 
     /**
      * Updates the domain of this variable by removing all the values which are
-     * allowed in the given returning {@code true} if the resulting domain is
-     * not empty.
+     * allowed in the given domain returning {@code true} if the resulting
+     * domain is not empty.
      *
-     * @param vals the complement values.
+     * @param lb the lower bound with which complement is performed.
+     * @param ub the upper bound with which complement is performed.
      * @return {@code true} if the resulting domain is not empty.
      */
-    public boolean complement(Collection<Boolean> vals);
+    public boolean complement(Int lb, Int ub);
 
     /**
-     * Removes the given value and returns {@code true} if the resulting domain
-     * is not empty.
+     * Checks if the domain of this variable is intersecting with the domain of
+     * the given variable.
      *
-     * @param value the value to be removed from this boolean domain.
-     * @return {@code true} if the resulting domain is not empty.
-     */
-    public boolean remove(Boolean value);
-
-    /**
-     * Checks if this domain is intersecting with the given domain.
-     *
-     * @param domain the domain with which intersection is checked.
+     * @param var the variable with which intersection is checked.
      * @return {@code true} if this domain is intersecting with the given
      * domain.
      */
-    public default boolean isIntersecting(IBoolVar domain) {
-        Set<Boolean> allowed_values = domain.getAllowedValues();
-        return this.getAllowedValues().stream().anyMatch(v -> allowed_values.contains(v));
+    public default boolean isIntersecting(IACInt var) {
+        return getUB().geq(var.getLB()) && getLB().leq(var.getUB());
+    }
+
+    /**
+     * Checks if the domain of this variable is intersecting with the given
+     * domain.
+     *
+     * @param lb the lower bound with which intersection is checked.
+     * @param ub the upper bound with which intersection is checked.
+     * @return {@code true} if this domain is intersecting with the given
+     * domain.
+     */
+    public default boolean isIntersecting(Int lb, Int ub) {
+        return getUB().geq(lb) && getLB().leq(ub);
     }
 
     @Override
     public default boolean isSingleton() {
-        return getAllowedValues().size() == 1;
+        return getLB().eq(getUB());
     }
 
     @Override
     public default boolean isEmpty() {
-        return getAllowedValues().isEmpty();
+        return getLB().gt(getUB());
     }
 }

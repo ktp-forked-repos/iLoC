@@ -18,14 +18,14 @@
  */
 package it.cnr.istc.ac;
 
-import it.cnr.istc.ac.api.IIntVar;
+import it.cnr.istc.ac.api.IACInt;
 import it.cnr.istc.ac.api.Int;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class IntVar extends Var implements IIntVar {
+class IntVar extends Var implements IACInt {
 
     protected Int lb, ub;
 

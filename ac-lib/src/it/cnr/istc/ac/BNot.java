@@ -18,7 +18,7 @@
  */
 package it.cnr.istc.ac;
 
-import it.cnr.istc.ac.api.IBoolVar;
+import it.cnr.istc.ac.api.IACBool;
 import it.cnr.istc.ac.api.IConstraint;
 import it.cnr.istc.ac.api.IVar;
 import java.util.Arrays;
@@ -31,10 +31,10 @@ import java.util.List;
  */
 class BNot extends BoolVar implements IConstraint {
 
-    private final IBoolVar v;
-    private final List<IBoolVar> arguments;
+    private final IACBool v;
+    private final List<IACBool> arguments;
 
-    BNot(ACNetwork network, IBoolVar v) {
+    BNot(ACNetwork network, IACBool v) {
         super(network, "(! " + (v.isSingleton() ? v.toString() : v.getName()) + ")");
         assert !v.isEmpty();
         if (v.isSingleton()) {
@@ -54,7 +54,7 @@ class BNot extends BoolVar implements IConstraint {
     public boolean propagate(IVar var) {
         assert var.isSingleton();
         if (var == v) {
-            return complement(((IBoolVar) var).getAllowedValues());
+            return complement(((IACBool) var).getAllowedValues());
         } else if (var == this) {
             return v.complement(allowed_values);
         } else {

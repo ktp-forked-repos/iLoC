@@ -18,7 +18,7 @@
  */
 package it.cnr.istc.ac;
 
-import it.cnr.istc.ac.api.IBoolVar;
+import it.cnr.istc.ac.api.IACBool;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class BoolVar extends Var implements IBoolVar {
+class BoolVar extends Var implements IACBool {
 
     protected final Set<Boolean> allowed_values;
 

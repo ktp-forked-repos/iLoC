@@ -18,7 +18,7 @@
  */
 package it.cnr.istc.ac;
 
-import it.cnr.istc.ac.api.IEnumVar;
+import it.cnr.istc.ac.api.IACEnum;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class EnumVar<T> extends Var implements IEnumVar<T> {
+class EnumVar<T> extends Var implements IACEnum<T> {
 
     private final Set<T> allowed_values;
 

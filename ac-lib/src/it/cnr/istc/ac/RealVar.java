@@ -18,14 +18,14 @@
  */
 package it.cnr.istc.ac;
 
-import it.cnr.istc.ac.api.IRealVar;
+import it.cnr.istc.ac.api.IACReal;
 import it.cnr.istc.ac.api.Real;
 
 /**
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-class RealVar extends Var implements IRealVar {
+class RealVar extends Var implements IACReal {
 
     protected Real lb, ub;
 

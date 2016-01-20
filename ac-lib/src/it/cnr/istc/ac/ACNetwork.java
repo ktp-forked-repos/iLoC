@@ -18,12 +18,12 @@
  */
 package it.cnr.istc.ac;
 
-import it.cnr.istc.ac.api.IBoolVar;
+import it.cnr.istc.ac.api.IACBool;
+import it.cnr.istc.ac.api.IACEnum;
+import it.cnr.istc.ac.api.IACInt;
+import it.cnr.istc.ac.api.IACNetwork;
+import it.cnr.istc.ac.api.IACReal;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IConstraintNetwork;
-import it.cnr.istc.ac.api.IEnumVar;
-import it.cnr.istc.ac.api.IIntVar;
-import it.cnr.istc.ac.api.IRealVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Int;
 import it.cnr.istc.ac.api.Real;
@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @author Riccardo De Benedictis <riccardo.debenedictis@istc.cnr.it>
  */
-public class ACNetwork implements IConstraintNetwork {
+public class ACNetwork implements IACNetwork {
 
     private final Properties properties;
     /**
@@ -67,14 +67,14 @@ public class ACNetwork implements IConstraintNetwork {
     }
 
     @Override
-    public IBoolVar newBool() {
+    public IACBool newBool() {
         BoolVar bv = new BoolVar(this, "x" + stack.peekFirst().vars.size());
         stack.peekFirst().vars.add(bv);
         return bv;
     }
 
     @Override
-    public IBoolVar newBool(String constant) {
+    public IACBool newBool(String constant) {
         switch (constant) {
             case "true":
                 return true_constant;
@@ -86,41 +86,41 @@ public class ACNetwork implements IConstraintNetwork {
     }
 
     @Override
-    public IBoolVar not(IBoolVar var) {
+    public IACBool not(IACBool var) {
         BNot not = new BNot(this, var);
         watchConstraint(not);
         return not;
     }
 
     @Override
-    public IBoolVar eq(IBoolVar var0, IBoolVar var1) {
+    public IACBool eq(IACBool var0, IACBool var1) {
         return new BEqB(this, var0, var1);
     }
 
     @Override
-    public IBoolVar and(IBoolVar... vars) {
+    public IACBool and(IACBool... vars) {
         return new And(this, Arrays.asList(vars));
     }
 
     @Override
-    public IBoolVar or(IBoolVar... vars) {
+    public IACBool or(IACBool... vars) {
         return new Or(this, Arrays.asList(vars));
     }
 
     @Override
-    public IBoolVar xor(IBoolVar var0, IBoolVar var1) {
+    public IACBool xor(IACBool var0, IACBool var1) {
         return new XOr(this, var0, var1);
     }
 
     @Override
-    public IIntVar newInt() {
+    public IACInt newInt() {
         IntVar i = new IntVar(this, "x" + stack.peekFirst().vars.size(), Int.NEGATIVE_INFINITY, Int.POSITIVE_INFINITY);
         stack.peekFirst().vars.add(i);
         return i;
     }
 
     @Override
-    public IIntVar newInt(String constant) {
+    public IACInt newInt(String constant) {
         Int c = new Int(constant);
         IntVar i = new IntVar(this, "x" + stack.peekFirst().vars.size(), c, c);
         stack.peekFirst().vars.add(i);
@@ -128,82 +128,82 @@ public class ACNetwork implements IConstraintNetwork {
     }
 
     @Override
-    public IIntVar add(IIntVar... vars) {
+    public IACInt add(IACInt... vars) {
         ISum sum = new ISum(this, Arrays.asList(vars));
         watchConstraint(sum);
         return sum;
     }
 
     @Override
-    public IIntVar divide(IIntVar var0, IIntVar var1) {
+    public IACInt divide(IACInt var0, IACInt var1) {
         IDiv div = new IDiv(this, var0, var1);
         watchConstraint(div);
         return div;
     }
 
     @Override
-    public IIntVar multiply(IIntVar... vars) {
+    public IACInt multiply(IACInt... vars) {
         IMul mul = new IMul(this, Arrays.asList(vars));
         watchConstraint(mul);
         return mul;
     }
 
     @Override
-    public IIntVar subtract(IIntVar var0, IIntVar var1) {
+    public IACInt subtract(IACInt var0, IACInt var1) {
         ISum sub = new ISum(this, Arrays.asList(var0, negate(var1)));
         watchConstraint(sub);
         return sub;
     }
 
     @Override
-    public IIntVar negate(IIntVar var) {
+    public IACInt negate(IACInt var) {
         INot not = new INot(this, var);
         watchConstraint(not);
         return not;
     }
 
     @Override
-    public IBoolVar leq(IIntVar var0, IIntVar var1) {
-        IIntVar slack = new IntVar(this, "$(<= " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Int.NEGATIVE_INFINITY, Int.ZERO);
+    public IACBool leq(IACInt var0, IACInt var1) {
+        IACInt slack = new IntVar(this, "$(<= " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Int.NEGATIVE_INFINITY, Int.ZERO);
         IEqI leq = new IEqI(this, add(var0, negate(var1)), slack);
         return leq;
     }
 
     @Override
-    public IBoolVar geq(IIntVar var0, IIntVar var1) {
-        IIntVar slack = new IntVar(this, "$(>= " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Int.ZERO, Int.POSITIVE_INFINITY);
+    public IACBool geq(IACInt var0, IACInt var1) {
+        IACInt slack = new IntVar(this, "$(>= " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Int.ZERO, Int.POSITIVE_INFINITY);
         IEqI geq = new IEqI(this, add(var0, negate(var1)), slack);
         return geq;
     }
 
     @Override
-    public IBoolVar lt(IIntVar var0, IIntVar var1) {
-        IIntVar slack = new IntVar(this, "$(< " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Int.NEGATIVE_INFINITY, Int.negate(Int.ONE));
+    public IACBool lt(IACInt var0, IACInt var1) {
+        IACInt slack = new IntVar(this, "$(< " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Int.NEGATIVE_INFINITY, Int.negate(Int.ONE));
         IEqI lt = new IEqI(this, add(var0, negate(var1)), slack);
         return lt;
     }
 
     @Override
-    public IBoolVar gt(IIntVar var0, IIntVar var1) {
-        IIntVar slack = new IntVar(this, "$(> " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Int.ONE, Int.POSITIVE_INFINITY);
+    public IACBool gt(IACInt var0, IACInt var1) {
+        IACInt slack = new IntVar(this, "$(> " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Int.ONE, Int.POSITIVE_INFINITY);
         IEqI gt = new IEqI(this, add(var0, negate(var1)), slack);
         return gt;
     }
 
     @Override
-    public IBoolVar eq(IIntVar var0, IIntVar var1) {
+    public IACBool eq(IACInt var0, IACInt var1) {
         return new IEqI(this, var0, var1);
     }
 
     @Override
-    public IRealVar newReal() {
+    public IACReal newReal() {
         RealVar i = new RealVar(this, "x" + stack.peekFirst().vars.size(), Real.NEGATIVE_INFINITY, Real.POSITIVE_INFINITY);
         stack.peekFirst().vars.add(i);
         return i;
     }
 
     @Override
-    public IRealVar newReal(String constant) {
+    public IACReal newReal(String constant) {
         Real c = new Real(constant);
         RealVar i = new RealVar(this, "x" + stack.peekFirst().vars.size(), c, c);
         stack.peekFirst().vars.add(i);
@@ -211,96 +211,96 @@ public class ACNetwork implements IConstraintNetwork {
     }
 
     @Override
-    public IRealVar add(IRealVar... vars) {
+    public IACReal add(IACReal... vars) {
         RSum sum = new RSum(this, Arrays.asList(vars));
         watchConstraint(sum);
         return sum;
     }
 
     @Override
-    public IRealVar divide(IRealVar var0, IRealVar var1) {
+    public IACReal divide(IACReal var0, IACReal var1) {
         RDiv div = new RDiv(this, var0, var1);
         watchConstraint(div);
         return div;
     }
 
     @Override
-    public IRealVar multiply(IRealVar... vars) {
+    public IACReal multiply(IACReal... vars) {
         RMul mul = new RMul(this, Arrays.asList(vars));
         watchConstraint(mul);
         return mul;
     }
 
     @Override
-    public IRealVar subtract(IRealVar var0, IRealVar var1) {
+    public IACReal subtract(IACReal var0, IACReal var1) {
         RSum sub = new RSum(this, Arrays.asList(var0, negate(var1)));
         watchConstraint(sub);
         return sub;
     }
 
     @Override
-    public IRealVar negate(IRealVar var) {
+    public IACReal negate(IACReal var) {
         RNot not = new RNot(this, var);
         watchConstraint(not);
         return not;
     }
 
     @Override
-    public IBoolVar leq(IRealVar var0, IRealVar var1) {
-        IRealVar slack = new RealVar(this, "$(<= " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Real.NEGATIVE_INFINITY, Real.ZERO);
+    public IACBool leq(IACReal var0, IACReal var1) {
+        IACReal slack = new RealVar(this, "$(<= " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Real.NEGATIVE_INFINITY, Real.ZERO);
         REqR leq = new REqR(this, add(var0, negate(var1)), slack);
         return leq;
     }
 
     @Override
-    public IBoolVar geq(IRealVar var0, IRealVar var1) {
-        IRealVar slack = new RealVar(this, "$(>= " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Real.ZERO, Real.POSITIVE_INFINITY);
+    public IACBool geq(IACReal var0, IACReal var1) {
+        IACReal slack = new RealVar(this, "$(>= " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Real.ZERO, Real.POSITIVE_INFINITY);
         REqR geq = new REqR(this, add(var0, negate(var1)), slack);
         return geq;
     }
 
     @Override
-    public IBoolVar lt(IRealVar var0, IRealVar var1) {
-        IRealVar slack = new RealVar(this, "$(< " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Real.NEGATIVE_INFINITY, Real.ZERO);
+    public IACBool lt(IACReal var0, IACReal var1) {
+        IACReal slack = new RealVar(this, "$(< " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Real.NEGATIVE_INFINITY, Real.ZERO);
         REqR lt = new REqR(this, add(var0, negate(var1)), slack);
         return lt;
     }
 
     @Override
-    public IBoolVar gt(IRealVar var0, IRealVar var1) {
-        IRealVar slack = new RealVar(this, "$(> " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Real.ZERO, Real.POSITIVE_INFINITY);
+    public IACBool gt(IACReal var0, IACReal var1) {
+        IACReal slack = new RealVar(this, "$(> " + (var0.isSingleton() ? var0.toString() : var0.getName()) + " " + (var1.isSingleton() ? var1.toString() : var1.getName()) + ")", Real.ZERO, Real.POSITIVE_INFINITY);
         REqR gt = new REqR(this, add(var0, negate(var1)), slack);
         return gt;
     }
 
     @Override
-    public IBoolVar eq(IRealVar var0, IRealVar var1) {
+    public IACBool eq(IACReal var0, IACReal var1) {
         return new REqR(this, var0, var1);
     }
 
     @Override
-    public IRealVar toReal(IIntVar var) {
+    public IACReal toReal(IACInt var) {
         ToReal to_real = new ToReal(this, var);
         watchConstraint(to_real);
         return to_real;
     }
 
     @Override
-    public IIntVar toInt(IRealVar var) {
+    public IACInt toInt(IACReal var) {
         ToInt to_int = new ToInt(this, var);
         watchConstraint(to_int);
         return to_int;
     }
 
     @Override
-    public <T> IEnumVar<T> newEnum(Collection<T> vals) {
+    public <T> IACEnum<T> newEnum(Collection<T> vals) {
         EnumVar<T> i = new EnumVar<>(this, "x" + stack.peekFirst().vars.size(), vals);
         stack.peekFirst().vars.add(i);
         return i;
     }
 
     @Override
-    public <T> IBoolVar eq(IEnumVar<T> var0, IEnumVar<T> var1) {
+    public <T> IACBool eq(IACEnum<T> var0, IACEnum<T> var1) {
         return new EEqE<>(this, var0, var1);
     }
 
@@ -313,8 +313,8 @@ public class ACNetwork implements IConstraintNetwork {
     }
 
     @Override
-    public void assertFacts(IBoolVar... facts) {
-        for (IBoolVar fact : facts) {
+    public void assertFacts(IACBool... facts) {
+        for (IACBool fact : facts) {
             if (fact instanceof IConstraint && !(fact instanceof BNot)) {
                 watchConstraint((IConstraint) fact);
             }
@@ -340,7 +340,7 @@ public class ACNetwork implements IConstraintNetwork {
     }
 
     @Override
-    public boolean checkFacts(IBoolVar... facts) {
+    public boolean checkFacts(IACBool... facts) {
         push();
         assertFacts(facts);
         boolean propagate = propagate();

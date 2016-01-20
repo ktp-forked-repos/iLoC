@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACInt;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IIntVar;
 import it.cnr.istc.ac.api.IVar;
 import it.cnr.istc.ac.api.Int;
 import java.util.Arrays;
@@ -32,10 +32,10 @@ import java.util.List;
  */
 class IDiv extends IntVar implements IConstraint {
 
-    private final IIntVar v0, v1;
-    private final List<IIntVar> arguments;
+    private final IACInt v0, v1;
+    private final List<IACInt> arguments;
 
-    IDiv(ACNetwork network, IIntVar v0, IIntVar v1) {
+    IDiv(ACNetwork network, IACInt v0, IACInt v1) {
         super(network, "(/ " + (v0.isSingleton() ? v0.toString() : v0.getName()) + " " + (v1.isSingleton() ? v1.toString() : v1.getName()) + ")", Int.NEGATIVE_INFINITY, Int.POSITIVE_INFINITY);
         this.v0 = v0;
         this.v1 = v1;

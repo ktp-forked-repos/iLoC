@@ -18,8 +18,8 @@
  */
 package it.cnr.istc.ac;
 
+import it.cnr.istc.ac.api.IACReal;
 import it.cnr.istc.ac.api.IConstraint;
-import it.cnr.istc.ac.api.IRealVar;
 import it.cnr.istc.ac.api.IVar;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,11 +32,11 @@ import java.util.Set;
  */
 class REqR extends BoolVar implements IConstraint {
 
-    private final IRealVar v0;
-    private final IRealVar v1;
+    private final IACReal v0;
+    private final IACReal v1;
     private final List<IVar> arguments;
 
-    REqR(ACNetwork network, IRealVar v0, IRealVar v1) {
+    REqR(ACNetwork network, IACReal v0, IACReal v1) {
         super(network, "(== " + (v0.isSingleton() ? v0.toString() : v0.getName()) + " " + (v1.isSingleton() ? v1.toString() : v1.getName()) + ")", Arrays.asList(Boolean.TRUE, Boolean.FALSE));
         this.v0 = v0;
         this.v1 = v1;
