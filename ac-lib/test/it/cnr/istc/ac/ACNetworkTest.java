@@ -1713,6 +1713,56 @@ public class ACNetworkTest {
     }
 
     /**
+     * Test of eq method, of class ACNetwork.
+     */
+    @Test
+    public void testBijection_IEnumVar_IEnumVar() {
+        LOG.info("bijection");
+        String a = new String("a");
+        String b = new String("b");
+        String c = new String("c");
+        String d = new String("d");
+        String e = new String("e");
+        String f = new String("f");
+        IACEnum<Object> enum_0 = instance.newEnum(Arrays.asList(a, b, c));
+        IACEnum<Object> enum_1 = instance.newEnum(Arrays.asList(d, e, f));
+
+        IACBool eq_0 = instance.bijection(enum_0, enum_1);
+        assertNotNull(eq_0);
+
+        instance.assertFacts(eq_0);
+
+        boolean propagate = instance.propagate();
+        assertTrue(propagate);
+
+        assertTrue(enum_0.getAllowedValues().contains(a));
+        assertTrue(enum_0.getAllowedValues().contains(b));
+        assertTrue(enum_0.getAllowedValues().contains(c));
+
+        assertTrue(enum_1.getAllowedValues().contains(d));
+        assertTrue(enum_1.getAllowedValues().contains(e));
+        assertTrue(enum_1.getAllowedValues().contains(f));
+
+        IACEnum<Object> enum_2 = instance.newEnum(Arrays.asList(a));
+
+        IACBool eq_1 = instance.eq(enum_0, enum_2);
+        assertNotNull(eq_1);
+
+        instance.assertFacts(eq_1);
+
+        propagate = instance.propagate();
+        assertTrue(propagate);
+
+        assertTrue(enum_0.getAllowedValues().contains(a));
+        assertFalse(enum_0.getAllowedValues().contains(b));
+        assertFalse(enum_0.getAllowedValues().contains(c));
+
+        assertTrue(enum_1.getAllowedValues().contains(d));
+        assertFalse(enum_1.getAllowedValues().contains(e));
+        assertFalse(enum_1.getAllowedValues().contains(f));
+    }
+
+    /**
      * Test of push and pop methods, of class ACNetwork.
      */
     @Test

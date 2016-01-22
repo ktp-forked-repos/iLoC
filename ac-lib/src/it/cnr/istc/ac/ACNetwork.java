@@ -305,6 +305,11 @@ public class ACNetwork implements IACNetwork {
     }
 
     @Override
+    public <T0, T1> IACBool bijection(IACEnum<T0> var0, IACEnum<T1> var1) {
+        return new EBiE<>(this, var0, var1);
+    }
+
+    @Override
     public void enqueue(IVar var) {
         if (stack.peekFirst().watched_constraints.containsKey(var)) {
             // we add the variable to the propagation queue only if it watches constraints..

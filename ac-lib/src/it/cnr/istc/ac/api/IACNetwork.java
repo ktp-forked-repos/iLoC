@@ -391,6 +391,20 @@ public interface IACNetwork {
     public <T> IACBool eq(IACEnum<T> var0, IACEnum<T> var1);
 
     /**
+     * Creates a bijection, or one-to-one correspondence, between the elements
+     * of two sets. Every element of one set is paired with exactly one element
+     * of the other set, according to their order.
+     *
+     * @param <T0> the type of the first enumerative variables' allowed values.
+     * @param <T1> the type of the second enumerative variables' allowed values.
+     * @param var0 a first enumerative variable.
+     * @param var1 a second enumerative variable.
+     * @return a new boolean variable which represents the bijection between the
+     * two enumerative variables.
+     */
+    public <T0, T1> IACBool bijection(IACEnum<T0> var0, IACEnum<T1> var1);
+
+    /**
      * Adds the given variable to the propagation queue.
      *
      * @param var the variable to be added to the propagation queue.
